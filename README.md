@@ -23,10 +23,15 @@ The installer links individual skills under `~/.codex/skills` and
 plugins. `AGENT_SKILLS_HOME` overrides the default source checkout location.
 The normal dot Codex installer invokes the same migration.
 
-For another machine, clone this repository first, then run the command above.
+For another machine, clone the public repository first, then run migration:
+
+```bash
+git clone https://github.com/mseok/agent-skills.git ~/agent-skills
+~/dot/bin/migrate_agent_skills.sh
+```
 Without this checkout, dot can bootstrap its formerly tracked skills from its
 own local Git history, but cannot recover skills that were never committed on
-that machine. No remote has been configured automatically.
+that machine. The public source is https://github.com/mseok/agent-skills.
 
 ## Repository boundary
 
