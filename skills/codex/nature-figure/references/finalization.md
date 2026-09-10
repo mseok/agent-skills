@@ -1,0 +1,12 @@
+# Finalization checks
+
+Checks are justified here because final physical size, live text and readability are the requested product. Test the exported result once, then repeat affected checks after fixes. Do not launch scientific experiments for layout QA.
+
+1. Confirm every panel is linked to the intended input and the displayed values/units agree with that input after documented transformations. Check grouping, pairing, missingness and statistical annotations where applicable.
+2. When PDF is requested or used internally, inspect PDF page dimensions (for example pdfinfo or a PDF library) against the specification. Inspect SVG width/height units as well as viewBox. Record physical font sizes after all group/page transforms; source declarations alone are insufficient.
+3. When PDF exists, check PDF text extraction and font inventory (for example pdftotext and pdffonts): expected labels remain text, requested fonts are present/embedded, no unexpected Type 3 or substitution. Inspect special symbols separately. Text extraction does not prove perfect visual rendering; SVG text nodes do not prove downstream Figma editability.
+4. Compute effective image resolution from actual pixel dimensions and placed physical dimensions: dpi=pixels/(mm/25.4). Measure each placed raster, including enlarged crops; document low-resolution sources. Rasterizing a low-resolution image at high output dpi does not restore detail.
+5. Render the final SVG (or optional PDF) to a 600 dpi PNG proof; verify its pixel dimensions and DPI metadata, with effective resolution strictly above 300 dpi. visually inspect all panels, including edges: clipping, collisions, units, symbols, missing content, legend mappings, arrow direction, panel order, line visibility and color distinguishability. Review at final-size equivalent as well as zoomed in. If the display is uncalibrated, do not claim an exact physical on-screen scale. Enlarge or rearrange crowded content rather than shrink below the profile.
+6. For requested native Figma/PowerPoint deliverables, verify the actual destination and representative object/text editability. Retain its file/frame or slide identity. A local PDF or successful API call alone does not establish native visual QA.
+
+Report numeric/export checks, visual checks and scientific questions separately. If a required check cannot run, call the result a draft or conditionally finalized and name the precise gap. Do not call a figure submission-ready from a PNG preview alone. Retain the original and accepted versions when making a variant.

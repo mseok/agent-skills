@@ -1,0 +1,4 @@
+interface:
+  display_name: "Ivanti Daily Login"
+  short_description: "Authenticate KVPN in Chrome and verify Ivanti"
+  default_prompt: "Use $ivanti-daily-login to authenticate the KAIST KVPN portal in Chrome, hand off to Ivanti, and verify the SA connection and messi SSH path within its safety limits."
