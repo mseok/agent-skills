@@ -1,0 +1,27 @@
+{
+  "skill_name": "artifact-template-seokhyun-research",
+  "skill_directory": "/Users/mseok/.codex/skills/artifact-template-seokhyun-research",
+  "clean_template": "/Users/mseok/.codex/skills/artifact-template-seokhyun-research/assets/reference.pptx",
+  "preview": "/Users/mseok/.codex/skills/artifact-template-seokhyun-research/assets/preview.png",
+  "workspace": "/Volumes/ExternalSSD/work/projects/thesis/research-talk-template",
+  "source_inventory": "/Volumes/ExternalSSD/work/projects/thesis/research-talk-template/source-analysis/source-inventory.json",
+  "historical_reference": "/Users/mseok/.codex/skills/artifact-template-seokhyun-research/assets/source-dissertation.pptx",
+  "sources": {
+    ".pptx": {
+      "path": "/Volumes/ExternalSSD/work/projects/thesis/20260526_SeokhyunMoon_Dissertation.pptx",
+      "sha256": "3f7d64b18810bcc22d0dea57b89eeeb001a2783be63a120f8e1d0ed6104642d3"
+    },
+    ".pdf": {
+      "path": "/Volumes/ExternalSSD/work/projects/thesis/20260526_SeokhyunMoon_Dissertation.pdf",
+      "sha256": "6650826b5e9d7e6bcec08d32af5ef1499505857f329116e9d613ac567e6224fc"
+    },
+    ".key": {
+      "path": "/Volumes/ExternalSSD/work/projects/thesis/20260526_SeokhyunMoon_Dissertation.key",
+      "sha256": "82172b8cc8118d7b83c0d46ab0cf3f029e8ad23f01377c18d43fed2cbcca47be"
+    }
+  },
+  "setup_note": {
+    "namespace": "main",
+    "path": "Inbox/Agents/local/2026-09-14 연구 발표 템플릿과 Obsidian 발표 흐름 research-talk--c2fa77a0.md"
+  }
+}

@@ -3,7 +3,7 @@
 Source repository for reusable personal skills. Edit these files here; installed
 skill directories and legacy dot paths point to this checkout.
 
-- `skills/codex/`: 7 personal Codex skills, including `nature-figure`.
+- `skills/codex/`: 8 personal Codex skills, including `nature-figure` and `research-talk` (slide decks in the dissertation style; Pretendard font bundled under `assets/fonts`, installed automatically).
 - `skills/claude/`: 12 personal Claude skills.
 
 Keep the existing agent-specific grouping during migration. Shared capabilities

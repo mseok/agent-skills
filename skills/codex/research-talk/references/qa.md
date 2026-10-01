@@ -1,0 +1,44 @@
+# Meaningful verification
+
+Verify user approval of the current brief and slide order/messages before building. Discuss substantive changes; typography/fit repairs do not need a new approval.
+
+Use Presentations finalization with intended slide count, source dimensions/font policy and actual native chart/table slides. Declare each required table both in `requiredNativeTableOwnerSlides` and layout arguments `--require-native-table-slide N`. Set `RUNTIME_NODE_MODULES` from the dependency loader for the first-party import check.
+
+New charts with complete literal data may use `materializeLiteralChartWorkbooks: true`. Preserve source lineage and uncertainty. If only central values are recoverable, distinguish the new central-value plot visibly and retain the original figure. Do not invent error bars or significance.
+
+For an Artifact Tool scatter chart intended for Keynote, set the series marker's fill explicitly (for example, `marker: {symbol: 'circle', size: 9, fill: color}`), not only the series fill. A marker exported as `a:noFill` can appear in the Artifact Tool preview but disappear in Keynote while its data remains editable. Verify that the points are visible in the native export; after a compatibility correction, confirm the point coordinates and embedded worksheet cell values are unchanged.
+
+Render every final slide and inspect text fit, title/subtitle spacing, figure proportions, symbols, table structure, chart labels/units and source fidelity. Inspect PowerPoint and representative Keynote pages when available. Check native editability in a disposable copy, never in the user's latest edited deck.
+
+Check the user's explicit language choice, 1.2× multiline spacing and a single verified font family (Pretendard, installed: `scripts/ensure_font.py`) including Greek symbols, and external citations visually equivalent to Helvetica Neue 20pt (Pretendard 20pt; Apple SD Gothic Neo 20.5pt); do not confuse CSS pixels with PPT points. Inspect arrows as native arrow/connector objects, not grouped rectangle/triangle pieces. For each slide, check whether its figure actually communicates the needed relationship; reject unexplained ladders, dots and generic symbolic placeholders. Keep author citations in Latin with `et al.` in Korean. Check claim/object-level source mapping using `citations.md`: every citation marker must identify its supported content and resolve to the corresponding reference. A footer-only list does not pass. For mechanism slides, verify that molecular actors, changed states and causal transitions are visible; a static protein beside an arrow-linked paragraph does not satisfy that requirement. For reused panels, verify source, crop context and whether the presenter can explain the actual assay/readout. For generated biology illustrations, check every actor, compartment and causal arrow against the cited mechanism; preserve generation provenance and keep experimental/PDB evidence separate.
+
+For Korean decks, run `python3 scripts/check_korean_slide_copy.py /absolute/path/deck.pptx --report /absolute/path/qa/korean-copy.json`. A nonzero result must be resolved before delivery; see `korean-slide-copy.md` for scope and narrowly documented literal-source exceptions. Do not rely on visual proofreading for this language rule.
+
+Record structural checks, render review and native-app checks separately. A PDF does not prove native editing. Missing native-app verification stays unverified. PDF must match the final PPTX version and slide count. Clean templates deliberately contain placeholders; actual example decks must have no unexplained placeholders.
+
+For revisions compare untouched slides against the latest input. Deliver a new version. Confirm Obsidian recording from its bridge receipt.
+
+## Native compatibility observed on 2026-09-14
+
+PowerPoint v4 PDFs were checked across all 20 pages. Keynote import retained editable chart/table/text/shape objects, but omitted table cell borders, altered chart axis formatting/spacing, and rendered the Unicode subscript j at a different height from i in the example equation. PPTX + PowerPoint-exported PDF are authoritative. For Keynote delivery, replace Unicode subscript notation with explicitly positioned editable indices or a checked native equation and recheck. Do not call the current text equation Office Math.
+
+Run `python3 scripts/check_layout_quality.py /absolute/deck.pptx --renders /absolute/render-dir --report /absolute/qa/layout.json` with a Python that has numpy, Pillow and lxml; its density thresholds come from the dissertation deck (fill ≥ 0.22, empty rectangle ≤ 0.22 of the content band) and a closing interpretation line is required on every non-divider slide. Resolve findings before delivery; exempt only genuine dividers/covers with `--exempt`.
+
+Run `python3 scripts/check_slide_conventions.py /absolute/deck.pptx --report /absolute/qa/conventions.json`. Resolve findings before delivery. Reference numbers start at1 in first-use order, slide footers sort ascending, and linked copies are renumbered together. Diagram nodes use their own centered native text, balanced insets and no label-overlapping actors; inspect optical centering in the final native/PDF render as well.
+
+For named molecular nodes, also run `check_rendered_node_alignment.py deck.pptx --renders '/absolute/pdf-previews/slide-{slide}.png' --report /absolute/qa/optical-alignment.json` using a Python environment with Pillow and numpy. Inspect findings and record before/after corrections; manually review unsupported nodes. This check uses visible dark glyph bounds, not text-frame geometry. Small measured native inset offsets are allowed with the helper's `opticalOffsetY` metadata; verify them in the final native render.
+
+For structure evidence, inspect each residue named in the argument at actual slide scale: its colored geometry, adjacent readable name, unambiguous leader if needed, and visible contacts. A footer distance list without a locally identifiable residue is insufficient. Mechanism shape variety should distinguish actors/states consistently rather than provide decoration.
+
+The renders pattern is a Python format string: use `slide-{slide:02d}.png` when the render files are zero-padded (as `render_pptx.mjs` writes them). If a deck has no `node-label` shapes the check reports 0 nodes; inspect label centering on a zoomed crop instead of calling it checked.
+
+White or light text on a dark badge is invisible to the dark-ink alignment check; crop and measure those badges manually and record the offsets. Page numbers in the kit are static text, not slide-number fields; speaker notes and theme fonts fall back to Calibri in Artifact Tool (no theme-font API): all slide and chart runs carry the deck font explicitly.
+
+Cross-renderer check: Apple's QuickLook draws a PPTX chart only when its workbook is embedded (finalizer `materializeLiteralChartWorkbooks`), ignores per-point bar fills (the highlighted bar stays gray there; a second padded series would fix the picture but leaves fake zero cells in the editable workbook, so `barChart()` does not use one) and draws chart text smaller than the XML says. Treat a chart that is correct in Artifact Tool but missing or recolored in QuickLook as an open Keynote risk and say so.
+QuickLook also mirrors rotated zero-height lines (leaders from older decks) and shifts centered shape text right by the left inset: `leader()` now writes a bounding box + `flipV` and `box()`/`stage()` default to zero horizontal inset. For a deck built earlier, `scripts/flip_leaders.py in.pptx out.pptx` and `scripts/zero_node_insets.py in.pptx out.pptx` apply the same repairs to the exported file; compare the QuickLook render of every leader and node label with the Artifact Tool render.
+
+Run `python3 scripts/check_font_glyphs.py deck.pptx` (runtime python) before delivery; any slide character missing from the deck font is a finding. Tooling notes: macOS has no `timeout` command; the system `python3` lacks Pillow/numpy (use the runtime python); `assets/finalize.mjs` removes its stale receipt on re-run and, with `--overwrite`, replaces an existing FINAL file (otherwise write a new filename).
+
+Artifact Tool draws pictures above shapes regardless of insertion order: put a label that belongs on a figure on blank pixels, or make the PNG transparent (`python3 scripts/white_to_alpha.py in.png out.png`). `finalize.mjs --pair-ea` finds `pair_fonts.py` under `$RESEARCH_TALK_SKILL` (default `~/.codex/skills/research-talk`); set it when working from a frozen copy. `barChart(..., {axisFormat})` sets the value-axis number format.
+
+Artifact Tool gotchas: a shape-level `text.style.fontSize` set after the text overrides run-level sizes (set sizes on the runs or on the shape, not both); native chart parts live in `ppt/slides/charts/`, so any package-level font or colour rewrite must include that path (`pair_fonts.py` does).

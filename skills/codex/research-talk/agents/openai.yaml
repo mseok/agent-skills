@@ -1,0 +1,4 @@
+interface:
+  display_name: "Research Talk"
+  short_description: "연구 기록에서 발표 흐름을 함께 정하고 원본 스타일의 PPTX 초안을 제작"
+  default_prompt: "Use $research-talk to develop a research presentation storyline with me from Obsidian records, then build slides after we agree on the flow."

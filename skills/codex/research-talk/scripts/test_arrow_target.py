@@ -1,0 +1,48 @@
+#!/usr/bin/env python3
+"""check_layout_quality.py flags an arrow whose end stops beside an object but outside its vertical span (near miss), not arrows that land or float between panels."""
+import json, subprocess, sys, tempfile, unittest, zipfile
+from pathlib import Path
+
+SCRIPT = Path(__file__).resolve().parent / 'check_layout_quality.py'
+EMU = 12700
+
+
+def sp(name, x, y, w, h, prst='rect', text=''):
+    body = '<p:txBody><a:bodyPr/><a:p><a:r><a:rPr sz="3000"/><a:t>%s</a:t></a:r></a:p></p:txBody>' % text if text else ''
+    return ('<p:sp><p:nvSpPr><p:cNvPr id="1" name="%s"/><p:cNvSpPr/><p:nvPr/></p:nvSpPr><p:spPr><a:xfrm><a:off x="%d" y="%d"/><a:ext cx="%d" cy="%d"/></a:xfrm>'
+            '<a:prstGeom prst="%s"/><a:solidFill><a:srgbClr val="FFFFFF"/></a:solidFill></p:spPr>%s</p:sp>') % (name, x * EMU, y * EMU, w * EMU, h * EMU, prst, body)
+
+
+def deck(shapes):
+    ns = 'xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"'
+    slide = '<p:sld %s><p:cSld><p:spTree>%s</p:spTree></p:cSld></p:sld>' % (ns, ''.join(shapes))
+    pres = ('<p:presentation %s><p:sldMasterIdLst/><p:sldIdLst><p:sldId id="256" r:id="rId1"/></p:sldIdLst><p:sldSz cx="%d" cy="%d"/></p:presentation>' % (ns, 1920 * EMU, 1080 * EMU))
+    rels = '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slide" Target="slides/slide1.xml"/></Relationships>'
+    return pres, rels, slide
+
+
+class ArrowTargetTests(unittest.TestCase):
+    def codes(self, arrow_y):
+        shapes = [sp('node-label:left', 100, 400, 400, 200, text='left'), sp('node-label:right', 760, 400, 400, 200, text='right'),
+                  sp('arrow', 540, arrow_y, 60, 34, prst='rightArrow')]
+        pres, rels, slide = deck(shapes)
+        with tempfile.TemporaryDirectory() as td:
+            pp = Path(td, 'a.pptx')
+            with zipfile.ZipFile(pp, 'w') as z:
+                z.writestr('ppt/presentation.xml', pres)
+                z.writestr('ppt/_rels/presentation.xml.rels', rels)
+                z.writestr('ppt/slides/slide1.xml', slide)
+            from PIL import Image
+            Image.new('RGB', (192, 108), 'white').save(Path(td, 'slide-01.png'))
+            out = subprocess.run([sys.executable, str(SCRIPT), str(pp), '--renders', td], capture_output=True, text=True)
+            return [f['code'] for f in json.loads(out.stdout)['findings']]
+
+    def test_centred_arrow_has_no_arrow_finding(self):
+        self.assertNotIn('arrow-target', self.codes(483))        # inside the 400..600 span of the left box
+
+    def test_near_miss_is_flagged(self):
+        self.assertIn('arrow-target', self.codes(640))           # 40 pt below the left box's span, still beside it
+
+
+if __name__ == '__main__':
+    unittest.main()
