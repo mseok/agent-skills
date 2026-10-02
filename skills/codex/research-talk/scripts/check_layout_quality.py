@@ -132,7 +132,11 @@ def main():
                 factor = 1.0
             inner_w = q['box'][2] * factor - 16
             worst = max(wid(t_, sz) for t_, sz in q['paras'])
-            if worst > inner_w:
+            # Paragraphs may wrap (stage-card detail lines do): flag only when one word is wider than the box or the wrapped text is taller than the box.
+            import math as _m
+            longest_word = max(wid(wd, sz) for t_, sz in q['paras'] for wd in t_.split() or [''])
+            wrapped_h = sum(max(1, _m.ceil(wid(t_, sz) / inner_w)) * sz * 1.25 for t_, sz in q['paras'])
+            if longest_word > inner_w or wrapped_h > q['box'][3] - 8:
                 kind = 'ellipse' if q.get('geom') == 'ellipse' else 'box'
                 add('label-overflow', f'label "{q["paras"][0][0][:24]}" (~{int(worst)} pt) does not fit its {kind} (usable width ~{int(inner_w)} pt{", an ellipse holds text only in the chord at the text block's edge" if kind == "ellipse" else ""}): widen the node or shorten the label')
         for t in s['text_boxes']:

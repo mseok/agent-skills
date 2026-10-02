@@ -181,6 +181,29 @@ export function stage(slide,value,x,y,w,h,{active=false,size=34,bold=false,color
 export function thinArrow(slide,cx,cy,{w=40,h=24,color=C.arrow,geometry='rightArrow'}={}){return arrow(slide,cx-w/2,cy-h/2,w,h,{geometry,color});}
 // Blocked flow: a red × on the stub of an arrow (native `plus` rotated 45°; `mathMultiply` is not drawn by Apple's renderer). Attach the label to it; name 'inhibition-x'.
 export function inhibitX(slide,cx,cy,{d=54,color=C.red}={}){return slide.shapes.add({name:'inhibition-x',geometry:'plus',position:{...frame(cx-d/2,cy-d/2,d,d),rotation:45},fill:color,line:{fill:'none',width:0}});}
+// Status pill under a stage card: 'done' black outline, 'active' accent outline, 'planned' gray outline. Text 24 pt+.
+export function statusPill(slide,value,cx,y,{state='planned',w=170,h=52}={}){
+  const col=state==='active'?C.accent:state==='done'?C.ink:C.muted,line=state==='planned'?C.edge:col;
+  return box(slide,value,cx-w/2,y,w,h,{geometry:'roundRect',borderRadius:'rounded-full',line,lineWidth:state==='planned'?1.5:2.5,color:col,size:26,bold:state!=='planned',name:'status-pill:'+value});
+}
+// Flow connectors. Thin native connectors attached to the nodes (they follow when a node is moved), with a small triangle head. Prefer these to block arrows in flow charts;
+// thinArrow() stays for the dissertation's pipeline rows. Routed (elbow/curved) connectors are NOT used: Artifact Tool draws them but Apple's renderer collapses them to a straight line.
+export function link(slide,a,b,{fromSide='right',toSide='left',color=C.ink,width=3,dash=false,head='triangle',headSize='lg'}={}){
+  return slide.shapes.connect(a,b,{kind:'straight',fromSide,toSide,line:{style:dash?'dashed':'solid',fill:color,width:width*S},...(head?{tail:{type:head,width:headSize,length:headSize}}:{})});
+}
+// Small gray label centred on a link (24 pt minimum). Put it above a horizontal link, or beside a vertical one.
+export function linkLabel(slide,value,cx,cy,{w=170,size=24,color=C.muted,bold=false}={}){
+  return text(slide,value,cx-w/2,cy-Math.ceil(size*0.6),w,Math.ceil(size*1.3),size,{name:'link-label:'+value.slice(0,24),alignment:'center',color,bold,lineSpacing:1});
+}
+// Return path from the bottom of node a, down by `drop`, left/right to under node b, up into b (head on the last segment). Three straight connectors through two invisible waypoints,
+// so it renders the same everywhere. boxA/boxB = [x,y,w,h] in source points.
+export function loopBack(slide,a,b,boxA,boxB,{drop=70,color=C.accent,width=3.5,headSize='lg'}={}){
+  const yb=Math.max(boxA[1]+boxA[3],boxB[1]+boxB[3])+drop,xa=boxA[0]+boxA[2]/2,xb=boxB[0]+boxB[2]/2;
+  const wp=(x)=>slide.shapes.add({name:'waypoint',geometry:'rect',position:frame(x-1,yb-1,2,2),fill:'none',line:{fill:'none',width:0}});
+  const w1=wp(xa),w2=wp(xb);
+  const ln=(f,t,fs,ts,head)=>slide.shapes.connect(f,t,{kind:'straight',fromSide:fs,toSide:ts,line:{style:'solid',fill:color,width:width*S},...(head?{tail:{type:'triangle',width:headSize,length:headSize}}:{})});
+  return [ln(a,w1,'bottom','top',false),ln(w1,w2,xb<xa?'left':'right',xb<xa?'right':'left',false),ln(w2,b,'top','bottom',true)];
+}
 // Numbered conclusion/finding list (dissertation p.49): colored number + colored label, bold statement with red key phrase, gray support line.
 // items: [{label, text, support}]; one accent for every numeral (tone 'navy' default, 'red' allowed). Two-line statements fit up to 3 items.
 // Width estimate in pt. Pretendard advances measured from the bundled font files (em fractions, Regular/Bold): Hangul 0.864, digits 0.58/0.62, capitals 0.64/0.67,
@@ -269,13 +292,16 @@ export function credit(slide,value,{size=28}={}){return text(slide,value,1100,49
 
 // Process card in the dissertation's pipeline style (p.45): gray small-caps kicker, bold name, one detail line, all centered in one native text body.
 // Fill the box with information instead of a one-word box in empty space; size it to its text (≤ ~2.5× the text area).
-export function stageCard(slide,{kicker='',name,detail=''},x,y,w,h,{active=false,color,geometry='rect',borderRadius}={}){
-  const ink=active?C.ink:C.muted,pt=n=>n+'pt';
+// state: 'done' (light-gray fill, black outline), 'active' (white, black outline), 'planned' (white, thin gray outline, muted text); `active:true` is the old spelling of 'active'.
+// Pair with statusPill() under each card for a pipeline whose stages are at different stages of completion.
+export function stageCard(slide,{kicker='',name,detail=''},x,y,w,h,{active=false,state,color,geometry='rect',borderRadius}={}){
+  const st=state??(active?'active':'planned'),on=st!=='planned';
+  const ink=on?C.ink:C.muted,pt=n=>n+'pt';
   const paras=[];
   if(kicker)paras.push({runs:[{run:kicker.toUpperCase(),textStyle:{color:C.muted,fontSize:pt(24)}}],bulletCharacter:'',spaceBefore:0,spaceAfter:0});
   paras.push({runs:[{run:name,textStyle:{color:color??ink,bold:true,fontSize:pt(38)}}],bulletCharacter:'',spaceBefore:kicker?400:0,spaceAfter:0});
-  if(detail)paras.push({runs:[{run:detail,textStyle:{color:C.muted,fontSize:pt(28)}}],bulletCharacter:'',spaceBefore:300,spaceAfter:0});
-  const shape=slide.shapes.add({name:'node-label:'+name,geometry,position:frame(x,y,w,h),fill:'#FFFFFF',line:{fill:active?C.ink:C.edge,width:(active?3:1.5)*S},...(borderRadius?{borderRadius}:{})});
+  if(detail)detail.split('\n').forEach((ln,i)=>paras.push({runs:[{run:ln,textStyle:{color:C.muted,fontSize:pt(28)}}],bulletCharacter:'',spaceBefore:i?0:300,spaceAfter:0}));   // '\n' in detail = line break; keep each line under ~24 characters in a 380 pt card
+  const shape=slide.shapes.add({name:'node-label:'+name,geometry,position:frame(x,y,w,h),fill:st==='done'?'#F5F5F5':'#FFFFFF',line:{fill:on?C.ink:C.edge,width:(on?3:1.5)*S},...(borderRadius?{borderRadius}:{})});
   shape.text=paras;
   shape.text.style={typeface:FAMILY,lineSpacing:1,alignment:'center',verticalAlignment:'middle',autoFit:'none',insets:{left:0,right:0,top:8*S,bottom:8*S}};
   return shape;

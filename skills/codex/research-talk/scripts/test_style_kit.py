@@ -114,6 +114,28 @@ class StyleKitTests(unittest.TestCase):
         self.assertIn('name="inhibition-x"', xml)
         self.assertIn('prst="plus"', xml)
 
+    def test_flow_helpers_make_connectors_cards_and_pills(self):
+        node = str(RUNTIME / 'bin/node')
+        script = ("import {PresentationFile} from '@oai/artifact-tool';"
+                  "import {createDeck,slide,stageCard,statusPill,link,linkLabel,loopBack} from './style-kit.mjs';"
+                  "const p=createDeck();const s=slide(p,'method',{title:'T',subtitle:'s',section:'x'});"
+                  "const a=stageCard(s,{kicker:'Step',name:'A',detail:'one\\ntwo'},95,400,360,180,{state:'done'});"
+                  "const b=stageCard(s,{kicker:'Step',name:'B'},555,400,360,180,{state:'active'});"
+                  "link(s,a,b);linkLabel(s,'calls',505,430);statusPill(s,'Done',275,600,{state:'done'});"
+                  "loopBack(s,b,a,[555,400,360,180],[95,400,360,180]);"
+                  "await (await PresentationFile.exportPptx(p)).save('s.pptx');")
+        with tempfile.TemporaryDirectory() as td:
+            shutil.copy(ASSETS / 'style-kit.mjs', td)
+            os.symlink(RUNTIME / 'node_modules', Path(td) / 'node_modules')
+            Path(td, 't.mjs').write_text(script)
+            subprocess.run([node, 't.mjs'], cwd=td, check=True, capture_output=True, timeout=180)
+            with zipfile.ZipFile(Path(td) / 's.pptx') as z:
+                xml = z.read('ppt/slides/slide1.xml').decode()
+        self.assertEqual(xml.count('<p:cxnSp>'), 4)                 # link + three loopBack segments
+        self.assertIn('tailEnd', xml)
+        self.assertIn('name="status-pill:Done', xml)
+        self.assertIn('F5F5F5', xml)                                # done card fill
+
     def test_default_family_is_pretendard(self):
         node = str(RUNTIME / 'bin/node')
         script = ("import {FAMILY,REFERENCE_PT,setFamily} from './style-kit.mjs';"
