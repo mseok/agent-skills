@@ -5,6 +5,7 @@ skill directories and legacy dot paths point to this checkout.
 
 - `skills/codex/`: 8 personal Codex skills, including `nature-figure` and `research-talk` (slide decks in the dissertation style; Pretendard font bundled under `assets/fonts`, installed automatically).
 - `skills/claude/`: 12 personal Claude skills.
+- `skills/codex/verification-before-completion/`: copied unchanged from obra/superpowers at commit `8ca22db` (MIT; its `LICENSE` is kept beside the skill).
 
 Keep the existing agent-specific grouping during migration. Shared capabilities
 can be consolidated later after checking their instructions and callers.
