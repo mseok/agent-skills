@@ -38,7 +38,7 @@ async function build(destination) {
   await writePlist(path.join(contents, 'Info.plist'), {
     CFBundleIdentifier:identifier, CFBundleName:'KAIST VPN Monitor Community',
     CFBundleDisplayName:'KAIST VPN Monitor Community', CFBundleExecutable:'kaist-vpn-monitor',
-    CFBundlePackageType:'APPL', CFBundleVersion:'0.2.2', CFBundleShortVersionString:'0.2.2',
+    CFBundlePackageType:'APPL', CFBundleVersion:'0.2.3', CFBundleShortVersionString:'0.2.3',
     CFBundleIconFile:'kvpn.icns', LSMinimumSystemVersion:'13.0', LSUIElement:true,
     MonitorNodePath:process.execPath,
   });

@@ -13,7 +13,7 @@ const {randomUUID} = require('node:crypto');
 const run = promisify(execFile);
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 const {loadSettings} = require('./settings.cjs');
-const {ORIGIN, OTP_ORIGIN, originIs, allowedRequest, allowedLauncher} = require('./browser-policy.cjs');
+const {ORIGIN, OTP_ORIGIN, originIs, allowedRequest, allowedLauncher, emailFrame, portalReady} = require('./browser-policy.cjs');
 const {startVpnProxy} = require('./vpn-proxy.cjs');
 const scriptRoot = path.resolve(__dirname, '..');
 const runtime = path.join(os.homedir(), 'Library', 'Caches', 'kaist-vpn-monitor');
@@ -210,12 +210,8 @@ async function authenticate(page) {
       if (!originIs(destination, ORIGIN)) stop('unexpected_login_action');
       attempts++;
       await login.click();
-      const iframe = await page.locator('#tp_frame').elementHandle();
-      const frame = iframe && await iframe.contentFrame();
-      if (!frame) stop('unexpected_otp_origin');
+      const frame = await emailFrame(page);
       const emailMethod = frame.locator('.email .title');
-      try {await emailMethod.waitFor({state:'visible',timeout:15000});}
-      catch {stop('email_method_unavailable');}
       if (await emailMethod.count() !== 1) stop('email_method_unavailable');
       if (!originIs(page.url(), ORIGIN) || !originIs(frame.url(), OTP_ORIGIN)) stop('unexpected_otp_origin');
       const scope = {capturedAtMs:Date.now(), otpSender:loadSettings().otpSender};
@@ -275,7 +271,7 @@ async function handoff(page, launcher) {
     return delivered;
   };
   let portalLoadFailed = false;
-  try {await page.goto(ORIGIN + '/dana/user/', {waitUntil:'domcontentloaded'});}
+  try {if(!await portalReady(page))await page.goto(ORIGIN + '/dana/user/', {waitUntil:'domcontentloaded'});}
   catch {portalLoadFailed = true;}
   // The portal can launch PulseApplicationLauncher immediately during this
   // navigation, which aborts Chromium's page load. Observe and hand off that

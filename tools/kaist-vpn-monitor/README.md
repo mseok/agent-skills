@@ -37,7 +37,7 @@ ssh -o BatchMode=yes -o ConnectTimeout=10 -o ConnectionAttempts=1 lab-vpn-check 
 
 Codex에 다음 요청을 전달하면 스킬을 설치할 수 있습니다.
 
-> https://github.com/mseok/agent-skills/tree/kaist-vpn-monitor-v0.2.2/tools/kaist-vpn-monitor 의 스킬을 설치해줘.
+> https://github.com/mseok/agent-skills/tree/kaist-vpn-monitor-v0.2.3/tools/kaist-vpn-monitor 의 스킬을 설치해줘.
 
 스킬이 설치된 다음 턴에 다음처럼 요청하세요.
 
@@ -51,7 +51,7 @@ Codex에 다음 요청을 전달하면 스킬을 설치할 수 있습니다.
 
 ### 1. 소스와 의존성
 
-[공유용 소스 ZIP](https://github.com/mseok/agent-skills/releases/tag/kaist-vpn-monitor-v0.2.2)을
+[공유용 소스 ZIP](https://github.com/mseok/agent-skills/releases/tag/kaist-vpn-monitor-v0.2.3)을
 받았다면 압축을 풀고 `kaist-vpn-monitor` 폴더에서 아래의 `npm ci`부터 실행하세요.
 Git으로 받는 경우는 다음과 같습니다.
 
@@ -179,10 +179,10 @@ v0.2.2는 Gmail의 간헐적인 검색 실패와 읽기 시간 초과에 대해 
 손쉬운 사용 권한을 다시 승인해야 합니다.
 
 
-## 로고가 포함된 앱 다운로드 (v0.2.2)
+## 로고가 포함된 앱 다운로드 (v0.2.3)
 
-[GitHub Release](https://github.com/mseok/agent-skills/releases/tag/kaist-vpn-monitor-v0.2.2)의
-`kaist-vpn-monitor-v0.2.2-macos-arm64.zip`은 Apple Silicon용 앱입니다.
+[GitHub Release](https://github.com/mseok/agent-skills/releases/tag/kaist-vpn-monitor-v0.2.3)의
+`kaist-vpn-monitor-v0.2.3-macos-arm64.zip`은 Apple Silicon용 앱입니다.
 macOS 13 이상을 빌드 대상으로 하며 실제 실행 검증 환경은 macOS 26입니다.
 Homebrew Node.js 22.19 이상이 `/opt/homebrew/bin/node`에 필요합니다.
 Ivanti, Chrome, Codex CLI와 Gmail 연결 및 개인 설정·키체인 등록은 별도입니다.
@@ -196,3 +196,9 @@ macOS 차단은 사용자가 시스템 설정에서 확인하고 승인해야 �
 Gatekeeper나 손쉬운 사용 보호 설정을 명령어로 우회하지 마세요.
 
 ![KVPN logo](assets/kvpn-logo-concept-v1.png)
+
+
+v0.2.3은 로그인 중 교체되는 OTP iframe을 준비 완료 후 다시 확인하고,
+이미 준비된 신뢰 포털의 중복 이동을 생략합니다. 수정한 실행 코드로
+실제 예약 환경에서 로그인 1회·OTP·SA·SSH 복구를 확인했습니다. 최종
+설치본 재서명 후에는 macOS 손쉬운 사용을 다시 승인해야 합니다.

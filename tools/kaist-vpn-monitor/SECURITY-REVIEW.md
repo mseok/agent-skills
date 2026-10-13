@@ -115,3 +115,15 @@ receipt, request binding, native and SSH checks remain unchanged.
 The regression scenarios failed before the fix and pass afterward. The previous
 Astra High review applies to the earlier security changes; this retry patch was
 verified with targeted and existing synthetic tests, not a new Astra review.
+
+
+## v0.2.3 navigation change
+
+The email option waits through replacement of the OTP iframe, then resolves its
+current Frame and enforces both exact origins before interaction. The native
+handoff skips a duplicate navigation only at the exact trusted portal path with
+one client header; its existing section validation, origin checks and launcher
+filter remain required. Isolated Chromium fixtures reproduce the old detached
+Frame failure and confirm rejection of a foreign iframe. These changes passed
+the 35-test suite and a real scheduled-context SA/SSH recovery. They are not
+covered by the earlier independent Astra review.
