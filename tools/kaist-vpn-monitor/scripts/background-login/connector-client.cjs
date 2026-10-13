@@ -64,9 +64,9 @@ class GmailClient {
   async ready() {
     await this.tool('gmail.search_emails', {query:'"KVPN OTP number" newer_than:1d -in:spam -in:trash',max_results:1});
   }
-  async candidates(capturedAtMs) {
+  async candidates(capturedAtMs, otpSender) {
     const after = Math.floor((capturedAtMs-2000)/1000);
-    const value = await this.tool('gmail.search_emails', {query:`"KVPN OTP number" after:${after} -in:spam -in:trash`,max_results:5});
+    const value = await this.tool('gmail.search_emails', {query:`"KVPN OTP number" from:"${otpSender}" after:${after} -in:spam -in:trash`,max_results:50});
     if (!Array.isArray(value.emails)) throw new Error('gmail_response_unavailable');
     return value.emails;
   }

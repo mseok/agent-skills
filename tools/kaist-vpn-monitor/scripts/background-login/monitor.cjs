@@ -62,11 +62,12 @@ async function check() {
 async function notify(message) {
   await run('/usr/bin/osascript',['-e','on run argv\ndisplay notification (item 1 of argv) with title "KAIST VPN"\nend run',message],{timeout:10000}).catch(()=>{});
 }
-async function abortOtp() {
+async function abortOtp(requestId) {
+  if(typeof requestId!=='string')return;
   await new Promise(resolve=>{
     const socket = net.createConnection(path.join(runtime,'connector-otp.sock'));
     socket.setTimeout(2000);
-    socket.on('connect',()=>socket.end('abort\n'));
+    socket.on('connect',()=>socket.end(JSON.stringify({requestId,code:'abort'})+'\n'));
     socket.on('data',()=>{});
     socket.on('timeout',()=>socket.destroy());
     socket.on('error',()=>{});socket.on('close',resolve);
@@ -77,41 +78,50 @@ async function otpRequest() {
   while(Date.now()<deadline) {
     try {
       const value = JSON.parse(await fs.readFile(path.join(runtime,'connector-otp-request.json'),'utf8'));
-      if(Number.isSafeInteger(value.capturedAtMs)&&Number.isSafeInteger(value.expiresAtMs)&&value.expiresAtMs>Date.now())return value;
+      if(typeof value.requestId==='string'&&Number.isSafeInteger(value.capturedAtMs)&&Number.isSafeInteger(value.expiresAtMs)&&value.expiresAtMs>Date.now())return value;
     } catch(error) {if(error.code!=='ENOENT')throw new Error('otp_request_unavailable');}
     await delay(100);
   }
   throw new Error('otp_request_unavailable');
 }
-async function submit(raw,received) {
+async function submit(raw,received,request) {
+  if(typeof raw!=='string'||raw.length>1048576||Date.now()>=request.expiresAtMs)return false;
   return new Promise((resolve,reject)=>{
-    const child = spawn(node,[path.join(__dirname,'submit-connector-gmail-otp.cjs'),'--received-at-ms',String(received)],{stdio:['pipe','pipe','ignore']});
+    const child = spawn(node,[path.join(__dirname,'submit-connector-gmail-otp.cjs'),'--received-at-ms',String(received),'--request-id',request.requestId],{stdio:['pipe','pipe','ignore']});
+    const timer = setTimeout(()=>child.kill('SIGTERM'),20000);
     let output='';
     child.stdout.on('data',chunk=>{if(output.length<4096)output+=chunk;});
-    child.once('error',()=>reject(new Error('otp_submit_unavailable')));
+    child.once('error',()=>{clearTimeout(timer);reject(new Error('otp_submit_unavailable'));});
     child.stdin.on('error',()=>{});
     child.once('close',code=>{
+      clearTimeout(timer);
       let result;try{result=JSON.parse(output.trim());}catch{}
-      code===0&&result?.status==='submitted' ? resolve() : reject(new Error('otp_validation_failed'));
+      if(code===0&&result?.status==='submitted')return resolve(true);
+      if(['stale_message','stale_request','sender_mismatch','template_mismatch','email_authentication_failed','message_unavailable'].includes(result?.status))return resolve(false);
+      reject(new Error('otp_submit_unavailable'));
     });
     child.stdin.end(raw+'\n');
   });
 }
-async function bridgeOtp(client) {
-  const request = await otpRequest();
+async function bridgeOtp(client, dependencies = {}) {
+  const request = await (dependencies.request || otpRequest)();
+  const submitCandidate = dependencies.submit || submit;
   const considered = new Set();
+  try {
   while(Date.now()<request.expiresAtMs) {
-    const messages = await client.candidates(request.capturedAtMs);
+    const messages = await client.candidates(request.capturedAtMs, request.otpSender);
     for(const message of messages) {
+      if(Date.now()>=request.expiresAtMs)return;
       const received = receivedAtMs(message.email_ts);
       if(!Number.isSafeInteger(received)||received<request.capturedAtMs-2000||received>request.expiresAtMs||considered.has(message.id))continue;
       considered.add(message.id);
       let raw = await client.raw(message.id);
-      try {await submit(raw,received);return;}
+      try {if(Date.now()>=request.expiresAtMs)return;if(await submitCandidate(raw,received,request))return;}
       finally {raw='';}
     }
     await delay(Math.min(5000,Math.max(0,request.expiresAtMs-Date.now())));
   }
+  } catch(error) {error.requestId=request.requestId;throw error;}
   // The existing runner owns the three-attempt email-timeout contract.
 }
 async function recover() {
@@ -126,7 +136,7 @@ async function recover() {
         let value;try{value=JSON.parse(line);}catch{return;}
         final=safeResult(value);
         if(value.status==='authenticating'&&value.stage==='email') {
-          bridge=bridge.then(()=>bridgeOtp(client)).catch(async()=>{bridgeFailed=true;await abortOtp();});
+          bridge=bridge.then(()=>bridgeOtp(client)).catch(async error=>{bridgeFailed=true;await abortOtp(error.requestId);});
         }
       });
       child.once('error',()=>reject(new Error('runner_unavailable')));
@@ -179,4 +189,4 @@ if(require.main===module)main().catch(async()=>{
 }).finally(async()=>{
   if(lock){await lock.close();await fs.unlink(path.join(stateRoot,'monitor.lock'));}
 });
-module.exports={safeResult,bridgeOtp,receivedAtMs,canRetryConnector};
+module.exports={safeResult,bridgeOtp,submit,receivedAtMs,canRetryConnector};

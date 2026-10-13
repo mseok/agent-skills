@@ -9,16 +9,17 @@ const os = require('node:os');
 const path = require('node:path');
 const {execFile, spawn} = require('node:child_process');
 const {promisify} = require('node:util');
+const {randomUUID} = require('node:crypto');
 const run = promisify(execFile);
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 const {loadSettings} = require('./settings.cjs');
-const ORIGIN = 'https://kvpn.kaist.ac.kr';
+const {ORIGIN, OTP_ORIGIN, originIs, allowedRequest, allowedLauncher} = require('./browser-policy.cjs');
+const {startVpnProxy} = require('./vpn-proxy.cjs');
 const scriptRoot = path.resolve(__dirname, '..');
 const runtime = path.join(os.homedir(), 'Library', 'Caches', 'kaist-vpn-monitor');
-const connectorOtpMode = process.argv.includes('--connector-otp');
 const healthCheckOnly = process.argv.includes('--health-check');
 const emit = result => process.stdout.write(JSON.stringify(result) + '\n');
-let stage = 'prerequisites', attempts = 0, context, lock;
+let stage = 'prerequisites', attempts = 0, context, proxy, lock;
 function stop(reason) {const error = new Error(reason);error.safeReason = reason;throw error;}
 async function helper(name) {
   const bundled = path.resolve(scriptRoot, '..', 'bin', name);
@@ -38,6 +39,7 @@ async function waitConnectorOtp(scope) {
   const socketPath = path.join(runtime, 'connector-otp.sock');
   const requestPath = path.join(runtime, 'connector-otp-request.json');
   const expiresAtMs = Date.now() + 90000;
+  const requestId = randomUUID();
   await removePrivatePath(socketPath);
   await removePrivatePath(requestPath);
   let server;
@@ -54,15 +56,19 @@ async function waitConnectorOtp(scope) {
       server = net.createServer(client => {
         let input = '', handled = false;
         client.setEncoding('utf8');
+        client.setTimeout(2000,()=>client.destroy());
         client.on('error', () => {});
         client.on('data', chunk => {
           if (handled) return;
           input += chunk;
-          if (input.length > 32) {handled = true;client.end('rejected\n');return;}
+          if (input.length > 256) {handled = true;client.end('rejected\n');return;}
           const newline = input.indexOf('\n');
           if (newline < 0) return;
           handled = true;
-          const code = input.slice(0,newline).trim();
+          let message;
+          try {message=JSON.parse(input.slice(0,newline));} catch {client.end('rejected\n');return;}
+          if(!message||message.requestId!==requestId||Date.now()>=expiresAtMs){client.end('rejected\n');return;}
+          const code = message.code;
           if (code === 'abort') {
             client.end('aborted\n');
             const error = new Error('connector_email_unavailable');
@@ -70,7 +76,7 @@ async function waitConnectorOtp(scope) {
             finish(error);
             return;
           }
-          if (!/^\d{6}$/.test(code) || input.slice(newline + 1).trim()) {client.end('rejected\n');return;}
+          if (typeof code!=='string'||!/^\d{6}$/.test(code) || input.slice(newline + 1).trim()) {client.end('rejected\n');return;}
           client.end('accepted\n');
           finish(null,code);
         });
@@ -79,7 +85,7 @@ async function waitConnectorOtp(scope) {
       server.listen(socketPath, async () => {
         try {
           await fs.chmod(socketPath,0o600);
-          await fs.writeFile(requestPath,JSON.stringify({capturedAtMs:scope.capturedAtMs,expiresAtMs,senderHash:scope.senderHash}),{mode:0o600});
+          await fs.writeFile(requestPath,JSON.stringify({requestId,capturedAtMs:scope.capturedAtMs,expiresAtMs,otpSender:scope.otpSender}),{mode:0o600});
           await fs.chmod(requestPath,0o600);
           timer = setTimeout(() => {
             const error = new Error('connector_email_timeout');
@@ -181,46 +187,49 @@ async function waitAuthentication(page) {
   if (!['portal','download'].includes(state)) stop('authentication_not_completed');
   await page.waitForFunction(() => location.pathname === '/download/' || !!document.getElementById('1-header'), {}, {timeout:15000});
 }
-async function authenticate(page, reader) {
+async function authenticate(page) {
   for (const wait of [0,10000,30000]) {
     if (wait) await delay(wait);
     await page.goto(ORIGIN + '/', {waitUntil:'domcontentloaded'});
     if (new URL(page.url()).origin !== ORIGIN) stop('unexpected_login_origin');
     if (['portal','download'].includes(await authState(page))) return;
-    const ready = JSON.parse((await run(reader, ['--probe'])).stdout);
-    if (ready.status !== 'ready') stop('mail_unavailable');
     if (await page.getByPlaceholder('User name',{exact:true}).count() !== 1 || await page.getByPlaceholder('Password',{exact:true}).count() !== 1) stop('unexpected_login_form');
     let secret = '', receipt;
     try {
       for (const [service,placeholder] of [['username','User name'],['password','Password']]) {
+        if (!originIs(page.url(), ORIGIN)) stop('unexpected_login_origin');
         secret = (await run('/usr/bin/security', ['find-generic-password','-s','kaist-vpn-monitor.' + service,'-w'])).stdout.replace(/\n$/,'');
+        if (!originIs(page.url(), ORIGIN)) stop('unexpected_login_origin');
         await page.getByPlaceholder(placeholder,{exact:true}).fill(secret);secret = '';
       }
       const realm = await page.locator('select').evaluateAll(es => es.map(e => e.selectedOptions[0]?.textContent.trim()));
       if (!realm.includes('KAIST Members')) stop('unexpected_realm');
+      if (!originIs(page.url(), ORIGIN)) stop('unexpected_login_origin');
+      const login = page.getByRole('button',{name:'LOGIN',exact:true});
+      const destination = await login.evaluate(button => button.hasAttribute('formaction') ? button.formAction : button.form?.action || location.href);
+      if (!originIs(destination, ORIGIN)) stop('unexpected_login_action');
       attempts++;
-      await page.getByRole('button',{name:'LOGIN',exact:true}).click();
-      const frame = page.frameLocator('#tp_frame');
+      await login.click();
+      const iframe = await page.locator('#tp_frame').elementHandle();
+      const frame = iframe && await iframe.contentFrame();
+      if (!frame) stop('unexpected_otp_origin');
       const emailMethod = frame.locator('.email .title');
       try {await emailMethod.waitFor({state:'visible',timeout:15000});}
       catch {stop('email_method_unavailable');}
       if (await emailMethod.count() !== 1) stop('email_method_unavailable');
-      if (new URL(page.url()).origin !== ORIGIN || !await page.locator('#tp_frame').evaluate(e => new URL(e.src).origin === 'https://kvpnportal.kaist.ac.kr:8443')) stop('unexpected_otp_origin');
-      const scope = JSON.parse((await run(reader,['--probe'])).stdout);
-      if (scope.status !== 'ready') stop('mail_unavailable');
+      if (!originIs(page.url(), ORIGIN) || !originIs(frame.url(), OTP_ORIGIN)) stop('unexpected_otp_origin');
+      const scope = {capturedAtMs:Date.now(), otpSender:loadSettings().otpSender};
       await emailMethod.click();
       emit({status:'authenticating',stage:'email',attempts});
       try {
-        receipt = connectorOtpMode
-          ? {status:'received',code:await waitConnectorOtp(scope)}
-          : JSON.parse((await run(reader,['--wait','--since-ms',String(scope.capturedAtMs),'--sender-hash',String(scope.senderHash),'--timeout','90'],{env:{KVPN_PRIVATE_PIPE:'1'},timeout:95000,maxBuffer:8192})).stdout);
+        receipt = {status:'received',code:await waitConnectorOtp(scope)};
       } catch (error) {
-        const timedOut = connectorOtpMode ? error.safeReason === 'connector_email_timeout' : error.code === 2;
+        const timedOut = error.safeReason === 'connector_email_timeout';
         if (timedOut && attempts < 3) continue;
-        stop(timedOut ? (connectorOtpMode ? 'connector_email_timeout' : 'email_timeout') : (connectorOtpMode ? 'connector_email_unavailable' : 'mail_read_failed'));
+        stop(timedOut ? 'connector_email_timeout' : 'connector_email_unavailable');
       }
       if (receipt.status !== 'received') stop('fresh_email_unavailable');
-      if (new URL(page.url()).origin !== ORIGIN || !await page.locator('#tp_frame').evaluate(e => new URL(e.src).origin === 'https://kvpnportal.kaist.ac.kr:8443')) stop('unexpected_otp_origin');
+      if (!originIs(page.url(), ORIGIN) || frame.isDetached() || !originIs(frame.url(), OTP_ORIGIN)) stop('unexpected_otp_origin');
       try {await frame.getByRole('textbox').fill(receipt.code);} finally {receipt.code = '';}
       await frame.getByRole('button',{name:'Login',exact:true}).click();
       await waitAuthentication(page);
@@ -255,11 +264,12 @@ async function handoff(page, launcher) {
   const observe = async target => {
     const cdp = await context.newCDPSession(target);
     await cdp.send('Page.enable');
-    cdp.on('Page.frameRequestedNavigation', event => deliver(event.url));
-    cdp.on('Page.windowOpen', event => deliver(event.url));
+    const {frameTree} = await cdp.send('Page.getFrameTree');
+    cdp.on('Page.frameRequestedNavigation', event => {
+      if (allowedLauncher(event.url,target.url(),event.frameId,frameTree.frame.id)) deliver(event.url);
+    });
   };
   await step('observe', () => observe(page));
-  context.on('page', target => observe(target).catch(() => {deliveryFailed = true;}));
   const awaitDelivery = async seconds => {
     for (let i=0;i<seconds && !delivered && !deliveryFailed;i++) await delay(1000);
     return delivered;
@@ -287,6 +297,7 @@ async function handoff(page, launcher) {
 }
 async function main() {
   loadSettings();
+  if (!healthCheckOnly && !process.argv.includes('--connector-otp')) stop('use_monitor_for_recovery');
   await fs.mkdir(runtime,{recursive:true,mode:0o700});
   await fs.chmod(runtime,0o700);
   const lockPath = path.join(runtime,'run.lock');
@@ -333,16 +344,23 @@ async function main() {
     await verifySsh();emit({status:'connected',native:'SA',ssh:'ok',attempts:0,reusedConnection:true});return;
   }
   if (!nativeInactive(initial)) stop('native_state_indeterminate');
-  const reader = await helper('mail-otp');
   const launcher = await helper('open-launcher');
   const dismissTimeout = await helper('dismiss-timeout');
   stage = 'browser';
   const {chromium} = require('playwright-core');
-  context = await chromium.launchPersistentContext(path.join(runtime,'chrome-profile'),{channel:'chrome',headless:true,chromiumSandbox:true,viewport:{width:1280,height:900}});
+  proxy = await startVpnProxy();
+  context = await chromium.launchPersistentContext(path.join(runtime,'chrome-profile'),{channel:'chrome',headless:true,chromiumSandbox:true,serviceWorkers:'block',proxy:{server:proxy.url,bypass:'<-loopback>'},args:['--disable-quic'],viewport:{width:1280,height:900}});
+  await context.route('**/*', route => {
+    const request = route.request();
+    let mainNavigation;
+    try {mainNavigation = request.isNavigationRequest() && !request.frame().parentFrame();}
+    catch {return route.abort();}
+    return allowedRequest(request.url(),mainNavigation) ? route.continue() : route.abort();
+  });
   const page = context.pages()[0] || await context.newPage();page.setDefaultTimeout(15000);
   page.on('dialog', dialog => dialog.dismiss().catch(() => {}));
   stage = 'authentication';
-  await authenticate(page,reader);
+  await authenticate(page);
   await handoff(page,launcher);
   await delay(1000);
   await hideIvanti(ivantiHider);
@@ -368,5 +386,6 @@ main().catch(error => {
   emit({status:'blocked',stage,reason:error.safeReason || 'operation_failed',attempts});process.exitCode = 1;
 }).finally(async () => {
   if (context) await context.close().catch(() => {});
+  if (proxy) await proxy.close().catch(() => {});
   if (lock) {await lock.close();await fs.unlink(path.join(runtime,'run.lock'));}
 });

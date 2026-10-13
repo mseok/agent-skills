@@ -43,6 +43,8 @@ async function build(destination) {
 }
 async function main() {
   if (process.platform !== 'darwin') throw new Error('macOS is required.');
+  const [major,minor] = process.versions.node.split('.').map(Number);
+  if(major<22||(major===22&&minor<19))throw new Error('Node.js 22.19 or newer is required.');
   const args = process.argv.slice(2);
   if (args.length === 2 && args[0] === '--build') {
     await build(path.resolve(args[1]));
@@ -64,12 +66,12 @@ async function main() {
     console.log('Schedule stopped. The current VPN connection is unchanged.');
     return;
   }
-  loadSettings();
   if (args[0] === '--install') {
     await build(app);
-    console.log('App installed, schedule OFF. Grant Accessibility and Full Disk Access, then verify --check-only.');
+    console.log('App installed, schedule OFF. Grant Accessibility, configure local settings and Keychain, then verify --check-only.');
     return;
   }
+  loadSettings();
   await fs.access(binary, fs.constants.X_OK);
   await fs.mkdir(state, {recursive:true, mode:0o700});
   await fs.chmod(state, 0o700);

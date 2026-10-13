@@ -12,7 +12,10 @@ function validateSettings(value) {
   if (typeof value.codexBinary !== 'string' || !path.isAbsolute(value.codexBinary)) {
     throw new Error('Codex executable must be an absolute path.');
   }
-  return {sshTarget:value.sshTarget, codexBinary:value.codexBinary};
+  if (typeof value.otpSender !== 'string' || !/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9.-]*[a-zA-Z0-9])?\.[a-zA-Z]{2,}$/.test(value.otpSender)) {
+    throw new Error('OTP sender must be the exact mailbox from a user-verified legitimate KVPN email.');
+  }
+  return {sshTarget:value.sshTarget, codexBinary:value.codexBinary, otpSender:value.otpSender.toLowerCase()};
 }
 function loadSettings() {
   try {return validateSettings(JSON.parse(fs.readFileSync(settingsPath, 'utf8')));}

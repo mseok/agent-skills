@@ -1,0 +1,4 @@
+interface:
+  display_name: "KAIST VPN Monitor"
+  short_description: "Install and maintain the macOS KAIST VPN monitor"
+  default_prompt: "Use $kaist-vpn-monitor to install and configure KAIST VPN Monitor Community on this Mac."
