@@ -3,6 +3,10 @@
 Source repository for reusable personal skills. Edit these files here; installed
 skill directories and legacy dot paths point to this checkout.
 
+For the shareable macOS KAIST VPN automation, see
+[KAIST VPN Monitor Community](tools/kaist-vpn-monitor/README.md)
+for setup, requirements, and validation limits.
+
 - `skills/codex/`: 8 personal Codex skills, including `nature-figure` and `research-talk` (slide decks in the dissertation style; Pretendard font bundled under `assets/fonts`, installed automatically).
 - `skills/claude/`: 12 personal Claude skills.
 - `skills/codex/verification-before-completion/`: copied unchanged from obra/superpowers at commit `8ca22db` (MIT; its `LICENSE` is kept beside the skill).

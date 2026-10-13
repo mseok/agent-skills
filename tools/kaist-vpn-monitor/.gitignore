@@ -1,0 +1,8 @@
+node_modules/
+*.app/
+*.zip
+.DS_Store
+config.json
+*.log
+*.emlx
+chrome-profile/

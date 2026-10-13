@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "playwright-core": "1.63.0"
+  },
+  "private": true,
+  "name": "kaist-vpn-monitor",
+  "version": "1.0.0"
+}
