@@ -157,3 +157,10 @@ test('KVPN raw selection is whitespace invariant and rejects controls or longer 
     await assert.rejects(validateMessage(encode(await kaistFixture(body)),now,scope,{resolver}),/template_mismatch/);
   }
 });
+
+test('OTP bridge sends the same challenge expiry to every connector read',async()=>{
+ const seen=[];
+ const client={candidates:async(_captured,_sender,deadline)=>{seen.push(deadline);return [{id:'same'}];},raw:async(_id,deadline)=>{seen.push(deadline);return {raw:'synthetic',receivedAtMs:now};}};
+ await bridgeOtp(client,{request:async()=>scope,submit:async()=>true});
+ assert.deepEqual(seen,[scope.expiresAtMs,scope.expiresAtMs]);
+});

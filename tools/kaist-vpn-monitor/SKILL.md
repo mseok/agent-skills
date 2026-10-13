@@ -33,7 +33,9 @@ scheduled monitors. Do not enable a second monitor alongside an existing one.
    Never ask them to paste credentials or OTPs into chat. Do not run hidden-password
    prompts in a recorded agent terminal, read Keychain secrets for inspection, or
    handle the user's password through tool arguments.
-5. Run `node install.cjs --install`. Verify the installed bundle with
+5. Run `node install.cjs --install`. If the user already unpacked the matching
+   release app at the documented path, verify its identity/version and skip
+   rebuilding it. Do not overwrite another installed app. Verify the bundle with
    `codesign --verify --deep --strict "$HOME/Applications/KAIST VPN Monitor Community.app"`.
    Installation alone must leave scheduling off. Do not launch or foreground apps
    just to inspect installation.

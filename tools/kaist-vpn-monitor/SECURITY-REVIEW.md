@@ -1,4 +1,4 @@
-# Security review: Community 0.2.1
+# Security review and change notes: Community 0.2.2
 
 Review date: 2026-10-13. Reviewer: independent **GPT-6 Astra, High** agent.
 Scope: source, installation skill, dependency manifests, and isolated synthetic tests.
@@ -95,3 +95,23 @@ with no blocking finding. It ran 24 email/monitor/sharing tests and four extra
 cryptographic cases, including cross-signature isolation and stale t rejection.
 The implementation run passed all 26 tests including the unchanged proxy. No
 private address, message or OTP is included in these fixtures or public files.
+
+
+## v0.2.2 connector availability change
+
+A scheduled run reproduced `GmailApiError: Failed to search emails` after
+successful readiness. An identical read later succeeded under the same scheduled
+context. The old monitor immediately aborted the active OTP request and latched
+the incident. The upstream error did not expose its underlying cause, so rate
+limiting, revoked permission or a specific Google outage is not established.
+
+The client now retries only that exact search error and read RPC timeouts, with
+at most two retries after 2 and 5 seconds, within the original request deadline.
+No additional authentication or OTP request is introduced. Other tool errors,
+including explicit permission rejection, are not retried. Fixed diagnostic codes
+are recorded without provider messages, addresses or codes. Signature, sender,
+receipt, request binding, native and SSH checks remain unchanged.
+
+The regression scenarios failed before the fix and pass afterward. The previous
+Astra High review applies to the earlier security changes; this retry patch was
+verified with targeted and existing synthetic tests, not a new Astra review.

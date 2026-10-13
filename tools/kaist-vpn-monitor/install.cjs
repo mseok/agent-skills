@@ -11,6 +11,7 @@ const binary = path.join(app, 'Contents', 'MacOS', 'kaist-vpn-monitor');
 const plist = path.join(os.homedir(), 'Library', 'LaunchAgents', identifier+'.plist');
 const domain = 'gui/'+process.getuid();
 const state = path.join(os.homedir(), '.local', 'state', 'kaist-vpn-monitor');
+const swiftTarget = (process.arch === 'arm64' ? 'arm64' : 'x86_64')+'-apple-macos13.0';
 function run(command, args) {return execFileSync(command, args, {stdio:'pipe'});}
 async function writePlist(destination, value) {
   await fs.writeFile(destination, JSON.stringify(value));
@@ -24,19 +25,21 @@ async function build(destination) {
   const contents = path.join(destination, 'Contents');
   await fs.mkdir(path.join(contents, 'MacOS'), {recursive:true});
   await fs.mkdir(path.join(contents, 'Resources'), {recursive:true});
+  await fs.copyFile(path.join(__dirname, 'assets', 'kvpn.icns'), path.join(contents, 'Resources', 'kvpn.icns'));
   // npm bin symlinks must not point back outside the installed app bundle.
   await fs.cp(path.join(__dirname, 'scripts'), path.join(contents, 'Resources', 'scripts'), {recursive:true, dereference:true});
-  run('/usr/bin/swiftc', [path.join(__dirname, 'scripts/background-login/monitor-launcher.swift'), '-o', path.join(contents, 'MacOS/kaist-vpn-monitor')]);
+  run('/usr/bin/swiftc', ['-target', swiftTarget, path.join(__dirname, 'scripts/background-login/monitor-launcher.swift'), '-o', path.join(contents, 'MacOS/kaist-vpn-monitor')]);
   // Compile helpers before enabling the schedule, so recovery needs no compiler.
   const bin = path.join(contents, 'Resources', 'bin');
   await fs.mkdir(bin);
   for (const file of await fs.readdir(path.join(__dirname, 'scripts'))) {
-    if (file.endsWith('.swift')) run('/usr/bin/swiftc', [path.join(__dirname, 'scripts', file), '-o', path.join(bin, file.slice(0,-6))]);
+    if (file.endsWith('.swift')) run('/usr/bin/swiftc', ['-target', swiftTarget, path.join(__dirname, 'scripts', file), '-o', path.join(bin, file.slice(0,-6))]);
   }
   await writePlist(path.join(contents, 'Info.plist'), {
     CFBundleIdentifier:identifier, CFBundleName:'KAIST VPN Monitor Community',
     CFBundleDisplayName:'KAIST VPN Monitor Community', CFBundleExecutable:'kaist-vpn-monitor',
-    CFBundlePackageType:'APPL', CFBundleVersion:'1', LSUIElement:true,
+    CFBundlePackageType:'APPL', CFBundleVersion:'0.2.2', CFBundleShortVersionString:'0.2.2',
+    CFBundleIconFile:'kvpn.icns', LSMinimumSystemVersion:'13.0', LSUIElement:true,
     MonitorNodePath:process.execPath,
   });
   run('/usr/bin/codesign', ['--force', '--deep', '--sign', '-', destination]);

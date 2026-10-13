@@ -6,10 +6,14 @@ const {spawn} = require('node:child_process');
 const readline = require('node:readline');
 const os = require('node:os');
 const path = require('node:path');
+const delay = ms => new Promise(resolve => setTimeout(resolve,ms));
 
 function unwrap(value) {
   if (value?.result) return unwrap(value.result);
-  if (value?.isError) throw new Error('gmail_tool_failed');
+  if (value?.isError) {
+    const temporarySearchFailure = value.content?.some(item => item.type === 'text' && item.text.trim() === 'GmailApiError: Failed to search emails');
+    throw new Error(temporarySearchFailure ? 'gmail_search_temporarily_unavailable' : 'gmail_tool_failed');
+  }
   if (value?.structuredContent) return value.structuredContent;
   for (const item of value?.content || []) {
     if (item.type !== 'text') continue;
@@ -50,31 +54,46 @@ class GmailClient {
     if (!server?.tools?.['gmail.search_emails'] || !server?.tools?.['gmail.read_email']) throw new Error('gmail_tools_unavailable');
   }
   send(message) {this.process.stdin.write(JSON.stringify({jsonrpc:'2.0',...message})+'\n');}
-  call(method, params) {
+  call(method, params, timeoutMs = 30000) {
     const id = this.nextId++;
     return new Promise((resolve,reject) => {
-      const timer = setTimeout(() => {this.pending.delete(id);reject(new Error('connector_timeout'));},30000);
+      const timer = setTimeout(() => {this.pending.delete(id);reject(new Error('connector_timeout'));},timeoutMs);
       this.pending.set(id,{resolve,reject,timer});this.send({id,method,params});
     });
   }
-  async tool(tool, args) {
+  async tool(tool, args, deadlineMs = Date.now()+30000) {
     if (!['gmail.search_emails','gmail.read_email'].includes(tool)) throw new Error('tool_not_allowed');
-    return unwrap(await this.call('mcpServer/tool/call', {threadId:this.threadId,server:'codex_apps',tool,arguments:args}));
+    let failure = new Error('connector_timeout');
+    // Retry only the same read, within this challenge. Never request a new OTP
+    // or hide a permission/authentication rejection behind a retry loop.
+    for (const wait of [0,2000,5000]) {
+      if (Date.now()+wait >= deadlineMs) throw failure;
+      if (wait) await delay(wait);
+      const remaining = deadlineMs-Date.now();
+      if (remaining <= 0) throw failure;
+      try {
+        return unwrap(await this.call('mcpServer/tool/call', {threadId:this.threadId,server:'codex_apps',tool,arguments:args},Math.min(30000,remaining)));
+      } catch(error) {
+        if (error.message !== 'connector_timeout' && !(tool === 'gmail.search_emails' && error.message === 'gmail_search_temporarily_unavailable')) throw error;
+        failure = error;
+      }
+    }
+    throw failure;
   }
   async ready() {
     await this.tool('gmail.search_emails', {query:'"KVPN OTP number" newer_than:1d -in:spam -in:trash',max_results:1});
   }
-  async candidates(capturedAtMs, otpSender) {
+  async candidates(capturedAtMs, otpSender, deadlineMs) {
     const after = Math.floor((capturedAtMs-2000)/1000);
-    const value = await this.tool('gmail.search_emails', {query:`"KVPN OTP number" from:"${otpSender}" after:${after} -in:spam -in:trash`,max_results:50});
+    const value = await this.tool('gmail.search_emails', {query:`"KVPN OTP number" from:"${otpSender}" after:${after} -in:spam -in:trash`,max_results:50},deadlineMs);
     if (!Array.isArray(value.emails)) throw new Error('gmail_response_unavailable');
     return value.emails;
   }
-  async raw(id) {
-    const value = await this.tool('gmail.read_email', {message_id:id,format:'raw'});
+  async raw(id, deadlineMs) {
+    const value = await this.tool('gmail.read_email', {message_id:id,format:'raw'},deadlineMs);
     // Raw format omits internal_date on this connector. Read metadata for the
     // same immutable message; search email_ts is the unsigned sender Date.
-    const metadata = await this.tool('gmail.read_email', {message_id:id,format:'metadata'});
+    const metadata = await this.tool('gmail.read_email', {message_id:id,format:'metadata'},deadlineMs);
     const received = typeof metadata.internal_date === 'string' && /^[0-9]+$/.test(metadata.internal_date) ? Number(metadata.internal_date) : NaN;
     if (value.id !== id || metadata.id !== id || typeof value.raw !== 'string' || !Number.isSafeInteger(received) || received <= 0) return {raw:'',receivedAtMs:NaN};
     return {raw:value.raw, receivedAtMs:received};

@@ -23,6 +23,10 @@ let lock;
 function safeResult(value) {
   return Object.fromEntries(['status','stage','reason','attempts','native','ssh','reusedConnection'].filter(k=>value[k]!==undefined).map(k=>[k,value[k]]));
 }
+function connectorDetail(error) {
+  const known = ['gmail_search_temporarily_unavailable','gmail_tool_failed','gmail_response_unavailable','gmail_tools_unavailable','connector_timeout','connector_request_failed','connector_unavailable','otp_request_unavailable','otp_submit_unavailable'];
+  return known.includes(error?.message) ? error.message : 'connector_failure';
+}
 function canRetryConnector(previous, health) {
   // A connector preflight outage submits no credentials. Recheck readiness on
   // the next scheduled run, including after login, without retrying auth failures.
@@ -109,12 +113,12 @@ async function bridgeOtp(client, dependencies = {}) {
   const considered = new Set();
   try {
   while(Date.now()<request.expiresAtMs) {
-    const messages = await client.candidates(request.capturedAtMs, request.otpSender);
+    const messages = await client.candidates(request.capturedAtMs, request.otpSender, request.expiresAtMs);
     for(const message of messages) {
       if(Date.now()>=request.expiresAtMs)return;
       if(considered.has(message.id))continue;
       considered.add(message.id);
-      let {raw,receivedAtMs:received} = await client.raw(message.id);
+      let {raw,receivedAtMs:received} = await client.raw(message.id, request.expiresAtMs);
       try {
         if(Date.now()>=request.expiresAtMs)return;
         if(!Number.isSafeInteger(received)||received<request.capturedAtMs-2000||received>request.expiresAtMs)continue;
@@ -134,23 +138,26 @@ async function recover() {
     return await new Promise((resolve,reject)=>{
       const child = spawn(node,[runner,'--connector-otp'],{stdio:['ignore','pipe','ignore']});
       const lines = readline.createInterface({input:child.stdout});
-      let final, bridge=Promise.resolve(), bridgeFailed=false;
+      let final, bridge=Promise.resolve(), bridgeFailed=false, detail;
       lines.on('line',line=>{
         let value;try{value=JSON.parse(line);}catch{return;}
         final=safeResult(value);
         if(value.status==='authenticating'&&value.stage==='email') {
-          bridge=bridge.then(()=>bridgeOtp(client)).catch(async error=>{bridgeFailed=true;await abortOtp(error.requestId);});
+          bridge=bridge.then(()=>bridgeOtp(client)).catch(async error=>{bridgeFailed=true;detail=connectorDetail(error);await abortOtp(error.requestId);});
         }
       });
       child.once('error',()=>reject(new Error('runner_unavailable')));
       child.once('close',async code=>{
         await bridge;lines.close();
         if(final?.status==='connected'&&code===0)resolve(final);
-        else resolve(final?.status==='blocked' ? final : {status:'blocked',stage:'recovery',reason:bridgeFailed?'connector_email_unavailable':'runner_unavailable',attempts:final?.attempts||0});
+        else {
+          const result = final?.status==='blocked' ? final : {status:'blocked',stage:'recovery',reason:bridgeFailed?'connector_email_unavailable':'runner_unavailable',attempts:final?.attempts||0};
+          resolve(detail ? {...result,detail} : result);
+        }
       });
     });
-  } catch {
-    return {status:'blocked',stage:'connector',reason:'gmail_connector_unavailable',attempts:0};
+  } catch(error) {
+    return {status:'blocked',stage:'connector',reason:'gmail_connector_unavailable',attempts:0,detail:connectorDetail(error)};
   } finally {client.close();}
 }
 async function main() {
@@ -192,4 +199,4 @@ if(require.main===module)main().catch(async()=>{
 }).finally(async()=>{
   if(lock){await lock.close();await fs.unlink(path.join(stateRoot,'monitor.lock'));}
 });
-module.exports={safeResult,bridgeOtp,submit,receivedAtMs,canRetryConnector};
+module.exports={safeResult,bridgeOtp,submit,receivedAtMs,canRetryConnector,connectorDetail};

@@ -34,3 +34,9 @@ test('an unlatched or absent incident uses the normal monitor path', () => {
   assert.equal(canRetryConnector({...outage,needsAttention:false},inactive),false);
   assert.equal(canRetryConnector({},inactive),false);
 });
+
+test('connector diagnostics expose only fixed error codes',()=>{
+ const {connectorDetail}=require('./monitor.cjs');
+ assert.equal(connectorDetail(new Error('gmail_search_temporarily_unavailable')),'gmail_search_temporarily_unavailable');
+ assert.equal(connectorDetail(new Error('private@example.invalid 123456')),'connector_failure');
+});

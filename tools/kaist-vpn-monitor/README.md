@@ -37,7 +37,7 @@ ssh -o BatchMode=yes -o ConnectTimeout=10 -o ConnectionAttempts=1 lab-vpn-check 
 
 Codex에 다음 요청을 전달하면 스킬을 설치할 수 있습니다.
 
-> https://github.com/mseok/agent-skills/tree/kaist-vpn-monitor-v0.2.1/tools/kaist-vpn-monitor 의 스킬을 설치해줘.
+> https://github.com/mseok/agent-skills/tree/kaist-vpn-monitor-v0.2.2/tools/kaist-vpn-monitor 의 스킬을 설치해줘.
 
 스킬이 설치된 다음 턴에 다음처럼 요청하세요.
 
@@ -51,7 +51,7 @@ Codex에 다음 요청을 전달하면 스킬을 설치할 수 있습니다.
 
 ### 1. 소스와 의존성
 
-[공유용 소스 ZIP](https://github.com/mseok/agent-skills/releases/tag/kaist-vpn-monitor-v0.2.1)을
+[공유용 소스 ZIP](https://github.com/mseok/agent-skills/releases/tag/kaist-vpn-monitor-v0.2.2)을
 받았다면 압축을 풀고 `kaist-vpn-monitor` 폴더에서 아래의 `npm ci`부터 실행하세요.
 Git으로 받는 경우는 다음과 같습니다.
 
@@ -169,3 +169,30 @@ Pulse URI 내부 형식과 공급업체 바이너리의 안전성은 별도 검�
 검증했습니다. 기존 Keychain·Ivanti·Gmail 연결은 재사용했으며, 새 Mac이나
 다른 계정 전체 설치를 대신 검증한 것은 아닙니다. 새 앱 빌드는 macOS
 손쉬운 사용 권한 재승인이 필요할 수 있습니다.
+
+
+v0.2.2는 Gmail의 간헐적인 검색 실패와 읽기 시간 초과에 대해 같은 요청을
+2초·5초 간격으로 최대 두 번 재조회합니다. 진행 중인 OTP의 90초 만료
+시간을 넘기지 않으며, 새로운 OTP나 로그인을 추가로 요청하지 않습니다.
+권한 거부와 다른 오류는 즉시 중단합니다. 실패 원인은 개인정보 없는
+고정 오류 코드로 상태에 남깁니다. 업데이트 후 앱 서명이 바뀌면 macOS
+손쉬운 사용 권한을 다시 승인해야 합니다.
+
+
+## 로고가 포함된 앱 다운로드 (v0.2.2)
+
+[GitHub Release](https://github.com/mseok/agent-skills/releases/tag/kaist-vpn-monitor-v0.2.2)의
+`kaist-vpn-monitor-v0.2.2-macos-arm64.zip`은 Apple Silicon용 앱입니다.
+macOS 13 이상을 빌드 대상으로 하며 실제 실행 검증 환경은 macOS 26입니다.
+Homebrew Node.js 22.19 이상이 `/opt/homebrew/bin/node`에 필요합니다.
+Ivanti, Chrome, Codex CLI와 Gmail 연결 및 개인 설정·키체인 등록은 별도입니다.
+Intel Mac 또는 다른 Node 경로에서는 위 소스 설치 방법을 사용하세요.
+
+ZIP을 풀고 `KAIST VPN Monitor Community.app`을 `~/Applications`에 넣으세요.
+이미 이 앱을 배치했다면 설치 단계의 `node install.cjs --install`은 생략하고,
+설정·키체인·권한 승인·연결 검증 단계를 진행하세요. 자동 실행은 별도로
+켜야 합니다. 이 앱은 ad-hoc 서명이며 Apple 공증을 받지 않았습니다.
+macOS 차단은 사용자가 시스템 설정에서 확인하고 승인해야 하며,
+Gatekeeper나 손쉬운 사용 보호 설정을 명령어로 우회하지 마세요.
+
+![KVPN logo](assets/kvpn-logo-concept-v1.png)
