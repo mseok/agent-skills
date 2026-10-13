@@ -72,8 +72,12 @@ class GmailClient {
   }
   async raw(id) {
     const value = await this.tool('gmail.read_email', {message_id:id,format:'raw'});
-    if (typeof value.raw !== 'string') throw new Error('gmail_raw_unavailable');
-    return value.raw;
+    // Raw format omits internal_date on this connector. Read metadata for the
+    // same immutable message; search email_ts is the unsigned sender Date.
+    const metadata = await this.tool('gmail.read_email', {message_id:id,format:'metadata'});
+    const received = typeof metadata.internal_date === 'string' && /^[0-9]+$/.test(metadata.internal_date) ? Number(metadata.internal_date) : NaN;
+    if (value.id !== id || metadata.id !== id || typeof value.raw !== 'string' || !Number.isSafeInteger(received) || received <= 0) return {raw:'',receivedAtMs:NaN};
+    return {raw:value.raw, receivedAtMs:received};
   }
   rejectPending(reason) {
     for (const request of this.pending.values()) {clearTimeout(request.timer);request.reject(new Error(reason));}

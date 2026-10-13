@@ -1,4 +1,4 @@
-# Security review: Community 0.2.0
+# Security review: Community 0.2.1
 
 Review date: 2026-10-13. Reviewer: independent **GPT-6 Astra, High** agent.
 Scope: source, installation skill, dependency manifests, and isolated synthetic tests.
@@ -21,10 +21,15 @@ establish that none exists.
 3. **Forged From accepted:** matching From text did not authenticate an OTP email.
    Added pinned `mailauth` DKIM verification and `mailparser` MIME parsing. Require
    the exact enrolled mailbox, a valid full-body signature from its exact domain,
-   signed From and present MIME interpretation headers, no duplicate From/MIME
-   headers, no `l=` body truncation, a non-test key, and RSA keys of at least 2048 bits.
-   The verified signature timestamp must be within 120 seconds before the request
-   and the request expiry. Raw Authentication-Results headers are never trusted.
+   signed From, no duplicate From/Subject/MIME headers, no `l=` body truncation,
+   a non-test key, and RSA keys of at least 2048 bits. If t= is present, it must
+   fall within 120 seconds before the request and its expiry. Fully signed MIME
+   decoding retains its timestamp requirement. Real KVPN instead uses Subject
+   selected by the same valid signature and exactly one six-digit run in the
+   authenticated ASCII body. That branch ignores unsigned MIME interpretation.
+   Gmail metadata internal_date, read separately with the same verified message
+   ID, must fall between request minus 2 seconds and expiry. Search email_ts is
+   never used as trusted receipt time. Raw Authentication-Results headers are never trusted.
 
 The reviewer also identified conditional origin/launcher weaknesses. The patch
 checks the live OTP Frame URL, rechecks page origin around credential use, checks
@@ -44,11 +49,14 @@ by the proxy, and the proxy closes with the owned browser.
 
 ## Residual risks and compatibility
 
-- Actual KVPN messages may lack a compatible signature, timestamp, or signed MIME
-  headers, or use a delegated signing domain. Such mail is rejected. No actual
-  KVPN account login was used to prove compatibility of the new verifier.
+- Actual KVPN messages have been privately verified with full-body DKIM, signed
+  Subject, literal ASCII code and same-ID Gmail receipt metadata. Version 0.2.0
+  rejected them because t= and MIME signatures were absent. Delegated signing
+  domains and other unsupported formats still fail closed. This mail validation
+  alone is not proof of a fresh end-to-end login.
 - Freshness is not binding to a server-issued challenge. A genuine signed message
-  replayed within the permitted window may still cause wrong-code rejection.
+  from any earlier time delivered again during the permitted receipt window may
+  still cause wrong-code rejection. Signed creation time is not guaranteed.
   The VPN server remains the final OTP authority. No bypass was demonstrated.
 - Sustained mailbox flooding, DNS failure, connector changes and platform changes
   can still deny service. Candidate and signature work is bounded; availability
@@ -79,3 +87,11 @@ narrow HTTP(S) redirect boundary, not every browser transport or real KVPN flow.
 
 App build, strict ad-hoc signature verification, and the read-only initial status
 check passed. See [VALIDATION.md](VALIDATION.md) for the full scope and limits.
+
+## Actual-mail compatibility review
+
+A separate GPT-6 Astra High review approved the four-file compatibility diff
+with no blocking finding. It ran 24 email/monitor/sharing tests and four extra
+cryptographic cases, including cross-signature isolation and stale t rejection.
+The implementation run passed all 26 tests including the unchanged proxy. No
+private address, message or OTP is included in these fixtures or public files.

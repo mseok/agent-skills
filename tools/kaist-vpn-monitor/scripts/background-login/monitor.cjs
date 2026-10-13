@@ -112,11 +112,14 @@ async function bridgeOtp(client, dependencies = {}) {
     const messages = await client.candidates(request.capturedAtMs, request.otpSender);
     for(const message of messages) {
       if(Date.now()>=request.expiresAtMs)return;
-      const received = receivedAtMs(message.email_ts);
-      if(!Number.isSafeInteger(received)||received<request.capturedAtMs-2000||received>request.expiresAtMs||considered.has(message.id))continue;
+      if(considered.has(message.id))continue;
       considered.add(message.id);
-      let raw = await client.raw(message.id);
-      try {if(Date.now()>=request.expiresAtMs)return;if(await submitCandidate(raw,received,request))return;}
+      let {raw,receivedAtMs:received} = await client.raw(message.id);
+      try {
+        if(Date.now()>=request.expiresAtMs)return;
+        if(!Number.isSafeInteger(received)||received<request.capturedAtMs-2000||received>request.expiresAtMs)continue;
+        if(await submitCandidate(raw,received,request))return;
+      }
       finally {raw='';}
     }
     await delay(Math.min(5000,Math.max(0,request.expiresAtMs-Date.now())));

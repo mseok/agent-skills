@@ -38,8 +38,9 @@ scheduled monitors. Do not enable a second monitor alongside an existing one.
    Installation alone must leave scheduling off. Do not launch or foreground apps
    just to inspect installation.
 6. Explain the user-controlled Accessibility step in the README. Full Disk Access
-   and local Mail data are not required. Valid, fresh, fully signed DKIM mail is
-   required; never disable verification to accommodate an unsigned message.
+   and local Mail data are not required. Exact sender and full-body DKIM plus same-ID Gmail metadata receipt are
+   required; the signed-Subject ASCII KVPN format ignores unsigned MIME. Creation
+   freshness is not guaranteed and genuine historical-mail replay can deny service; never disable verification to accommodate an unsigned message.
    Never grant privacy permissions programmatically or modify TCC databases.
 7. After those steps, run the installed binary's `--check-only` against an already
    connected VPN. Require exact native state and SSH success. First recovery
