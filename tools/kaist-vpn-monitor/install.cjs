@@ -81,14 +81,14 @@ async function main() {
   await fs.mkdir(path.dirname(plist), {recursive:true});
   await writePlist(plist, {
     Label:identifier, AssociatedBundleIdentifiers:[identifier], ProgramArguments:[binary,'--scheduled'],
-    StartInterval:300, RunAtLoad:true, ProcessType:'Background', Nice:19,
+    StartInterval:60, RunAtLoad:true, ProcessType:'Background', Nice:19,
     LowPriorityIO:true, LowPriorityBackgroundIO:true,
     EnvironmentVariables:{PATH:[path.dirname(process.execPath),path.dirname(loadSettings().codexBinary),'/opt/homebrew/bin','/usr/local/bin','/usr/bin','/bin','/usr/sbin','/sbin'].join(':')},
     StandardOutPath:'/dev/null', StandardErrorPath:path.join(state, 'launchd-error.log'),
   });
   run('/bin/launchctl', ['enable', domain+'/'+identifier]);
   run('/bin/launchctl', ['bootstrap', domain, plist]);
-  console.log('5-minute schedule enabled, including at user login. Check --status after the first run.');
+  console.log('1-minute schedule enabled, including at user login. Check --status after the first run.');
 }
 main().catch(error => {
   console.error(error.status !== undefined ? 'Build or launchctl failed; schedule success is not confirmed.' : error.message);

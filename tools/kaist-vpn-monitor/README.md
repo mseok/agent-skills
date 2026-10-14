@@ -1,6 +1,6 @@
 # KAIST VPN Monitor Community
 
-KAIST KVPN의 공식 Ivanti 클라이언트를 5분마다 점검하고, 연결이 끊어지면 이메일 OTP로 다시 연결하는 **macOS용 실험적 자동화 도구**입니다. KAIST·Ivanti의 공식 배포물이 아닙니다.
+KAIST KVPN의 공식 Ivanti 클라이언트를 1분마다 점검하고, 연결이 끊어지면 이메일 OTP로 다시 연결하는 **macOS용 실험적 자동화 도구**입니다. KAIST·Ivanti의 공식 배포물이 아닙니다.
 
 **현재는 Mac + Codex Gmail 연결 + 검증 가능한 DKIM 서명이 있는 KVPN 메일이 필요합니다.** 앱 하나만 받아 실행하는 완제품은 아닙니다. 개인용으로 사용하던 자동화를 공유용으로 분리했으며, 공유판의 다른 사용자 계정에서 최초 로그인은 아직 검증하지 않았습니다. Windows/Linux는 지원하지 않습니다.
 
@@ -37,7 +37,7 @@ ssh -o BatchMode=yes -o ConnectTimeout=10 -o ConnectionAttempts=1 lab-vpn-check 
 
 Codex에 다음 요청을 전달하면 스킬을 설치할 수 있습니다.
 
-> https://github.com/mseok/agent-skills/tree/kaist-vpn-monitor-v0.2.3/tools/kaist-vpn-monitor 의 스킬을 설치해줘.
+> https://github.com/mseok/agent-skills/tree/kaist-vpn-monitor-v0.2.4/tools/kaist-vpn-monitor 의 스킬을 설치해줘.
 
 스킬이 설치된 다음 턴에 다음처럼 요청하세요.
 
@@ -51,7 +51,7 @@ Codex에 다음 요청을 전달하면 스킬을 설치할 수 있습니다.
 
 ### 1. 소스와 의존성
 
-[공유용 소스 ZIP](https://github.com/mseok/agent-skills/releases/tag/kaist-vpn-monitor-v0.2.3)을
+[공유용 소스 ZIP](https://github.com/mseok/agent-skills/releases/tag/kaist-vpn-monitor-v0.2.4)을
 받았다면 압축을 풀고 `kaist-vpn-monitor` 폴더에서 아래의 `npm ci`부터 실행하세요.
 Git으로 받는 경우는 다음과 같습니다.
 
@@ -106,7 +106,21 @@ node install.cjs --enable
 "$APP" --status
 ```
 
-활성화 직후와 macOS 사용자 로그인 시 실행하고, 이후 **300초마다** 점검합니다. 잠자기·로그아웃 중에는 주기 실행을 보장하지 않습니다. `--status`는 마지막 저장 기록이므로 `lastCheckedAt`을 함께 보세요. 최신 연결 점검은 `--check-only`입니다.
+활성화 직후와 macOS 사용자 로그인 시 실행하고, 이후 **60초마다** 점검합니다. 잠자기·로그아웃 중에는 주기 실행을 보장하지 않습니다. `--status`는 마지막 저장 기록이므로 `lastCheckedAt`을 함께 보세요. 최신 연결 점검은 `--check-only`입니다.
+
+### 기존 설치를 1분 주기로 바꾸기 (설치기 v0.2.4)
+
+v0.2.4는 예약 주기만 변경한 설치기 업데이트입니다. **앱 재설치·재서명이나
+접근성 재승인은 필요하지 않습니다.** 기존 v0.2.3 앱을 그대로 사용합니다.
+로그인 복구가 실행 중이지 않을 때 새 소스 폴더에서 다음을 실행하세요.
+
+```sh
+node install.cjs --disable
+node install.cjs --enable
+```
+
+이 명령은 현재 VPN 연결을 직접 끊지 않습니다. 실행 중인 점검·복구는
+중복 실행 방지로 겹치지 않으며, 기존 인증 실패 중단 정책도 유지합니다.
 
 ## 중지, 업데이트, 제거
 
@@ -135,7 +149,7 @@ Community 앱의 전체 디스크 접근 권한을 해제하세요. 새 버전�
 
 - `settings_unavailable`: `node setup.cjs`로 로컬 설정을 만드세요.
 - `accessibility_unavailable` / `native_state_unavailable`: 앱 권한과 Ivanti의 정확한 프로필·영어 상태 메뉴를 확인하세요. 알 수 없는 상태에서 무작정 비밀번호를 제출하지 않습니다.
-- `gmail_connector_unavailable`: Codex에서 Gmail 연결을 확인하세요. 인증 시도 전 발생한 일시적 연결 장애는 다음 5분 점검에서 다시 확인합니다. 이 도구는 연결이 허용되지 않은 계정에서 Gmail 접근을 우회하지 않습니다.
+- `gmail_connector_unavailable`: Codex에서 Gmail 연결을 확인하세요. 인증 시도 전 발생한 일시적 연결 장애는 다음 1분 점검에서 다시 확인합니다. 이 도구는 연결이 허용되지 않은 계정에서 Gmail 접근을 우회하지 않습니다.
 - `connector_email_timeout`: 유효한 메일을 시간 내 찾지 못했습니다. Gmail 연결, 등록한 발신 주소, 실제 메일의 DKIM·MIME 호환성을 확인하세요. 잘못된 후보는 무시하며, 검증을 우회해 OTP를 넣지 않습니다.
 - `ssh_check_failed`: VPN이 연결돼 있어도 SSH 서버·키·별칭에 문제가 있으면 실패합니다. 이 경우 재인증으로 VPN을 교체하지 않습니다.
 - 인증 실패 후에는 원인을 해결하고 `--retry`로 명시적으로 재시도하세요. 재시작을 반복해서 OTP를 계속 요청하지 마세요.
