@@ -1,0 +1,7 @@
+interface:
+  display_name: "Zotero Annotation Research"
+  short_description: "Explain and synthesize Zotero annotations"
+  default_prompt: "Use $zotero-annotation-research to review a Zotero annotation in preview mode."
+
+policy:
+  allow_implicit_invocation: true

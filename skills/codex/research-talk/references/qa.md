@@ -14,6 +14,8 @@ Check the user's explicit language choice, 1.2× multiline spacing and a single 
 
 For Korean decks, run `python3 scripts/check_korean_slide_copy.py /absolute/path/deck.pptx --report /absolute/path/qa/korean-copy.json`. A nonzero result must be resolved before delivery; see `korean-slide-copy.md` for scope and narrowly documented literal-source exceptions. Do not rely on visual proofreading for this language rule.
 
+For Mac PowerPoint delivery, check single-line labels for disabled wrapping and sufficient width, and inspect the actual target-app view when available. Record whether the font is embedded or merely named; do not infer that font substitution occurred without checking. A LibreOffice PNG/PDF pass does not establish Mac PowerPoint compatibility. The agreed fast-draft option can skip visual checks, with that limitation stated.
+
 Record structural checks, render review and native-app checks separately. A PDF does not prove native editing. Missing native-app verification stays unverified. PDF must match the final PPTX version and slide count. Clean templates deliberately contain placeholders; actual example decks must have no unexplained placeholders.
 
 For revisions compare untouched slides against the latest input. Deliver a new version. Confirm Obsidian recording from its bridge receipt.
@@ -42,3 +44,13 @@ Run `python3 scripts/check_font_glyphs.py deck.pptx` (runtime python) before del
 Artifact Tool draws pictures above shapes regardless of insertion order: put a label that belongs on a figure on blank pixels, or make the PNG transparent (`python3 scripts/white_to_alpha.py in.png out.png`). `finalize.mjs --pair-ea` finds `pair_fonts.py` under `$RESEARCH_TALK_SKILL` (default `~/.codex/skills/research-talk`); set it when working from a frozen copy. `barChart(..., {axisFormat})` sets the value-axis number format.
 
 Artifact Tool gotchas: a shape-level `text.style.fontSize` set after the text overrides run-level sizes (set sizes on the runs or on the shape, not both); native chart parts live in `ppt/slides/charts/`, so any package-level font or colour rewrite must include that path (`pair_fonts.py` does).
+
+## Mechanism sequence review
+
+Review adjacent mechanism slides together. The audience should recognize the same biological map without reconstructing actor positions, and should see which segment each cited paper establishes. Check that compartment boundaries, interventions and downstream outcomes are explicit; isolated parallel compound rows or a uniform box grid do not substitute for that scene. Review generated anatomy separately from the evidence layer, retaining prompt provenance and editable scientific annotations. A successful layout checker does not establish causal clarity or visual continuity.
+
+## Connection and legend pass (normal mode)
+
+Inspect the final figure at slide size and a close crop, then review adjacent views together. Trace each relationship from its visible source to its intended target: flag floating endpoints, inconsistent or excessive endpoint gaps, edges crossing text or unrelated objects, accidental outline intersections, and image pointers terminating in transparent margins. Check that arrowheads and inhibition bars encode the intended action and meet the target cleanly. Confirm that the legend shows the actual solid, dashed, arrow and bar samples used by the figure. Review spacing and visual hierarchy as a composition; a clean text-overlap report alone is not an aesthetic pass. Fix these issues before declaring the figure visually reviewed.
+
+Fast mode follows SKILL.md: for a requested rushed draft, this pass and full rendering may be skipped. Record “visual QA skipped for fast draft” and the checks actually performed; do not replace an omitted review with an assertion that the design passes.

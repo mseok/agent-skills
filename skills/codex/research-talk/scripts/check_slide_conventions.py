@@ -102,9 +102,9 @@ def audit(path):
                             expected_delta=2*float(optical.group(1))*12700 if optical else 0
                             if vals['lIns']!=vals['rIns'] or abs(vals['tIns']-vals['bIns']-expected_delta)>2:
                                 add(index,'node_asymmetric_insets',item,'Use balanced insets, or a declared measured optical-y offset consistent with the native insets. Optical offsets also require rendered QA.')
-                # Blank container + separate short textbox reproduces the GSK3B misalignment failure.
+                # Blank actor containers need native labels. Biological compartments intentionally contain separate actors.
                 for outer in objects:
-                    if not outer['filled'] or outer['text'] or not outer['bounds'] or outer['name'].startswith('prose:'):
+                    if not outer['filled'] or outer['text'] or not outer['bounds'] or outer['name'].startswith(('prose:', 'compartment:')):
                         continue
                     for inner in objects:
                         if inner['filled'] or not (0<len(inner['text'])<=80) or not inner['bounds']:
