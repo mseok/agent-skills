@@ -7,3 +7,6 @@ __pycache__/
 .env.*
 *.pem
 *.key
+
+# Archived skill kept local only (may contain unpublished research examples)
+archive/codex/manuscript-writing/
