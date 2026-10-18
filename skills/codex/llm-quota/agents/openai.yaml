@@ -1,0 +1,4 @@
+interface:
+  display_name: "LLM Quota"
+  short_description: "Read live Codex and Claude subscription limits"
+  default_prompt: "Use $llm-quota to check my remaining subscription allowance and reset times."

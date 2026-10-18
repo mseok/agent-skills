@@ -1,6 +1,6 @@
 ---
 name: slurm-execution-contract
-description: Plan, launch, monitor, cancel, and hand off a Slurm workload only when the user explicitly invokes `$slurm-execution-contract` or explicitly asks to submit, monitor, cancel, replace, scale, or diagnose a Slurm job. Do not use for routine debugging, short tests, metadata inspection, or proxy measurements.
+description: Plan, submit, modify, monitor, cancel and hand off result-producing Slurm jobs (sbatch, scontrol update, scancel), including jobs submitted inside an already authorized task and campaigns of array jobs. Use whenever a scheduler job is launched or watched; not for squeue or sacct reads alone or short debugging inside an existing allocation.
 ---
 
 # Slurm Execution Contract
@@ -41,8 +41,10 @@ Disable runtime compilation, such as `torch.compile`, for debugging and short te
 
 State the requested and actual values for:
 
-- nodes; GPUs per node; total GPUs; CPUs per task; partition; time limit
+- purpose; input subset; nodes; GPUs per node; total GPUs; CPUs per task; CPU and memory budget; concurrency; partition; time limit; output location; stop condition
 - array/chunk layout; checkpoint; commit; config; split; batch size; world size; seed
+
+Preserve the user's resource semantics and request only what the workload supports.
 
 Make availability claims only from fresh, scoped scheduler evidence. Query the relevant job IDs and nodes with `squeue`, `sacct`, `scontrol`, or cluster-native equivalents; do not infer availability from an earlier observation or an apparently idle GPU.
 
@@ -61,3 +63,32 @@ Cancel or replace only the exact job IDs explicitly authorized by the user. Veri
 Before interpreting a comparison, verify checkpoint, commit, config, data split, batch size, world size, and seed. State every mismatch before drawing conclusions.
 
 Finish with the final job state, resource shape, lineage, validation result, and any pending or failed work. If validation was run and failed, state whether the failure is environmental, pre-existing, or unresolved; never describe it as passed.
+
+## Progress is measured on outputs, not queue state
+
+- Before reporting array or campaign progress, open at least one completed task's output artifact; "running" from `squeue` is not progress. A stage with zero outputs after its first expected completion is a failure to report immediately.
+- Smoke tests use real-sized inputs for at least one task (a toy subset hides timeouts and memory faults).
+- Transfers are resumable (`rsync --partial`, chunked downloads); a self-imposed cap never discards partial data.
+
+## Polling without hand-written sleeps
+
+Use a monitor loop (the harness Monitor tool, or `scripts/poll_jobs.sh JOBID… --interval SECONDS`) instead of repeated `sleep` calls. State the cadence once: about a quarter of the expected duration, never below 30 minutes for multi-hour jobs, back off while unchanged. A notification turn with no change says nothing.
+
+## Outputs in shared storage
+
+Any run whose outputs land in shared storage uses allocation-local staging and atomic publication with one writer per artifact; there is no small-run exemption. Keep results in the established artifact root; a source edit does not update submitted jobs.
+
+## Site conventions
+
+Read the target host's `~/.codex/host-context.md` for partition names, per-GPU CPU allowance, array caps, nice values, controller-allowed actions and staging roots; those norms override the defaults in this skill. When a convention is confirmed in a session and missing there, append it to host-context in the same turn.
+
+## Cancellation and reuse
+
+- Cancelling or replacing a running job, or any job you did not submit in the current task, needs the user's explicit authorization for that job ID. A pending job you submitted in this task that can no longer run, or that your own fix supersedes, may be cancelled and resubmitted within the same resource envelope; name both job IDs in your next message.
+- Derive new job scripts from the last verified launch script recorded in the task state, which also lists environment failures with their fixes; do not rewrite launch scripts from memory.
+- Label every reported table with checkpoint, evaluator version and cohort size; confirm from the evaluator's documentation or code what a metric scores before naming it in a claim.
+
+## Verified additions (2026-10-17 audit)
+
+- A load cap you chose yourself (connections, threads, CPUs) is a default, not a site rule: when the measured rate puts the ETA past the time limit, report the rate and ETA and raise the cap within host-context norms before extending the limit.
+- Before the final report, list your own pending and running jobs; cancel pending ones the task no longer needs and name the IDs, and end with one yes/no question for running ones. When the user's result depends on a job, start the watcher (`scripts/poll_jobs.sh`, or `sbatch --wait` for a single job) at submission, and run a one-minute environment-only check on the target partition first.

@@ -1,0 +1,13 @@
+{
+  "dependencies": {
+    "mailauth": "7.3.0",
+    "mailparser": "3.9.38",
+    "playwright-core": "1.63.0"
+  },
+  "private": true,
+  "name": "kaist-vpn-monitor",
+  "version": "0.2.0",
+  "engines": {
+    "node": ">=22.19.0"
+  }
+}

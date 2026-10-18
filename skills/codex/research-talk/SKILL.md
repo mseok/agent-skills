@@ -1,6 +1,6 @@
 ---
 name: research-talk
-description: Develop research presentation storylines collaboratively from Obsidian experiment records, then create or revise editable PPTX and PDF slides in Seokhyun Moon's dissertation style after the user approves the flow. Use for research talks, lab meetings, seminars and defenses; not manuscript rewriting or automatic experiment reporting.
+description: Develop a research presentation storyline collaboratively, then create, rebuild or edit editable PPTX and PDF slides in Seokhyun Moon's dissertation style after the user approves the flow, with a claim-by-claim fact-check gate before delivery. Use whenever the user asks for 발표자료, 슬라이드, a deck or a presentation from existing results or records, including informal decks and edits of an existing deck, on any host or harness; not manuscript rewriting or automatic experiment reporting.
 ---
 
 # Research Talk
@@ -52,3 +52,23 @@ After discussion: “이 흐름으로 확정하자. 슬라이드를 만들어 �
 ## Fresh-context rebuild and skill evaluation
 
 When the user explicitly asks to rebuild from a fresh context, use the approved content brief and raw evidence with the clean template, not the previous deck or its builder. This is a new build, not a revision of the old layout. Preserve the old outputs. For an explicitly requested fresh-context skill evaluation, follow `references/fresh-context-evaluation.md`; assess the independently produced artifact before changing the skill based on observed failures.
+
+## Harness-neutral storyline, approval and gates
+
+The storyline, the approval step and the gates below apply in every harness and on every host (Codex desktop, Claude Code, T3 Code, the lab server). Only the production step differs: the Codex Presentations plugin with the registered template on the Mac; the `pptx` skill or `python-pptx` with the clean reference deck copied locally elsewhere. If the template or design-system artifact is unreachable in the current harness, say so once and build with a local copy; never skip the approval step because a tool is missing.
+
+- Fact-check gate before delivery: extract every number, named comparison, citation and claim from the slides into a checklist, map each to its source (paper section, figure, record, data file), and mark unresolved items. The deck is not ready while any item is unresolved; say so in the first line of the delivery. Format checks (fonts, Korean endings, layout) never count as content verification.
+- Completion list: each requested slide or change is reported as done or blocked; unfinished work is named as blocked, never offered as a "follow-up suggestion". A rebuild request ("skill 업데이트해서 다시 만들어") means a fresh build from the storyline, not a patch of the old deck; a figure that could not be fetched is reported, not silently kept.
+- Content: existing evidence only; no new experiments or analyses designed for a talk unless asked. Editable native objects only (no pasted images of text or charts, no generated-image biology), house theme, no AI-template headers or callout boxes.
+- Per-talk feedback list: keep the user's slide-level corrections in the presentation note and in `storyline.json`, and carry them into every fresh-context brief; rules kept only as prose regressed, rules turned into script checks held.
+- Visual claims (centred labels, no overlaps) are proven on the rendered PDF or PNG, not on XML; if PowerPoint or Keynote rendering is blocked, report it once with the unblock step and name the renderer actually used.
+- Deck numbering follows the application's slide numbers, not PDF pages.
+- Trigger: use whenever the user asks for 발표자료, 슬라이드, a deck or a presentation from existing results or records, including informal discussion decks and edits of an existing deck. On a host without the Artifact tool (T3-launched sessions, the lab server), go straight to this skill's PPTX build path; ship `reference.pptx` and a one-time export of the design-system bundle inside the skill's assets, resolved relative to the skill directory.
+- Existing-deck edits: pull in the deck's own source PPTX template and the user's style reference first; when the user rejects a visual's style, keep the tool and change the style; never generated images for proteins, molecules, cells or data; each non-gray colour has one declared meaning for the whole deck; titles are topic or method noun phrases and findings go in the takeaway line; the presenter's own analyses carry no citation label.
+- Fan-out for slide work: each subagent gets one output path, a required artifact list and a limit in wait calls; poll with the agent wait tool, not sleep; after two empty waits ask the agent for its blocker. Browser tasks are created from the GUI, not the API.
+- Rendering and QA run from scripts under a timeout (`open -a`, Keynote AppleScript export, scripted PowerPoint save-as-PDF), never by driving Open or Export dialogs; if PowerPoint verification fails once, stop retrying, name the blocking app state and the one user action that unblocks it, and label every layout check "Keynote/PDF only". A property claimed about the rendering is measured on the exported PDF or PNG, never on XML attributes.
+- Skill maintenance: turn each accepted style correction into a script check or a `references/qa.md` line in the same turn; the fresh-context brief carries the approved storyline file and the full feedback ledger, never a summary; validate the skill with the system skill-creator's `quick_validate.py` through `uv run --with pyyaml`, never by installing validator dependencies into a talk's environment.
+
+## Definitions on first use (2026-10-17 audit)
+
+Every metric, comparison or background set and every ambiguous abbreviation is defined on the slide where it first appears (a short label plus a one-line definition in the takeaway or a footnote); `scripts/check_slide_conventions.py` findings about undefined terms block delivery.

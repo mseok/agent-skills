@@ -103,3 +103,8 @@ description: >
 - note를 PDF로 변환하는 절차는 넣지 않는다.
 - 새 schematic/diagram figure를 직접 만드는 절차는 넣지 않는다.
 - 본문은 한국어로 쓰되 따옴표는 가능하면 ASCII `" "`를 사용한다.
+
+## Vault writes and verification (2026-10-17)
+
+- Attachments and notes go through `obsidian_main` (`attachment_upload`, `record_create`); never write into the vault's `Attachments/` or `Notes/` folders directly. When `obsidian_main` is not connected, deliver the note as a local file and say so.
+- Every number in the note is spot-checked against the extracted text by a second pass before delivery; first-pass notes have carried 2 to 10 wrong numeric claims each.

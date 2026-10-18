@@ -1,0 +1,6 @@
+{
+  "name": "usage-progress",
+  "version": "0.1.0",
+  "description": "Band above the prompt with a hover-to-peek / click-to-pin Usage button and a Progress button that asks a btw-style side question about what is going on.",
+  "types": "./types/index.d.ts"
+}
