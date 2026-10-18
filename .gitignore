@@ -10,3 +10,8 @@ __pycache__/
 
 # Archived skill kept local only (may contain unpublished research examples)
 archive/codex/manuscript-writing/
+
+# Generated font cache id
+**/fonts/.uuid
+# Host-local third-party skill kept off the public repo (MacBook)
+skills/codex/hwpx-skill/
