@@ -164,7 +164,7 @@ async function verifySsh() {
 async function authState(page) {
   return page.evaluate(() => {
     if (location.origin !== 'https://kvpn.kaist.ac.kr') return 'unexpected_origin';
-    if (document.body.innerText.includes('Invalid username or password.')) return 'credentials_rejected';
+    if (document.body?.innerText.includes('Invalid username or password.')) return 'credentials_rejected';
     if (document.title === 'Confirmation') return 'confirmation';
     if (location.pathname === '/download/') return 'download';
     if (location.pathname.startsWith('/dana/user/')) return 'portal';
@@ -172,7 +172,7 @@ async function authState(page) {
   });
 }
 async function waitAuthentication(page) {
-  await page.waitForFunction(() => document.title === 'Confirmation' || location.pathname === '/download/' || location.pathname.startsWith('/dana/user/') || document.body.innerText.includes('Invalid username or password.'), {}, {timeout:30000});
+  await page.waitForFunction(() => document.title === 'Confirmation' || location.pathname === '/download/' || location.pathname.startsWith('/dana/user/') || document.body?.innerText.includes('Invalid username or password.'), {}, {timeout:30000});
   let state = await authState(page);
   if (state === 'confirmation') {
     const message = await page.locator('body').innerText();
@@ -180,7 +180,7 @@ async function waitAuthentication(page) {
     // The user authorized reconnecting this account. Native preflight was inactive.
     // Handle the continuation immediately; do not leave the OTP challenge waiting.
     await page.getByRole('button', {name:'Continue the session',exact:true}).click();
-    await page.waitForFunction(() => location.pathname === '/download/' || location.pathname.startsWith('/dana/user/') || document.body.innerText.includes('Invalid username or password.'), {}, {timeout:30000});
+    await page.waitForFunction(() => location.pathname === '/download/' || location.pathname.startsWith('/dana/user/') || document.body?.innerText.includes('Invalid username or password.'), {}, {timeout:30000});
     state = await authState(page);
   }
   if (state === 'credentials_rejected') stop('credentials_rejected');
