@@ -1,13 +1,13 @@
 ---
 name: phone-adb
-description: Operate the user's Android phone (Galaxy Z Fold 7) over adb for a specific requested input, such as typing a code, tapping a named button or posting a prepared listing. Use when the user says 폰에서, 핸드폰, adb, 넥슨플레이, 당근에 올려줘, or asks to press or type something on the phone. Not for exploring the phone, screenshots for curiosity, or changing phone settings.
+description: Operate the user's Android phone (Galaxy Z Fold 7) over adb for a specific requested input, such as typing a code, tapping a named button or posting a prepared listing. Use when the user says 폰에서, 핸드폰, adb, 당근에 올려줘, or asks to press or type something on the phone. Not for exploring the phone, screenshots for curiosity, or changing phone settings.
 ---
 
 # Phone input over adb
 
 ## Connect
 
-1. Reuse the connection logic in `~/.claude/skills/nexon-play-auth/scripts/nxplay.py`: `nxplay.py status` shows the connection, screen, lock state and foreground app; `nxplay.py adb <args>` runs adb against the resolved endpoint. It tries the existing connection, the last working endpoint, port 5555, the wireless-debugging port on the LAN, then the phone's Tailscale address.
+1. Use the connection helper `scripts/nxplay.py` beside this file: `nxplay.py status` shows the connection, screen, lock state and foreground app; `nxplay.py adb <args>` runs adb against the resolved endpoint. It tries the existing connection, the last working endpoint, port 5555, the wireless-debugging port on the LAN, then the phone's Tailscale address.
 2. Wireless debugging must be switched on by the user, and Android turns it off after Wi-Fi drops and at reboot; the port changes each time. If no connection is found, tell the user exactly that in one line and wait. Pairing codes come from the user; never store them in memory or notes.
 3. `persist` (adb on port 5555 until reboot) needs the user's explicit agreement each time; do not make it automatic.
 
@@ -21,7 +21,6 @@ description: Operate the user's Android phone (Galaxy Z Fold 7) over adb for a s
 
 ## Known apps
 
-- Nexon Play OTP entry: use the `nexon-play-auth` skill (first action must be the typing command; the code expires in 60 s).
 - Marketplace posting (당근): prepare the listing text and images locally, show them to the user, post only after approval, and verify the published listing on screen.
 
 ## Verified additions (2026-10-17 audit)
