@@ -78,7 +78,7 @@ HTTPS egress is restricted by the reviewed two-origin CONNECT proxy.
 
 ## Audit notes (2026-10-17)
 
-- The installed ad-hoc signature identifies this exact code, not just its bundle ID. Re-signing it changes the permission identity. Preserve the installed bundle for routine maintenance. A necessary code update needs a separately reviewed stable-identity migration, such as a fixed launcher with external scripts or a persistent signing identity; neither is already implemented.
+- The installed ad-hoc signature identifies this exact code, not just its bundle ID. Re-signing it changes the permission identity. Preserve the installed bundle for routine maintenance. A necessary code update needs a separately reviewed stable-identity migration, such as a fixed launcher with external scripts or a persistent signing identity; neither is already implemented. Exception verified on 2026-10-20: an in-place edit of one script under `Contents/Resources/scripts` without re-signing kept the cdhash designated requirement and the Accessibility grant (scheduled native checks stayed normal); only `codesign --verify` reports the modified sealed resource.
 - Port fixes into the installed personal app as a minimal patch on its current code; store rollback copies as `.app.backup` or a zip so LaunchServices never registers a second bundle with the same identifier.
 - Report "fixed" only after the scheduled entry point completes a disconnected-to-connected run; the previous mechanism stays active until that passes. A mail-tool error during login must not latch the monitor off; classify it as transient and retry on the next scheduled run.
 
