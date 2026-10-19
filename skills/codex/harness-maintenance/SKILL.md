@@ -8,7 +8,7 @@ description: Maintain the agent harness itself across hosts: the shared AGENTS.m
 ## Where things live
 
 - Shared guidance: `~/dot/ai/codex/AGENTS.md` (every host links `~/.codex/AGENTS.md` and `~/.claude/CLAUDE.md` to it). The research block at its top is managed by `obsidian-main/scripts/deploy-research.py` from `policies/research-router.md`; edit both the router source and AGENTS.md identically, or redeploy, never one alone.
-- Shared skills: `~/agent-skills/skills/codex` (both harnesses) and `~/agent-skills/skills/claude` (Claude only); `~/dot/bin/install_codex.sh` and `~/dot/bin/install_claude.sh` link them into `~/.codex/skills` and `~/.claude/skills`. Deployer-managed research skills and host-local skill directories are never edited by hand.
+- Shared skills: `~/agent-skills/skills/codex` (both harnesses) and `~/agent-skills/skills/claude` (Claude only); `~/dot/bin/install_codex.sh` and `~/dot/bin/install_claude.sh` link them into `~/.codex/skills` and `~/.claude/skills`. The research skills (`research-workflow` with its recording policy under `references/`, `experiment-ledger`, `obsidian-main-note`) live here too; the obsidian-main deployer manages only the research block and hooks. Host-local skill directories are never edited by hand.
 - Host facts: `~/.codex/host-context.md` on each host. Hooks and settings: `~/.claude/settings.json`, `~/.codex/hooks.json`, host-local.
 - Memory: Claude auto-memory under `~/.claude/projects/<cwd-key>/memory/`, Codex memory under `~/.codex/memories/`. Mandatory behavior never lives only in memory; promote it to AGENTS.md, a skill or host-context, then delete the memory note.
 
