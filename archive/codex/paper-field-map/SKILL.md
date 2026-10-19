@@ -1,6 +1,6 @@
 ---
 name: paper-field-map
-description: Learn a new paper field or answer a comparison question from the literature by turning one question into evidence cards, a big-picture map and a reading queue of 8-10 papers. Use for literature surveys, novelty or precedent checks, related work, 논문 조사, 선행연구, 문헌 정리, or whenever several papers must be found, read and compared; novelty claims stay unverified until the precedent check returns. The parent never reads bio-adjacent papers itself (bio-safe-reading). Not for a single paper summary (single-paper-review).
+description: Learn a new paper field or answer a comparison question from the literature by turning one question into evidence cards, a big-picture map and a reading queue of 8-10 papers. Use for literature surveys, novelty or precedent checks, related work, 논문 조사, 선행연구, 문헌 정리, or whenever several papers must be found, read and compared; novelty claims stay unverified until the precedent check returns. Follow the model-specific reading rules in bio-safe-reading. Not for a single paper summary (single-paper-review).
 ---
 
 # Question to map to reading queue

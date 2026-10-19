@@ -7,8 +7,9 @@ For the shareable macOS KAIST VPN automation, see
 [KAIST VPN Monitor Community](tools/kaist-vpn-monitor/README.md)
 for setup, requirements, and validation limits.
 
-- `skills/codex/`: 8 personal Codex skills, including `nature-figure` and `research-talk` (slide decks in the dissertation style; Pretendard font bundled under `assets/fonts`, installed automatically).
-- `skills/claude/`: 12 personal Claude skills.
+- `skills/codex/`: skills installed for both Codex and Claude, including `nature-figure` and `research-talk` (slide decks in the dissertation style; Pretendard font bundled under `assets/fonts`, installed automatically).
+- `skills/claude/`: Claude-only skills (`bio-safe-reading`, `single-paper-review`) and the `usage-progress` Claude Code plugin.
+- `archive/`: retired skills; not installed.
 - `skills/codex/verification-before-completion/`: copied unchanged from obra/superpowers at commit `8ca22db` (MIT; its `LICENSE` is kept beside the skill).
 
 Keep the existing agent-specific grouping during migration. Shared capabilities
@@ -24,7 +25,8 @@ With the companion dot checkout available:
 ```
 
 The installer links individual skills under `~/.codex/skills` and
-`~/.claude/skills`. It preserves host-owned `.system` skills and unrelated
+`~/.claude/skills` (`skills/claude` only into Claude) and removes links left by
+archived or moved skills. It preserves host-owned `.system` skills and unrelated
 plugins. `AGENT_SKILLS_HOME` overrides the default source checkout location.
 The normal dot Codex installer invokes the same migration.
 

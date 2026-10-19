@@ -38,7 +38,7 @@ At session start on any host, `~/.codex/AGENTS.md` and `~/.claude/CLAUDE.md` mus
 ## Health checks (model-free first)
 
 - Obsidian gateway: `tailscale serve status` and `tailscale funnel status` on the home hub must show the Funnel binding recorded in host-context (443 to the gateway port); then one `investigation_context` read from each host; then `obsidian-research status` for a pending outbox. Replay only with a session filter.
-- Tunnels and services: Zotero MCP, html-preview relay, KVPN monitor status (`ivanti-daily-login`). Record outages and root causes in host-context, not only in memory.
+- Tunnels and services: Zotero MCP, html-preview relay, KVPN monitor status (KAIST VPN Monitor app, `tools/kaist-vpn-monitor`). Record outages and root causes in host-context, not only in memory.
 - Memory hygiene: delete notes that are wrong or superseded, keep one fact per note, and keep the index line consistent with the note.
 
 ## Verified additions (2026-10-17 audit)
