@@ -78,7 +78,7 @@ export function readQuota(provider, { spawnChild = spawn, timeoutMs = 25_000 } =
     ];
     const env = provider === 'codex' ? process.env : {
       ...process.env, ENABLE_CLAUDEAI_MCP_SERVERS: 'false', CLAUDE_CODE_AUTO_CONNECT_IDE: '0',
-      CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC: '1', DISABLE_AUTOUPDATER: '1',
+      DISABLE_AUTOUPDATER: '1',
     };
     const child = spawnChild(provider, args, { stdio: ['pipe', 'pipe', 'pipe'], env });
     const lines = createInterface({ input: child.stdout });

@@ -20,6 +20,8 @@ The request is experimental. T3's own [Claude provider](https://github.com/pingd
 
 Read account-wide `five_hour` and `seven_day`, any populated legacy `seven_day_*` buckets, and `model_scoped` entries. Keep model names as scope labels. Disable hooks, MCP discovery, tools, session persistence, IDE auto-connect, and auto-update for this short-lived helper; these flags apply to its subprocess only and do not alter user settings. The live query returned both account windows and a model-scoped weekly window.
 
+Do not set `CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC`. On 2026-10-27 with Claude Code `2.1.311`, `get_usage` still answered `rate_limits_available: true` with that variable set, but `rate_limits` was `null`, so the helper reported `unavailable`; the same request without it returned `five_hour`, `seven_day` and a `model_scoped` window. If a later CLI again returns `rate_limits: null` while reporting availability, check the subprocess environment before suspecting the protocol.
+
 ## Failure and privacy boundaries
 
 Each subprocess has one 25-second deadline and is terminated after its response. No automatic retry is performed. Missing CLIs, rejected initialization or quota requests, unexpected interactive requests, invalid stream JSON, and early exit produce a sanitized error. Raw initialization data, stderr, account identifiers, and token-bearing data are never printed or persisted. Native CLIs retain ownership of their ordinary authentication behavior.
