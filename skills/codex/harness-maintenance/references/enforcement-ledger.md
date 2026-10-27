@@ -1,0 +1,7 @@
+# Enforcement ledger
+
+One row per rule that a failure has tested. "Enforcer" is what makes the mistake fail without the agent remembering the rule: removed path (architecture), hook or permission rule, test or check script, or prose. Evidence names the harness-audit case (`inbox/harness-audit-20261017/findings/stage2-<batch>.md`, case id) or the dated user correction. Update a row in the same change that alters its enforcer; delete a row and its prose when the mistake can no longer happen.
+
+| Rule and where it is written | Evidence | Enforcer now | Next level | Status (checked) |
+|---|---|---|---|---|
+| A subagent fan-out passes model and effort through the host's own subagent tool; `claude -p --effort` only where no native tool exists (AGENTS.md, Context/handoff/delegation; thread-handoff step 1) | 2026-10-27 ChatGPT app, Claude Opus 5.5 chat 01a17b74-81af-7511-9031-d8763786643b, turn 01a17be6-861d-7761-8bdd-7c08532c5e53: three reviewers launched with `claude -p` instead of `spawn_agent`, so no app UI cards, no app tools, and the first `nohup &` batch died with the command. User approval 2026-10-27 ("둘 다 적용하면 될 듯?") | Prose: AGENTS.md line 86 and thread-handoff step 1 name the native tool first | Hook candidate: `agent-guard` denying `claude -p` in a shell command of a session that has `spawn_agent` | Prose applied 2026-10-27 in the Mac mini checkouts; not committed or propagated |

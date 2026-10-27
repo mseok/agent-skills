@@ -25,7 +25,7 @@ description: Hand work between threads, sessions, harnesses (Codex, Claude Code,
 
 ## Subagent fan-out preflight
 
-1. Before launching, state in one block: number of agents, model, effort (pass it through Agent `effort`, `claude -p --effort` or Workflow; if no route supports it, say so before launching), expected token cost, search cap per agent, and output files. Check the remaining usage budget first; stop launching when a usage warning appears.
+1. Before launching, state in one block: number of agents, model, effort (pass the requested model and effort through the host's own subagent tool: ChatGPT app `spawn_agent` with explicit `model` and `reasoning_effort`, Claude Code Agent `effort`; use `claude -p --effort` only where no native subagent tool exists, such as a plain terminal or Workflow; if no route supports it, say so before launching), expected token cost, search cap per agent, and output files. Check the remaining usage budget first; stop launching when a usage warning appears.
 2. No nested subagents by default. Each prompt carries: the exact question, input paths, the output path, "local tools only", and the identifier restriction (no emails, phone numbers, account IDs in requests or outputs).
 3. The parent verifies subagent claims (citations, numbers, "done") against sources before relaying them, and never lets an inter-thread status message be the final reply to the user.
 4. Partial results are salvaged into files as agents finish; a crashed workflow must not lose finished work.
@@ -51,3 +51,7 @@ Archiving, renaming, restarting or deleting many threads or sessions: produce th
 ## Bulk operations: what "back" means (2026-10-17 audit)
 
 A restored or replacement thread counts as back only when it is visible where the user looks (sidebar and mobile); threads created through app-server tools are hidden there, so create replacements from the GUI or say that they are hidden. After importing a thread into another harness, compare the imported history with the handoff's completed checks and report any gap before continuing.
+
+## User decisions
+
+- 2026-10-27 (ChatGPT app, Claude chat 01a17beb-b6e8-7861-8906-b61838d2e8b1, continued in 01a17c0d-815e-76b0-b8aa-0a33e0754199): a fan-out passes model and effort through the host's own subagent tool and uses `claude -p --effort` only where no native subagent tool exists (step 1 above). User's words: "ㅇㅇ 둘다 적용 ㄱㄱ" and "둘 다 적용하면 될 듯?".
