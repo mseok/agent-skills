@@ -9,13 +9,15 @@ description: Hand work between threads, sessions, harnesses (Codex, Claude Code)
 
 1. Keep the current-state file in the task's artifact location with `~/dot/bin/codex-task-state` (read it first, pass `--expected-sha` on rewrite). The tool accepts only its documented fields, so put each item where it belongs: `goal`; `scope` (permitted changes, forbidden changes, and the exclusions the user ruled out); `decisions` (dated entries, including every user-fixed threshold or number with the user's wording when it was a correction); `sources` (exact paths, hosts, checkpoints, data and figure versions); `active_operations` (job and process IDs with hosts); `completed_checks`; `pending_questions`; `status`; `next_action`.
 2. Create it at the first compaction or before the first external-account change or bulk write; refresh it at material transitions, after about five compactions (then offer a fresh thread), when the user resets context, and before the thread is archived. A handoff carries decisions, not history: no chat summary, no exploration log.
-3. Name the file in the reply with its absolute path and the SHA from the tool's output.
+3. Keep it current, not cumulative. When the user reverses or replaces a decision, delete the old entry in the same write that adds the new one; drop finished operations, answered questions and sources no longer used. Do this only when the `read` output has a `history` key, which means the tool appends every removed entry verbatim to `<name>.history.jsonl`; an older tool has no history, so keep the old entry there. Never paraphrase, merge or shorten a decision to save space, and ask the user before removing a decision that is still in force.
+4. The tool prefixes each completed check with an ID such as `[k12]`. Append new checks at the end, keep the prefixes when you rewrite the list, and write `[k12]` in a decision, question or next action that rests on that check. Over 12,000 bytes the tool moves the oldest checks to the history, keeping the newest ten and every check those fields cite; a file still over budget is saved with a warning, and you clean it up as in step 3 at the next write. Read the history only when the user disputes a decision or the handoff names a gap.
+5. Name the file in the reply with its absolute path and the SHA from the tool's output.
 
 ## Resume
 
-1. Read only the handoff and the files it points to; do not re-read raw history or earlier threads unless the handoff names a gap.
+1. Read only the handoff and the files it points to; do not re-read raw history or earlier threads unless the handoff names a gap. When the read reports `copy_of`, the folder was duplicated and the original still exists: read it and ask which one is current before writing either.
 2. Start in the directory the handoff names; verify host, branch and data version before acting. A handoff is not permission: standing authorizations must be listed in it explicitly, otherwise ask once.
-3. Restate goal, scope and next action in two lines, then continue. If the user disputes a decision, quote the handoff's recorded decision before answering.
+3. Restate goal, scope and next action in two lines, then continue. If the user disputes a decision, quote the handoff's recorded decision, or its removed entry in the history, before answering.
 
 ## Cross-harness
 

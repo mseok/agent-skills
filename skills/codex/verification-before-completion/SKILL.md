@@ -145,3 +145,9 @@ Cutover or migration checklist: list every consumer of the old path (loaded inst
 | Review findings addressed | Every unresolved review thread on the PR listed (not a time window), each fixed or answered, with the count | Comments newer than the last push; the bot's summary |
 | Evaluation is correct | At least two selected rows traced to the evaluator's native per-item output with entity match | The aggregated table reproduces |
 | Quality goal for writing or figures | The user's stated goal checked explicitly (for example a fresh-context reader pass listing terms used before definition) or declared unchecked | Compile, render or layout success |
+
+## More rows (2026-10-27 review)
+
+| Claim | Proof that counts | Not sufficient |
+|---|---|---|
+| A change is safe or touches nothing else | Effects outside the diff listed and each checked by running or opening it: documents or files that cite what you removed, OS permissions tied to a build signature, live sessions and their history, caches and indexes | The diff looks contained; tests in the touched module pass |
