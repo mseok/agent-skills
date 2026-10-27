@@ -1,6 +1,6 @@
 ---
 name: harness-maintenance
-description: Maintain the agent harness itself across hosts: the shared AGENTS.md/CLAUDE.md source in ~/dot, the agent-skills repository, host-context files, hooks, memory notes and the Obsidian research gateway, and run instruction or skill A/B evaluations. Use when the user says 지침, AGENTS, CLAUDE.md, 스킬 정리, dotfiles, hook, 동기화, 하네스, 평가 harness, or when a rule or skill must change or reach another host. Not for ordinary project work.
+description: "Maintain the agent harness itself across hosts: the shared AGENTS.md/CLAUDE.md source in ~/dot, the agent-skills repository, host-context files, hooks, memory notes and the Obsidian research gateway, and run instruction or skill A/B evaluations. Use when the user says 지침, AGENTS, CLAUDE.md, 스킬 정리, dotfiles, hook, 동기화, 하네스, 평가 harness, or when a rule or skill must change or reach another host. Not for ordinary project work."
 ---
 
 # Harness maintenance
@@ -15,10 +15,11 @@ description: Maintain the agent harness itself across hosts: the shared AGENTS.m
 ## Change a rule or skill
 
 1. Start from evidence: the failure or correction, with thread and turn, and the sentence that should have prevented it. Do not adopt a rule set wholesale from a video or a repository; add the clause that earns its place and remove clauses that measured as unfollowed.
-2. Keep AGENTS.md scoped: chat-reply style applies to chat only; procedures go to a skill or a reference file; host facts go to host-context. Target under 15k characters.
-3. Edit the source checkout, not a linked copy. `git status` first; preserve other uncommitted work. Commit only when the user asks; never push without a request.
-4. Propagate: fetch and fast-forward each host's `~/dot` and `~/agent-skills`, run the guidance-only installer, then grep skills, automations and per-project instruction files on every host for the old path or rule. A running session does not reload guidance; say that a new session is needed.
-5. Verify on each host: the links resolve, the skill list loads (`ls ~/.claude/skills`, `ls ~/.codex/skills`), no `AGENTS.override.md` shadows the common file, and host-context has the facts the change relies on.
+2. Pick the strongest enforcer before writing prose, in this order: remove the way to make the mistake (one source of truth, a template or tool that does the step, a stable signing identity); a hook or permission rule that blocks it with a message naming the right action; a test or check script; prose in AGENTS.md or a skill last, for judgment calls. Prove a new hook or check fires on the recorded failure before adopting it. Keep each rule and its enforcer in `references/enforcement-ledger.md`; when a failure class recurs while only prose covers it, move it up a level in the same change, and delete prose that an enforcer has made redundant.
+3. Keep AGENTS.md scoped: chat-reply style applies to chat only; procedures go to a skill or a reference file; host facts go to host-context. Target under 15k characters.
+4. Edit the source checkout, not a linked copy. `git status` first; preserve other uncommitted work. Commit only when the user asks; never push without a request.
+5. Propagate: fetch and fast-forward each host's `~/dot` and `~/agent-skills`, run the guidance-only installer, then grep skills, automations and per-project instruction files on every host for the old path or rule. A running session does not reload guidance; say that a new session is needed.
+6. Verify on each host: the links resolve, the skill list loads (`ls ~/.claude/skills`, `ls ~/.codex/skills`), no `AGENTS.override.md` shadows the common file, and host-context has the facts the change relies on.
 
 ## Skills that encode user decisions
 
@@ -28,7 +29,7 @@ When the user adopts a rule for a skill or automation, record it verbatim with i
 
 - Run A/B arms from a clean working directory with the candidate file loaded by an explicit path; include an empty-baseline arm and a probe that reports which file was loaded. Preflight the tool list of the client under test, log every tool call (not only shell commands), give every arm the same repetitions, quote the cost before starting, and add no arm without approval.
 - Send-capable connectors (mail, Slack, calendar) and research recording are disabled for every arm; evaluation prompts carry the identifier restriction.
-- Factuality is a hard gate; model judges are not human calibration. Report per-arm counts with the exact prompts and keep the arms under `inbox/<project>/arms/` with a task-state file.
+- Factuality is a hard gate; model judges are not human calibration. Report per-arm counts with the exact prompts and keep the arms under `inbox/<project>/arms/` with a task-state file. Before reporting an automatic scorer's count or rate (regex, keyword, script or model judge), read a few outputs it marked pass and a few it marked fail and confirm each verdict; until then the number is a draft.
 - Stop when the completion criterion is met; score-chasing beyond it is waste.
 
 ## Instruction-source integrity

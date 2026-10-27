@@ -15,6 +15,8 @@ A trade-off, null or adverse result that answers the paper's question is a findi
 
 ## Opening a Results section
 
+Before drafting, map each core paragraph to the reader's question, the observation that answers it, the implication supported by that observation and its role in the paper's central claim. Keep this map in the writing plan, or make it privately when planning is skipped; for a local revision, map the target passage in its surrounding argument. A supporting-only paragraph can name the claim it supports. These are reasoning prompts, not four compulsory sentences: use the order the reader needs, and do not invent an implication to fill a slot. A benchmark name or metric alone is not a scientific question.
+
 Open the section, and each major subsection whose question changes, the way a good Introduction paragraph opens: one sentence on the question the experiment answers, one on how it was set up if the reader needs it, then the headline answer with its number. The reader should know what to look for before the details arrive. Do not open on a description of a table, and do not repeat the Introduction's motivation. The headline in the opening already carries its scope words ("at signal-to-noise ratios below 10 dB"), so that no later sentence has to narrow it; the numbers of weak results come later, beside the claims they qualify. When an ml-conference Experiments section begins with a setup subsection, this opening belongs to the first results subsection.
 
 ## Making strong results land
@@ -26,6 +28,20 @@ Open the section, and each major subsection whose question changes, the way a go
 - **Mechanisms at the strength the evidence allows.** An ablation shows what removing a component does under its controls; say what was held fixed and whether variants were retrained when the inputs say so. Call something a mechanism only when an analysis isolates it; otherwise use "suggests" once, or leave the cause out while keeping the implication.
 - **Numbers carry the intensity.** At most one evaluative adverb per paragraph ("substantially"), and only next to a number. No "remarkable", "unprecedented" or "dramatic".
 - **Proportion.** Each paragraph carries one claim, its evidence and its meaning. Per-item numbers that a table already lists appear in the text only when the sentence uses them. A subsection that reports one main comparison usually reads best at about 400–600 words; above that, cut per-item numbers, secondary comparisons that bound no headline claim, and repeated setup before cutting any sentence that says what a result means.
+
+## What a case adds
+
+A case should explain something the aggregate comparison leaves unresolved: which scientific object or process was recovered, where a prediction failed, or which relevant distinction a summary metric conceals. State that difference in the domain's terms, with measurements close by. Explain what a change in coordinates, error or score means for the question rather than stopping at the measurement. If the case adds only another win, shorten it to supporting evidence instead of forcing a separate interpretation.
+
+Distinguish an observed failure mode from why a model produced it. Explain the former directly when the source supports it; connect it to the paper's proposed approach at the strength allowed by the evidence. Attributing success to a component, or failure to a comparator's design, needs evidence that separates that cause. When this evidence is absent, keep the observed distinction and its scientific implication; do not invent a cause or erase the explanation.
+
+## Semantic review
+
+Read the draft for meaning separately from running the prose checker:
+
+- Temporarily hide numerical values and method names. Can a reader still identify the scientific question, the observed difference and its role in the paper's argument? Keep quantities and named methods wherever they are needed in the final text; this is a diagnostic for result lists, not a reason to remove evidence or repeat the central claim in every paragraph.
+- For a case, what explanatory information would disappear if it were removed? If nothing beyond another favorable score disappears, revise its role using the available evidence or shorten it to support the existing claim.
+- For each "therefore", "thus" or equivalent inference, identify the premises in the preceding text. Supply a supported missing premise or narrow the conclusion. Check whether the conclusion describes an observation, an implication or a causal explanation, and preserve useful interpretation at the level the evidence supports.
 
 ## Placing weak results
 
