@@ -88,7 +88,7 @@ HTTPS egress is restricted by the reviewed two-origin CONNECT proxy.
   flags. Do not clear them, overwrite the app, or re-sign it during diagnosis or
   an interval change. Check protection before stopping any existing schedule.
   The legacy installer now refuses to overwrite this self-contained app.
-- Direct commands launched from T3/Codex can report `accessibility_unavailable`
+- Direct commands launched from Codex can report `accessibility_unavailable`
   while the app's own LaunchAgent remains healthy. Inspect `--status`, its fresh
   timestamp and the actual scheduled result before asking for any reapproval.
   A direct caller's denial does not establish a missing grant for the scheduler.

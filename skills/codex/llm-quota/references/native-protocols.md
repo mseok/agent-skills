@@ -16,7 +16,7 @@ Prefer the complete `rateLimitsByLimitId` map when present; otherwise read `rate
 
 Launch the CLI in print/stream-json mode with an open stdin. Send a `control_request` with `request.subtype: "initialize"`; after its successful `control_response`, send another with `request.subtype: "get_usage"`. Read `response.response.rate_limits_available` and `rate_limits`. Never write a `type: "user"` message.
 
-The request is experimental. T3's own [Claude provider](https://github.com/pingdotgg/t3code/blob/main/apps/server/src/provider/ClaudeProvider.ts) uses the SDK's experimental usage request without yielding a user prompt. Its [quota mapper](https://github.com/pingdotgg/t3code/blob/main/apps/server/src/provider/claudeUsageLimits.ts) distinguishes percentage-valued `get_usage` responses from fractional streamed rate-limit events. The helper consumes only `get_usage`, so it never multiplies utilization by 100.
+The request is experimental. Percentage-valued `get_usage` responses differ from the fractional streamed rate-limit events. The helper consumes only `get_usage`, so it never multiplies utilization by 100.
 
 Read account-wide `five_hour` and `seven_day`, any populated legacy `seven_day_*` buckets, and `model_scoped` entries. Keep model names as scope labels. Disable hooks, MCP discovery, tools, session persistence, IDE auto-connect, and auto-update for this short-lived helper; these flags apply to its subprocess only and do not alter user settings. The live query returned both account windows and a model-scoped weekly window.
 

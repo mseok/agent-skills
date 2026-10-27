@@ -22,7 +22,7 @@ node scripts/quota.mjs all
 ```
 
 - For "my quota", select the current agent's provider: Codex → `codex`; Claude → `claude`. Use `all` when both services are requested or the provider is unclear.
-- A CLI must already be installed and logged in. Preserve the calling environment, including `CODEX_HOME` and `CLAUDE_CONFIG_DIR`. The result is for that local CLI account; do not claim it belongs to a custom T3 provider instance unless its binary and account binding have been established.
+- A CLI must already be installed and logged in. Preserve the calling environment, including `CODEX_HOME` and `CLAUDE_CONFIG_DIR`. The result is for that local CLI account.
 - The helper sends initialization and quota control requests only. It never sends a user prompt or starts a model turn. Authentication stays inside the native CLI; do not read credential files or Keychain, extract tokens, or replace this helper with `npx ai-quota`.
 - Codex uses `account/rateLimits/read` over app-server stdio. Claude uses its experimental `get_usage` control request over stream-json. Protocol details and sources are in [references/native-protocols.md](references/native-protocols.md); read that reference when diagnosing a protocol failure.
 
