@@ -1,6 +1,6 @@
 ---
 name: thread-handoff
-description: Hand work between threads, sessions, harnesses (Codex, Claude Code, T3 Code) and hosts, resume from a handoff, and run subagent fan-outs or bulk thread operations safely. Use when a thread is long or compacted, when the user says 인계, 이어서, 새 스레드에서, 핸드오프, resume, continue in Codex/Claude, or before spawning several agents or archiving many threads.
+description: Hand work between threads, sessions, harnesses (Codex, Claude Code) and hosts, resume from a handoff, and run subagent fan-outs or bulk thread operations safely. Use when a thread is long or compacted, when the user says 인계, 이어서, 새 스레드에서, 핸드오프, resume, continue in Codex/Claude, or before spawning several agents or archiving many threads.
 ---
 
 # Thread handoff and delegation
@@ -19,8 +19,8 @@ description: Hand work between threads, sessions, harnesses (Codex, Claude Code,
 
 ## Cross-harness
 
-- Codex → Claude/T3: write the handoff file, then start the new thread with its path; do not paste the Codex transcript. T3 thread imports can drop the latest result: check the handoff's `completed_checks` against the imported thread before trusting it.
-- Claude/T3 → Codex: same file; Codex worker threads created through an API lack browser context, so browser work stays in the GUI thread.
+- Codex → Claude: write the handoff file, then start the new thread with its path; do not paste the Codex transcript.
+- Claude → Codex: same file; Codex worker threads created through an API lack browser context, so browser work stays in the GUI thread.
 - Links to another harness's thread cannot be opened; say so immediately instead of trying.
 
 ## Subagent fan-out preflight
