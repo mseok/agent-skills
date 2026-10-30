@@ -1,0 +1,4 @@
+interface:
+  display_name: "HTML Research Deck"
+  short_description: "승인된 발표 흐름을 연구 테마 HTML 덱(흰 패널·교과서식 장면)으로 제작하고 PDF·미리보기까지 검증"
+  default_prompt: "Use $html-research-deck to build the approved storyline as an HTML deck in the research theme, starting with a two- or three-slide taste benchmark."

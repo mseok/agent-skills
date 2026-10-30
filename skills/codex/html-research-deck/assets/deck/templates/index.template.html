@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="{{LANG}}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>{{TITLE}}</title>
+<link rel="stylesheet" href="vendor/katex/katex.min.css">
+<link rel="stylesheet" href="css/deck.css">
+<link rel="stylesheet" href="css/theme-research.css">
+<script src="vendor/katex/katex.min.js"></script>
+<script src="vendor/katex/contrib/auto-render.min.js"></script>
+<script src="js/util.js"></script>
+<script src="js/deck.js"></script>
+</head>
+<body>
+{{SPRITE}}
+<div class="viewport"><div class="stage">
+
+<!-- Slides: one section.slide each, in order. Fragments: templates/slide-*.html -->
+{{SLIDES}}
+
+</div></div>
+</body>
+</html>
