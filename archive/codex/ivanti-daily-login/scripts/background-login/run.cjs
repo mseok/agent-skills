@@ -187,6 +187,21 @@ async function waitAuthentication(page) {
   if (!['portal','download'].includes(state)) stop('authentication_not_completed');
   await page.waitForFunction(() => location.pathname === '/download/' || !!document.getElementById('1-header'), {}, {timeout:15000});
 }
+async function acknowledgeSignInNotice(page) {
+  // Since 2026-10-28 KVPN can show a Pre Sign-In Notification (Proceed/Decline) before the
+  // login form, e.g. the 2026-11-01 power-outage notice. Proceed only past an informational
+  // notice; a notice asking for agreement stops for a person.
+  const proceed = page.locator('input[type=submit][name="sn-preauth-proceed"]');
+  if (await proceed.count() === 0) return;
+  const notice = page.locator('textarea[name="sn-preauth-text"]');
+  if (await proceed.count() !== 1 || await notice.count() !== 1 || await proceed.inputValue() !== 'Proceed') stop('unexpected_sign_in_notice');
+  if (/동의|서약|agree|consent|terms of/i.test(await notice.inputValue())) stop('sign_in_notice_needs_consent');
+  const destination = await proceed.evaluate(button => button.hasAttribute('formaction') ? button.formAction : button.form?.action || location.href);
+  if (!originIs(destination, ORIGIN)) stop('unexpected_login_action');
+  await proceed.click();
+  await page.waitForFunction(() => document.readyState !== 'loading' && !document.querySelector('[name="sn-preauth-proceed"]'), {}, {timeout:30000});
+  if (!originIs(page.url(), ORIGIN)) stop('unexpected_login_origin');
+}
 async function authenticate(page) {
   for (const wait of [0,10000,30000]) {
     if (attempts>=3) stop('authentication_attempts_exhausted');
@@ -194,6 +209,7 @@ async function authenticate(page) {
     await page.goto(ORIGIN + '/', {waitUntil:'domcontentloaded'});
     if (new URL(page.url()).origin !== ORIGIN) stop('unexpected_login_origin');
     if (['portal','download'].includes(await authState(page))) return;
+    await acknowledgeSignInNotice(page);
     if (await page.getByPlaceholder('User name',{exact:true}).count() !== 1 || await page.getByPlaceholder('Password',{exact:true}).count() !== 1) stop('unexpected_login_form');
     let secret = '', receipt;
     try {
