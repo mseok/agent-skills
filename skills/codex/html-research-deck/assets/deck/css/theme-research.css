@@ -1,0 +1,50 @@
+/* Research theme for the HTML deck engine (loads after css/deck.css).
+   Fixed per-slide grid, 1920×1080 stage:
+     title block  kicker y=50 · h2 y=92 (51 px) → ends at y≈152
+     panels       top 176 … bottom 898 (height 722 when one row); every gutter 24 px; inner padding 20 px
+     closing line white panel, bottom 80 → spans y 922–1000 (one line of 30 px)
+     cite         bottom 30, 17 px · slide number bottom right (engine)
+   Figures sit on white panels; the stage stays the warm off-white. No coloured bars, gradients or tracking. */
+
+.slide > .kicker { letter-spacing: .02em; text-transform: none; font-size: 21px; font-weight: 600; }
+
+/* panels */
+.panel { position: absolute; background: #fff; border-radius: 16px; box-shadow: 0 1px 2px rgba(31,41,51,.05), 0 6px 24px rgba(31,41,51,.07); }
+.panel > svg.sc { left: 20px; top: 20px; }
+.panel > .figwrap { position: absolute; left: 20px; top: 20px; }
+.panel > .cap { position: absolute; left: 20px; right: 20px; bottom: 16px; margin: 0; font-size: 19px; color: var(--muted); line-height: 1.35; }
+.panel > .lines { position: absolute; left: 40px; right: 40px; top: 40px; font-size: 30px; line-height: 1.55; color: var(--ink); }
+.panel > .lines p { margin: 0 0 22px; }
+.panel > .lines b { color: var(--navy); font-weight: 700; }
+
+/* closing line: a plain white panel, same shadow as the figure panels */
+.slide > .takeaway, .slide > .takeaway.blue, .slide > .takeaway.teal, .slide > .takeaway.violet, .slide > .takeaway.coral, .slide > .takeaway.navy, .slide > .takeaway.solid {
+  background: #fff; border: 0; border-radius: 16px; box-shadow: 0 1px 2px rgba(31,41,51,.05), 0 6px 24px rgba(31,41,51,.07);
+  padding: 18px 30px; left: 110px; right: 110px; bottom: 80px; text-align: center; font-size: 30px; font-weight: 600; color: var(--navy); line-height: 1.4; }
+.progress { background: #D9DEE3; height: 3px; }
+.cite { font-size: 17px; }
+
+/* title and section slides: no blurred colour wash, no gradient text, no tracking */
+.wash { display: none; }
+.title-slide h1 em { background: none; -webkit-background-clip: initial; background-clip: initial; color: var(--blue); -webkit-text-fill-color: var(--blue); }
+.section-slide .sec-num { letter-spacing: .02em; text-transform: none; color: var(--blue); }
+
+/* scene drawings (inline SVG inside a panel). Classes: n name · s sub · m muted · in in-shape label · lane lane header */
+svg.sprite text { font-family: var(--sans); }
+svg.sc { position: absolute; overflow: visible; }
+svg.sc text { font-family: var(--sans); fill: var(--ink); }
+svg.sc .n { font-size: 26px; font-weight: 700; }
+svg.sc .s { font-size: 21px; fill: var(--ink-soft); }
+svg.sc .m { font-size: 19px; fill: var(--muted); }
+svg.sc .in { font-size: 24px; font-weight: 700; text-anchor: middle; }
+svg.sc .lane { font-size: 21px; font-weight: 650; fill: var(--ink-soft); }
+svg.sc .ar { fill: none; stroke: #8E9AA6; stroke-width: 2.5; }
+svg.sc .arb { fill: none; stroke: #4C72B0; stroke-width: 2.8; }
+svg.sc .x { stroke: #D1495B; stroke-width: 4; stroke-linecap: round; }
+
+/* raster render with leader labels drawn on top */
+.figwrap img { display: block; }
+.figwrap svg { position: absolute; left: 0; top: 0; overflow: visible; }
+.figwrap svg text { font-family: var(--sans); font-size: 20px; font-weight: 600; fill: var(--ink); paint-order: stroke; stroke: #fff; stroke-width: 5px; stroke-linejoin: round; }
+.figwrap svg line { stroke: #1F2933; stroke-width: 1.5; }
+.figwrap svg circle { fill: #1F2933; }
