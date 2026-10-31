@@ -87,6 +87,7 @@ def main():
     ap.add_argument('--iterate', default='iterate_deck.py', help='iteration script in this folder (iterate_deck.py for design, iterate_message.py for copy)')
     ap.add_argument('--prefix', default='iter', help='record file prefix: iter (design) or iter-msg (message)')
     ap.add_argument('--note', default='심사 근거(evidence)에 적힌 장을 우선 고친다. 측정 항목 만점을 유지한다.')
+    ap.add_argument('--judges', type=int, default=1, help='message-judge runs per iteration (median of N); only iterate_message.py understands it')
     a = ap.parse_args()
     deck = Path(a.deck).resolve()
     qa = deck / 'deck' / 'qa'
@@ -125,7 +126,7 @@ def main():
         log(qa, f'iteration {n} start')
         with open(qa / f'{pre}-{n}.log', 'w', encoding='utf-8') as lf:
             r = subprocess.run([sys.executable, '-I', str(HERE / a.iterate), str(deck), '--n', str(n), '--builder', '--model', a.model, '--effort', a.effort,
-                                '--note', a.note], stdout=lf, stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL, timeout=4 * 3600)
+                                '--note', a.note] + (['--judges', str(a.judges)] if a.judges > 1 else []), stdout=lf, stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL, timeout=4 * 3600)
         rec_p = qa / f'{pre}-{n}.json'
         rec = json.loads(rec_p.read_text(encoding='utf-8')) if rec_p.exists() else {}
         b_p = qa / f'{bpre}-{n}.json'

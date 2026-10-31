@@ -64,6 +64,7 @@ def main():
     ap.add_argument('deck'); ap.add_argument('--n', type=int, required=True); ap.add_argument('--builder', action='store_true')
     ap.add_argument('--model', default='claude-opus-5-5'); ap.add_argument('--effort', default='max'); ap.add_argument('--note', default='')
     ap.add_argument('--reuse-design-judge'); ap.add_argument('--skip-judges', action='store_true'); ap.add_argument('--design-target', type=float, default=90)
+    ap.add_argument('--judges', type=int, default=1, help='message-judge runs on the same copy dump; >1 scores the per-item median (judge_median.py)')
     a = ap.parse_args()
     deck = Path(a.deck).resolve(); qa = deck / 'deck' / 'qa'; index = deck / 'deck' / 'index.html'; work = deck / 'work'
     rec = {'n': a.n, 'kind': 'message', 'started': datetime.datetime.now().astimezone().isoformat(timespec='seconds'), 'model': a.model, 'effort': a.effort, 'costs_usd': {}}
@@ -129,9 +130,28 @@ def main():
     if not a.skip_judges:
         ts = datetime.datetime.now().strftime('%Y%m%dT%H%M%S'); jm = qa / f'judge-msg-{ts}.json'
         n = json.loads((qa / 'copy.json').read_text(encoding='utf-8'))['n']
-        j = sh([PY, '-I', str(HERE / 'judge_message.py'), '--copy', str(qa / 'copy.txt'), '--context', str(deck / 'paper' / 'context-for-judge.txt'), '--contact', str(qa / 'contact.png'),
-                '--slides', str(n), '--out', str(jm), '--model', a.model, '--effort', a.effort, '--timeout', '2400'], timeout=2700)
-        rec['message_judge_stdout'] = j.stdout.strip()[-300:]
+        judge_cmd = [PY, '-I', str(HERE / 'judge_message.py'), '--copy', str(qa / 'copy.txt'), '--context', str(deck / 'paper' / 'context-for-judge.txt'), '--contact', str(qa / 'contact.png'),
+                     '--slides', str(n), '--model', a.model, '--effort', a.effort, '--timeout', '2400']
+        if a.judges <= 1:
+            j = sh(judge_cmd + ['--out', str(jm)], timeout=2700)
+            rec['message_judge_stdout'] = j.stdout.strip()[-300:]
+        else:
+            # several independent draws on the same dump, run concurrently, then the per-item median (judge_median.py)
+            run_files = [qa / f'judge-msg-{ts}-r{k + 1}.json' for k in range(a.judges)]
+            procs = [subprocess.Popen(judge_cmd + ['--out', str(f)], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL, text=True) for f in run_files]
+            outs = []
+            for p in procs:
+                try:
+                    outs.append(p.communicate(timeout=2700)[0].strip()[-200:])
+                except subprocess.TimeoutExpired:
+                    p.kill(); outs.append('timeout')
+            good = [f for f in run_files if f.exists() and not json.loads(f.read_text(encoding='utf-8')).get('parse_error')]
+            rec['message_judge_runs'] = {str(f.name): o for f, o in zip(run_files, outs)}
+            if len(good) >= 2:
+                m = sh([PY, '-I', str(HERE / 'judge_median.py'), '--out', str(jm)] + [str(f) for f in good], timeout=120)
+                rec['message_judge_stdout'] = m.stdout.strip()[-300:]
+            elif good:
+                shutil.copy(good[0], jm); rec['message_judge_stdout'] = f'only one usable judge run ({good[0].name}); used as is'
         if jm.exists():
             m = json.loads(jm.read_text(encoding='utf-8')); rec['costs_usd']['message_judge'] = m.get('cost_usd'); rec['message_judge_parse_error'] = m.get('parse_error')
     else:
