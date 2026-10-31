@@ -160,11 +160,13 @@ def main():
         D['colon'][s['n']] = cnt
         ok += cnt == 0
     M8 = round(4 * ok / nc, 2)
-    # M9 no parenthetical tags without a number in title, closing line, lane headers and visible runs (user decision 2026-10-31)
+    # M9 no parenthetical tags in title, closing line, lane headers and visible runs (user decision 2026-10-31);
+    # a parenthesis that holds a number or only a unit (%, pp, 점, 회 …) carries information and is exempt, as the rubric says
     ok = 0; D['paren'] = {}
     PAREN = re.compile(r'[(（]([^()（）]*)[)）]')
+    UNIT = re.compile(r'^\s*(%|pp|%p|포인트|점|회|대|개|명|초|분|시간|GPU-h|kB|MB)\s*$')
     for s in content:
-        tags = [m.group(1) for t in [s['h2'], s['closing']] + s['lanes'] + s['visible'] for m in PAREN.finditer(t) if not re.search(r'\d', m.group(1))]
+        tags = [m.group(1) for t in [s['h2'], s['closing']] + s['lanes'] + s['visible'] for m in PAREN.finditer(t) if not re.search(r'\d', m.group(1)) and not UNIT.match(m.group(1))]
         D['paren'][s['n']] = tags or 'ok'
         ok += not tags
     M9 = round(4 * ok / nc, 2)
