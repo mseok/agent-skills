@@ -93,15 +93,26 @@ MEASURE = r'''
         const b = box(el); if (b.w === 0 && b.h === 0) return;
         const tag = el.tagName.toLowerCase();
         add(b);
-        if (tag === 'text') texts.push({ b, fs: R(parseFloat(getComputedStyle(el).fontSize) || 0), t: snip(el) });
+        if (tag === 'text') texts.push({ b, fs: R(parseFloat(getComputedStyle(el).fontSize) || 0), t: snip(el), fill: getComputedStyle(el).fill, chars: (el.textContent || '').replace(/\s+/g, '').length });
         else if (tag === 'rect' || tag === 'circle' || tag === 'ellipse' || tag === 'use') shapes.push({ b, tag });
         else if (tag === 'line') { const e = endpoints(el); if (e) segs.push({ p: e[0], q: e[1] }); }
       });
+      // figure extent: every non-text SVG element plus images (for the "is there a drawing, how much of the panel does it use" score)
+      let fu = null;
+      const addF = b => { fu = fu ? { x: Math.min(fu.x, b.x), y: Math.min(fu.y, b.y), x2: Math.max(fu.x2, b.x + b.w), y2: Math.max(fu.y2, b.y + b.h) } : { x: b.x, y: b.y, x2: b.x + b.w, y2: b.y + b.h }; };
+      svgLeaves.forEach(el => { if (el.tagName.toLowerCase() === 'text') return; const b = box(el); if (b.w > 0 || b.h > 0) addF(b); });
       const htmlBlocks = [];
-      htmlLeaves.forEach(el => { const b = box(el); if (b.w === 0 && b.h === 0) return; add(b); htmlBlocks.push({ b, t: snip(el), tag: el.tagName.toLowerCase() }); });
+      htmlLeaves.forEach(el => { const b = box(el); if (b.w === 0 && b.h === 0) return; add(b); if (el.tagName.toLowerCase() === 'img') addF(b); htmlBlocks.push({ b, t: snip(el), tag: el.tagName.toLowerCase(), chars: (el.textContent || '').replace(/\s+/g, '').length }); });
       // bordered HTML rows/cards count as content for the fill measurement (their text may end above the border)
       Array.from(p.children).filter(el => !(el instanceof SVGElement) && vis(el)).forEach(el => { const b = box(el); if (b.w > 0 && b.h > 0) add(b); });
       const P = { i: pi + 1, box: pb, svg: svgLeaves.length, texts: texts.length, html: htmlBlocks.length };
+      const innerArea = Math.max(1, (pb.w - 2 * PAD) * (pb.h - 2 * PAD));
+      P.figure = fu ? { x: R(fu.x), y: R(fu.y), w: R(fu.x2 - fu.x), h: R(fu.y2 - fu.y), share: R(100 * (fu.x2 - fu.x) * (fu.y2 - fu.y) / innerArea) / 100 } : null;
+      // text runs with size, colour and whether they are free commentary (not inside a shape, wider than 40 % of the inner width)
+      P.runs = texts.map(t => ({ fs: t.fs, x: t.b.x, y: t.b.y, w: t.b.w, h: t.b.h, fill: t.fill, chars: t.chars, t: t.t.slice(0, 24), inShape: shapes.some(sh => contains(sh.b, em(t), 1.5)), free: !shapes.some(sh => contains(sh.b, em(t), 1.5)) && t.b.w >= 0.4 * (pb.w - 2 * PAD) }));
+      P.shapeBoxes = shapes.map(sh => sh.b);
+      P.ink = P.figure;  // non-text extent only (figure incl. labels is computed by score_deck.py)
+      P.htmlChars = htmlBlocks.reduce((a, h) => a + (h.chars || 0), 0);
       if (u) {
         P.content = { x: R(u.x), y: R(u.y), w: R(u.x2 - u.x), h: R(u.y2 - u.y) };
         P.gap = { top: R(u.y - pb.y), bottom: R(pb.y + pb.h - u.y2), left: R(u.x - pb.x), right: R(pb.x + pb.w - u.x2) };
