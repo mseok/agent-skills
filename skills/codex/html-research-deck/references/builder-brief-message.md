@@ -15,7 +15,7 @@
    - 정직: 모식·좌표값·발표자 해석은 **인용줄**에 표시(제목·라벨의 괄호 태그가 아니라). 논문 범위(30개 모델, 14개 시나리오, 이 게임)를 넘는 일반화 금지. 저자 주장과 발표자 생각을 섞지 않는다.
    - 노트: 출처 인용은 유지하고, 그 장을 말할 첫 문장과 다음 장으로 넘어가는 문장을 덧붙인다.
 3. 그림 요소의 라벨을 바꿀 때는 글자 수가 늘어 패널 밖으로 나가거나 겹치지 않게 한다. 레이아웃을 바꿔야 한다면 최소로, `check_layout.py` 0 오류·0 경고를 유지한다.
-4. `work/build.py`만 고친다. 그런 다음 반드시 실행: `python3 work/build.py`, `python3 ~/.claude/skills/html-research-deck/scripts/check_deck.py deck/index.html`, `python3 ~/.claude/skills/html-research-deck/scripts/check_layout.py deck/index.html --quiet`, `python3 ~/.claude/skills/html-research-deck/scripts/score_message.py deck/index.html --out /tmp/score-message-check.json --storyline-v1 work/storyline-v1.json`(측정 항목만 — 심사 없이 측정 50점 중 몇 점인지와 detail을 본다), `sh ~/.claude/skills/html-research-deck/scripts/shots.sh deck/index.html deck/qa/shots-full 1`. 고친 장의 PNG를 열어 눈으로 확인한다.
+4. `work/build.py`만 고친다. 그런 다음 반드시 실행: `python3 work/build.py`, `python3 ~/.claude/skills/html-research-deck/scripts/check_deck.py deck/index.html`, `python3 ~/.claude/skills/html-research-deck/scripts/check_layout.py deck/index.html --quiet`, `python3 ~/.claude/skills/html-research-deck/scripts/score_message.py deck/index.html --out /tmp/score-message-check.json --storyline-v1 work/storyline-v1.json`(측정 항목만 — 심사 없이 측정 50점 중 몇 점인지와 detail을 본다), `sh ~/.claude/skills/html-research-deck/scripts/shots.sh deck/index.html deck/qa/shots-full 1`, `python3 ~/.claude/skills/html-research-deck/scripts/copy_lint.py deck/index.html`(유효 규칙 B·C·D·F의 기계 점검 — 금지어 0장이 될 때까지 고친다; 나머지 항목은 보고에 적는다). 고친 장의 PNG를 열어 눈으로 확인한다.
 5. 마지막에 바꾼 장과 문구(제목·마무리줄 전후), 측정 점수 줄, 남은 경고를 짧게 보고한다. 심사와 최종 점수는 호출자가 한다(직접 점수를 주장하지 않는다).
 
 금지: `references/`, `scripts/`, `deck/qa/judge*.json`, `deck/qa/score*.json`, `work/storyline*.json` 수정(스토리라인은 호출자가 덱에서 다시 스냅샷한다); 슬라이드 삭제·병합·추가; 출처 없는 수치 추가; 노트에 없는 숫자를 화면에 추가; 그림 재설계(문구 때문에 꼭 필요한 최소 조정만); 하위 에이전트 생성; 네트워크·GUI 사용.
@@ -42,7 +42,7 @@
 - 섹션 이름 "들여다보기"는 무엇을 보는지 말하지 않는다는 지적 — 바꾼다면 네 장(16–19) 킥커를 한꺼번에, "보고서 읽기"처럼 대상이 보이는 짧은 말로.
 
 **D. 제목 (N1).**
-- 콜론을 쉼표로 바꾼 "주제, 요점" 두 토막도 라벨 구문이다(6회차 N3 근거: 20장 제목 "우리에게 주는 뜻, 성과와 이유를 따로 재기", 20장 레인 헤더 "안테나 함정의 숨은 기전, 신호 → 탐지 → 격추"와 "말로 본 실패, 여러 턴 보고서의 네 패턴"; 17장 레인 헤더도 같은 꼴). 한 구절로 쓴다 — "성과와 이유를 따로 재야 하는 우리 데이터", "신호를 내보내 탐지되는 안테나". 사용자 결정(2026-10-31 "A:B … 최대한 안 쓰면")의 취지다.
+- 콜론을 쉼표로 바꾼 "주제, 요점" 두 토막도 라벨 구문이다(6회차 N3 근거: 20장 제목 "우리에게 주는 뜻, 성과와 이유를 따로 재기", 8장 레인 헤더 "안테나 함정의 숨은 기전, 신호 → 탐지 → 격추"와 17장 레인 헤더 "말로 본 실패, 여러 턴 보고서의 네 패턴"·"설계로 본 실패, 안테나 함정 504판의 경로"; 심사는 이것들을 20장으로 적었지만 덤프상 위치는 8·17장). 한 구절로 쓴다 — "성과와 이유를 따로 재야 하는 우리 데이터", "신호를 내보내 탐지되는 안테나". 사용자 결정(2026-10-31 "A:B … 최대한 안 쓰면")의 취지다.
 - 차트를 서술하는 제목("…가 …에서만 갈림")은 요점이 아니다(15장 N1 1). 제목은 청중의 말로 된 발견 하나. 15장은 논문 §4.3 Observation 4("Only causal reasoning protects against exploration overfitting … At Stage 1 rates of 75 to 85%, causally-aware trajectories have a mean gap of −3.0 pp versus +4.5 pp otherwise")를 연관으로 읽은 범위 안에서 쓴다 — 예: "이유를 짚은 판일수록 작은 표본에 덜 속음" — 그리고 인용줄의 "저자의 'protects'를 발표자는 연관으로 읽음"은 유지한다. 저자의 'only'를 그대로 옮기려면 제목이 아니라 노트에 저자 표현임을 적고 옮긴다.
 
 **E. 한 양 한 이름, 한 낱말 한 뜻 (N2).**
@@ -62,11 +62,11 @@
 
 **I. 마치기 전 자체 점검 — 결과를 보고에 적는다.**
 1. 바뀐 제목·마무리줄 목록이 A의 지목 장 안에 있는가.
-2. 모든 마무리줄에 B의 금지어가 없는가(`deck_copy.py`로 덤프해 grep).
+2. 모든 마무리줄에 B의 금지어가 없는가(`copy_lint.py`의 "금지어 0장").
 3. 사례 숫자가 든 마무리줄마다 같은 문장에 범위 말이 있는가.
 4. 본문(레인·라벨)에 '저자'·'발표자'·'모식'이 없고 인용줄에만 있는가.
 5. "A, B" 두 절 쉼표형 마무리줄이 내용 18장 중 12장 이하인가.
-6. 손잡이가 되는 전환(마지막 명사 = 다음 장 킥커 소주제·제목 주제어)이 몇 곳인가.
+6. 손잡이가 되는 전환(마지막 명사 = 다음 장 킥커 소주제·제목 주제어)이 몇 곳인가. 3–6은 `copy_lint.py`의 요약 줄을 그대로 보고에 붙인다.
 
 ## 7회차 이후 우선순위 (6회차 심사 2026-11-01 01:22 기준)
 
