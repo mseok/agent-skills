@@ -119,6 +119,12 @@ def main():
     sd = json.loads((qa / 'score.json').read_text(encoding='utf-8'))
     # message score with a fresh message judge
     sh([PY, '-I', str(HERE / 'deck_copy.py'), str(index), '--json', str(qa / 'copy.json'), '--text', str(qa / 'copy.txt'), '--notes', '500'])
+    try:  # advisory rule self-check (builder brief section I): summary line into the record, full report into qa/copy-lint.txt
+        lint = sh([PY, '-I', str(HERE / 'copy_lint.py'), '--json', str(qa / 'copy.json')], timeout=120)
+        (qa / 'copy-lint.txt').write_text(lint.stdout, encoding='utf-8')
+        rec['copy_lint'] = [l for l in lint.stdout.splitlines() if l.startswith('요약')][-1:]
+    except (OSError, subprocess.SubprocessError) as e:
+        rec['copy_lint'] = [f'copy_lint failed: {e}']
     jm = None
     if not a.skip_judges:
         ts = datetime.datetime.now().strftime('%Y%m%dT%H%M%S'); jm = qa / f'judge-msg-{ts}.json'
