@@ -15,7 +15,7 @@ Everything below was fixed on 2026-10-30 against the accepted three-slide sample
 
 Rows of panels: equal heights inside a row; widths sum to 1700 with 24 px between. Standard splits: 1700 · 838+838 · 1012+664 (scene + render) · 1236+440 (scene + small render) · two rows 388 + 310. Templates in `assets/deck/templates/` carry these coordinates; `scripts/check_deck.py` rejects any other gutter.
 
-Inside a panel the drawing is centred: pick the `viewBox` so the content has equal top/bottom margins (slide 1 of the sample uses `viewBox="20 21 1660 682"` for a 540 px tall drawing). Keep inner margins between 20 and ~80 px; if the drawing cannot fill a 722 px panel, split the slide or add the consequence panel rather than leaving a half-empty card.
+Inside a panel the drawing is centred: pick the `viewBox` so the content has equal top/bottom margins (slide 1 of the sample uses `viewBox="20 21 1660 682"` for a 540 px tall drawing). Keep inner margins between 20 and ~80 px; if the drawing cannot fill a 722 px panel, split the slide or add the consequence panel rather than leaving a half-empty card. Measured rule (`scripts/check_layout.py`): with the lane header baseline at scene y 28 the top gap is ≈27 px, so the lowest glyph or shape must reach scene y ≈ 650–665 in a 682 px scene (bottom gap within 24 px of the top gap, never above 80 px). Fill by enlarging the figure (taller bars, wider node spacing, bigger boxes) and the type — scene text 20 px minimum, lane 22, body 21–22, emphasis 23–26 — not by adding lines; a detail that only fits at 17–18 px goes to the speaker notes.
 
 ## Typography
 
