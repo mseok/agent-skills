@@ -114,7 +114,7 @@ def main():
         D['closing'][s['n']] = why or 'ok'
         ok += not why
     M3 = round(8 * ok / nc, 2)
-    # M4 jargon: (a) banned tokens incl. closing slide, (b) first-use gloss
+    # M4 jargon: (a) banned tokens incl. closing slide, (b) jargon avoided (plain Korean instead of term + parenthetical gloss)
     scope = [s for s in S if s['n'] > 1]
     clean = 0
     for s in scope:
@@ -122,15 +122,15 @@ def main():
         D['banned'][s['n']] = hits or 'ok'
         clean += not hits
     M4a = round(4 * clean / max(1, len(scope)), 2)
-    present = 0; good = 0
+    present = 0
     for term in JARGON:
         for s in S:
             text = vis_text(s); idx = find_term(text, term)
             if idx >= 0:
-                present += 1; g = glossed(text, idx, term); good += g
-                D['jargon'][term] = {'first_slide': s['n'], 'glossed': g, 'context': text[max(0, idx - 20): idx + len(term) + 36]}
+                present += 1
+                D['jargon'][term] = {'first_slide': s['n'], 'glossed': glossed(text, idx, term), 'context': text[max(0, idx - 20): idx + len(term) + 36]}
                 break
-    M4b = round(6 * good / present, 2) if present else 6.0
+    M4b = round(6 * (1 - present / len(JARGON)), 2)
     M4 = round(M4a + M4b, 2)
     # M5 number budget in kicker/h2/closing/lanes
     ok = 0
@@ -143,16 +143,16 @@ def main():
     guide = any(re.search(r'(^|\s)(이 발표|오늘)', r) for s in S if 2 <= s['n'] <= 4 for r in s['visible'] + s['lanes'] + [s['closing']])
     hook = any(any(h in r for h in HOOK) for s in S if 2 <= s['n'] <= 3 for r in s['visible'] + s['lanes'] + [s['closing'], s['h2']])
     D['guide'] = {'this_talk_sentence_in_2_4': guide, 'audience_hook_in_2_3': hook}
-    M6 = (3 if guide else 0) + (3 if hook else 0)
-    # M7 honesty marks
+    M6 = (2 if guide else 0) + (2 if hook else 0)
+    # M7 honesty marks must sit in the cite line (not as parenthetical tags in titles or labels)
     app = 0; ok = 0
     for s in scope:
         if HONEST_NOTE.search(s['notes'] or ''):
             app += 1
-            shown = bool(HONEST_MARK.search(' '.join(s['visible'] + s['lanes'] + [s['closing'], s['cite']])))
-            D['honesty'][s['n']] = 'ok' if shown else '노트에는 있으나 화면 표시 없음'
+            shown = bool(HONEST_MARK.search(s['cite'] or ''))
+            D['honesty'][s['n']] = 'ok' if shown else '노트에는 있으나 인용줄 표시 없음'
             ok += shown
-    M7 = round(6 * ok / app, 2) if app else 6.0
+    M7 = round(4 * ok / app, 2) if app else 4.0
     # M8 no colon constructions in title, closing line and lane headers (user decision 2026-10-31)
     ok = 0; D['colon'] = {}
     for s in content:
@@ -160,7 +160,15 @@ def main():
         D['colon'][s['n']] = cnt
         ok += cnt == 0
     M8 = round(4 * ok / nc, 2)
-    measured = {'M1': M1, 'M2': M2, 'M3': M3, 'M4': M4, 'M5': M5, 'M6': M6, 'M7': M7, 'M8': M8}
+    # M9 no parenthetical tags without a number in title, closing line, lane headers and visible runs (user decision 2026-10-31)
+    ok = 0; D['paren'] = {}
+    PAREN = re.compile(r'[(（]([^()（）]*)[)）]')
+    for s in content:
+        tags = [m.group(1) for t in [s['h2'], s['closing']] + s['lanes'] + s['visible'] for m in PAREN.finditer(t) if not re.search(r'\d', m.group(1))]
+        D['paren'][s['n']] = tags or 'ok'
+        ok += not tags
+    M9 = round(4 * ok / nc, 2)
+    measured = {'M1': M1, 'M2': M2, 'M3': M3, 'M4': M4, 'M5': M5, 'M6': M6, 'M7': M7, 'M8': M8, 'M9': M9}
     measured_total = round(sum(measured.values()), 2)
 
     judged = {'N1': 0.0, 'N2': 0.0, 'N3': 0.0, 'N4': 0.0, 'N5': 0.0, 'missing_slides': []}
