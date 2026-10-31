@@ -10,8 +10,9 @@ script appended; the copy and the Chrome profile are removed afterwards. Every s
 (#/n/99). Coordinates are stage pixels (1920x1080). Exit 1 when errors were found, 2 when the run failed.
 
 errors   : text-outside-panel, text-outside-stage, text-overlap, html-overflow, closing-wraps
-warnings : text-in-padding (inside the 20 px inner margin), text-crosses-shape, panel-underfilled (a gap > 80 px),
-           panel-unbalanced (|top gap - bottom gap| > 24 px), panel-tight (a gap < 12 px)
+warnings : text-in-padding (inside the 20 px inner margin), text-crosses-shape, text-crosses-line (a <line> segment
+           runs through a glyph box), box-unbalanced (text inside a rect sits off-centre vertically by > 10 px),
+           panel-underfilled (a gap > 80 px), panel-unbalanced (|top gap - bottom gap| > 24 px), panel-tight (a gap < 12 px)
 """
 import argparse
 import json
@@ -56,6 +57,17 @@ MEASURE = r'''
   const box = el => norm(el.getBoundingClientRect());
   const inter = (a, b) => ({ w: Math.min(a.x + a.w, b.x + b.w) - Math.max(a.x, b.x), h: Math.min(a.y + a.h, b.y + b.h) - Math.max(a.y, b.y) });
   const contains = (o, i, tol) => i.x >= o.x - tol && i.y >= o.y - tol && i.x + i.w <= o.x + o.w + tol && i.y + i.h <= o.y + o.h + tol;
+  const segRect = (p, q, r) => {  // does segment p-q pass through rect r (Liang–Barsky clip)?
+    let t0 = 0, t1 = 1; const dx = q.x - p.x, dy = q.y - p.y;
+    const clip = (den, num) => { if (den === 0) return num <= 0; const t = num / den; if (den < 0) { if (t > t1) return false; if (t > t0) t0 = t; } else { if (t < t0) return false; if (t < t1) t1 = t; } return true; };
+    return clip(-dx, p.x - r.x) && clip(dx, r.x + r.w - p.x) && clip(-dy, p.y - r.y) && clip(dy, r.y + r.h - p.y) && t0 <= t1;
+  };
+  const endpoints = el => {  // <line> endpoints in stage pixels
+    const m = el.getScreenCTM(); if (!m) return null;
+    const s = stage.getBoundingClientRect(); const k = s.width / 1920;
+    const pt = (x, y) => { const d = new DOMPoint(x, y).matrixTransform(m); return { x: R((d.x - s.left) / k), y: R((d.y - s.top) / k) }; };
+    return [pt(el.x1.baseVal.value, el.y1.baseVal.value), pt(el.x2.baseVal.value, el.y2.baseVal.value)];
+  };
   const snip = el => (el.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 70);
   const em = t => { const ins = Math.max(0, (t.b.h - t.fs * 0.95) / 2); return { x: t.b.x, y: t.b.y + ins, w: t.b.w, h: t.b.h - 2 * ins }; };
   const STAGE = { x: 0, y: 0, w: 1920, h: 1080 };
@@ -74,7 +86,7 @@ MEASURE = r'''
       const inner = { x: pb.x + PAD, y: pb.y + PAD, w: pb.w - 2 * PAD, h: pb.h - 2 * PAD };
       const svgLeaves = Array.from(p.querySelectorAll('text, rect, circle, ellipse, line, path, polygon, polyline, image, use')).filter(el => el instanceof SVGElement && !el.closest('defs') && vis(el));
       const htmlLeaves = Array.from(p.querySelectorAll('p, li, h3, h4, img, .cap')).filter(el => !(el instanceof SVGElement) && vis(el));
-      const texts = [], shapes = [];
+      const texts = [], shapes = [], segs = [];
       let u = null;
       const add = b => { u = u ? { x: Math.min(u.x, b.x), y: Math.min(u.y, b.y), x2: Math.max(u.x2, b.x + b.w), y2: Math.max(u.y2, b.y + b.h) } : { x: b.x, y: b.y, x2: b.x + b.w, y2: b.y + b.h }; };
       svgLeaves.forEach(el => {
@@ -83,6 +95,7 @@ MEASURE = r'''
         add(b);
         if (tag === 'text') texts.push({ b, fs: R(parseFloat(getComputedStyle(el).fontSize) || 0), t: snip(el) });
         else if (tag === 'rect' || tag === 'circle' || tag === 'ellipse' || tag === 'use') shapes.push({ b, tag });
+        else if (tag === 'line') { const e = endpoints(el); if (e) segs.push({ p: e[0], q: e[1] }); }
       });
       const htmlBlocks = [];
       htmlLeaves.forEach(el => { const b = box(el); if (b.w === 0 && b.h === 0) return; add(b); htmlBlocks.push({ b, t: snip(el), tag: el.tagName.toLowerCase() }); });
@@ -108,6 +121,17 @@ MEASURE = r'''
         const o = inter(t.b, sh.b);
         if (o.w > 1 && o.h > 1 && !contains(sh.b, em(t), 1.5)) S.findings.push({ kind: 'text-crosses-shape', panel: pi + 1, text: t.t, shape: sh.tag, shapeBox: sh.b, box: t.b });
       }));
+      texts.forEach(t => { const e = em(t); const r = { x: e.x + 1, y: e.y + 1, w: Math.max(0, e.w - 2), h: Math.max(0, e.h - 2) };
+        segs.forEach(sg => { if (segRect(sg.p, sg.q, r)) S.findings.push({ kind: 'text-crosses-line', panel: pi + 1, text: t.t, box: t.b, line: [sg.p, sg.q] }); }); });
+      // text inside a leaf box should sit centred: compare the gap above the first glyph with the gap below the last one.
+      // Containers (a rect holding other shapes: cards with bars, column bands, grouped boxes) are judged by eye instead.
+      shapes.filter(sh => sh.tag === 'rect' && sh.b.h >= 50 && sh.b.w >= 60 && !shapes.some(o => o !== sh && contains(sh.b, o.b, 1))).forEach(sh => {
+        const inside = texts.filter(t => contains(sh.b, em(t), 1.5));
+        if (!inside.length) return;
+        const top = Math.min(...inside.map(t => t.b.y)), bot = Math.max(...inside.map(t => t.b.y + t.b.h));
+        const gt = R(top - sh.b.y), gb = R(sh.b.y + sh.b.h - bot);
+        if (Math.abs(gt - gb) > 10) S.findings.push({ kind: 'box-unbalanced', panel: pi + 1, box: sh.b, gapTop: gt, gapBottom: gb, text: inside[0].t });
+      });
       if (P.gap) {
         if (P.gap.bottom > 80 || P.gap.top > 80) S.findings.push({ kind: 'panel-underfilled', panel: pi + 1, gap: P.gap });
         else if (Math.abs(P.gap.bottom - P.gap.top) > 24) S.findings.push({ kind: 'panel-unbalanced', panel: pi + 1, gap: P.gap });
@@ -159,6 +183,11 @@ def describe(f):
         return f"{k}: \"{f['a']}\" × \"{f['b']}\" overlap {f['overlap']['w']:g}×{f['overlap']['h']:g} px at {fmt_box(f['boxA'])} / {fmt_box(f['boxB'])}"
     if k == 'text-crosses-shape':
         return f"{k}: \"{f['text']}\" {fmt_box(f['box'])} crosses {f['shape']} {fmt_box(f['shapeBox'])}"
+    if k == 'text-crosses-line':
+        p, q = f['line']
+        return f"{k}: \"{f['text']}\" {fmt_box(f['box'])} crossed by line ({p['x']:g},{p['y']:g})–({q['x']:g},{q['y']:g})"
+    if k == 'box-unbalanced':
+        return f"{k}: rect {fmt_box(f['box'])} text gap top {f['gapTop']:g} · bottom {f['gapBottom']:g} (\"{f['text']}\" …)"
     if k in ('panel-underfilled', 'panel-unbalanced', 'panel-tight'):
         g = f['gap']
         return f"{k}: gaps top {g['top']:g} · bottom {g['bottom']:g} · left {g['left']:g} · right {g['right']:g}"
