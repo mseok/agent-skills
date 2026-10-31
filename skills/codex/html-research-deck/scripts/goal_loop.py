@@ -84,11 +84,15 @@ def main():
     ap.add_argument('--effort', default='max')
     ap.add_argument('--max-hours', type=float, default=72)
     ap.add_argument('--quota-sleep', type=int, default=18300)
+    ap.add_argument('--iterate', default='iterate_deck.py', help='iteration script in this folder (iterate_deck.py for design, iterate_message.py for copy)')
+    ap.add_argument('--prefix', default='iter', help='record file prefix: iter (design) or iter-msg (message)')
+    ap.add_argument('--note', default='심사 근거(evidence)에 적힌 장을 우선 고친다. 측정 항목 만점을 유지한다.')
     a = ap.parse_args()
     deck = Path(a.deck).resolve()
     qa = deck / 'deck' / 'qa'
+    pre = a.prefix; bpre = 'builder' + pre[4:]  # iter → builder, iter-msg → builder-msg
     t_end = time.time() + a.max_hours * 3600
-    log(qa, f'loop start target={a.target} model={a.model}/{a.effort} max_hours={a.max_hours}')
+    log(qa, f'loop start target={a.target} model={a.model}/{a.effort} max_hours={a.max_hours} iterate={a.iterate} prefix={pre}')
     status(qa, phase='start', target=a.target, pid=os.getpid())
     while time.time() < t_end:
         if (qa / 'STOP').exists():
@@ -100,9 +104,9 @@ def main():
             status(qa, phase='waiting-for-running-iteration', waiting_pid=running)
             time.sleep(60)
             continue
-        done = sorted(int(p.stem.split('-')[1]) for p in qa.glob('iter-*.json') if p.stem.split('-')[1].isdigit())
+        done = sorted(int(p.stem[len(pre) + 1:]) for p in qa.glob(f'{pre}-*.json') if p.stem[len(pre) + 1:].isdigit())
         if done:
-            last = json.loads((qa / f'iter-{done[-1]}.json').read_text(encoding='utf-8'))
+            last = json.loads((qa / f'{pre}-{done[-1]}.json').read_text(encoding='utf-8'))
             if last.get('valid') and (last.get('total') or 0) >= a.target:
                 log(qa, f"target reached at iteration {done[-1]}: {last['total']}")
                 status(qa, phase='done', iteration=done[-1], total=last['total'])
@@ -118,18 +122,19 @@ def main():
             continue
         status(qa, phase=f'iteration-{n}', iteration=n, started=now().isoformat(timespec='seconds'))
         log(qa, f'iteration {n} start')
-        with open(qa / f'iter-{n}.log', 'w', encoding='utf-8') as lf:
-            r = subprocess.run([sys.executable, '-I', str(HERE / 'iterate_deck.py'), str(deck), '--n', str(n), '--builder', '--model', a.model, '--effort', a.effort,
-                                '--note', '심사 근거(evidence)에 적힌 장을 우선 고친다. 측정 항목 만점을 유지한다.'], stdout=lf, stderr=subprocess.STDOUT, timeout=4 * 3600)
-        rec_p = qa / f'iter-{n}.json'
+        with open(qa / f'{pre}-{n}.log', 'w', encoding='utf-8') as lf:
+            r = subprocess.run([sys.executable, '-I', str(HERE / a.iterate), str(deck), '--n', str(n), '--builder', '--model', a.model, '--effort', a.effort,
+                                '--note', a.note], stdout=lf, stderr=subprocess.STDOUT, timeout=4 * 3600)
+        rec_p = qa / f'{pre}-{n}.json'
         rec = json.loads(rec_p.read_text(encoding='utf-8')) if rec_p.exists() else {}
-        b_p = qa / f'builder-{n}.json'
+        b_p = qa / f'{bpre}-{n}.json'
         b = json.loads(b_p.read_text(encoding='utf-8')) if b_p.exists() else {}
-        hit = (b.get('is_error') and LIMIT.search(str(b.get('result')))) or (rec.get('judge_parse_error') and LIMIT.search(str(rec.get('judge_stdout', '')) + str(rec.get('judge_parse_error'))))
+        judge_text = ' '.join(str(rec.get(k, '')) for k in ('judge_parse_error', 'judge_stdout', 'message_judge_parse_error', 'message_judge_stdout', 'design_judge_parse_error', 'design_judge_stdout'))
+        hit = (b.get('is_error') and LIMIT.search(str(b.get('result')))) or ((rec.get('judge_parse_error') or rec.get('message_judge_parse_error') or rec.get('design_judge_parse_error')) and LIMIT.search(judge_text))
         log(qa, f"iteration {n} end rc={r.returncode} total={rec.get('total')} valid={rec.get('valid')} costs={rec.get('costs_usd')}")
         status(qa, phase='between', iteration=n, total=rec.get('total'), valid=rec.get('valid'), costs=rec.get('costs_usd'), last_rc=r.returncode)
         if hit:
-            wait = reset_wait(str(b.get('result')) + str(rec.get('judge_stdout', '')), a.quota_sleep)
+            wait = reset_wait(str(b.get('result')) + judge_text, a.quota_sleep)
             wake = now() + datetime.timedelta(seconds=wait)
             log(qa, f'usage limit during iteration {n}; sleeping {wait}s until {wake.isoformat(timespec="minutes")}')
             status(qa, phase='sleeping-quota', next_wake=wake.isoformat(timespec='seconds'))
