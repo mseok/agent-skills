@@ -6,15 +6,21 @@ usage: python3 judge_median.py --out /abs/deck/qa/judge-msg-<ts>.json run1.json 
 Why: two Opus 5.5 max runs on identical text scored the CausalGame deck 37.22 and 34.56 of 50 and placed the N5
 deductions on different slides, so a single run cannot separate a better deck from a lenient draw near the threshold.
 The merged file keeps the judge-file shape score_message.py reads (judge.slides[].N1/N2/N4, judge.deck.N3/N5) with
-the median over runs for every item, concatenates each run's evidence with a run tag so the builder still sees every
+the median over runs for every item (lower middle value for an even number of runs; per-slide items stay integers 0–2 as score_message.py requires), concatenates each run's evidence with a run tag so the builder still sees every
 finding, sums the costs and lists the run files. The rubric, weights and threshold are untouched — only the estimator
 changes from one draw to the median of several. Read-only apart from --out.
 """
 import argparse
 import datetime
 import json
-import statistics
 from pathlib import Path
+
+
+def low_median(vals):
+    """Median for an odd count; the lower middle value for an even count (score_message.py accepts only 0, 1, 2 per
+    slide item, and rounding a .5 upward would flatter the deck)."""
+    s = sorted(vals)
+    return s[(len(s) - 1) // 2]
 
 
 def load(path):
@@ -42,15 +48,15 @@ def main():
         rows = slides[n]
         item = {'n': n}
         for k in ('N1', 'N2', 'N4'):
-            vals = [float(s.get(k, 0)) for _, s in rows]
-            item[k] = round(statistics.median(vals), 2)
+            vals = [int(s.get(k, 0) or 0) for _, s in rows]
+            item[k] = low_median(vals)
         item['runs'] = {tag: {k: s.get(k) for k in ('N1', 'N2', 'N4')} for tag, s in rows}
         item['evidence'] = ' | '.join(f"[{tag}] {s.get('evidence', '')}" for tag, s in rows)
         merged.append(item)
     deck = {}
     for k in ('N3', 'N5'):
         vals = [float(d['judge'].get('deck', {}).get(k, 0) or 0) for d in runs]
-        deck[k] = round(statistics.median(vals), 2)
+        deck[k] = low_median(vals)
         deck[f'{k}_runs'] = dict(zip(tags, vals))
         deck[f'{k}_evidence'] = ' | '.join(f"[{tag}] {d['judge'].get('deck', {}).get(f'{k}_evidence', '')}" for tag, d in zip(tags, runs))
     summary = {'worst': [f'[{tag}] {w}' for tag, d in zip(tags, runs) for w in (d['judge'].get('summary', {}).get('worst') or [])],
