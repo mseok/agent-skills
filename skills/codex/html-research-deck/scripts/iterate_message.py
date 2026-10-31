@@ -23,7 +23,8 @@ PY = sys.executable
 
 
 def sh(cmd, cwd=None, timeout=3600):
-    return subprocess.run(cmd, cwd=cwd, capture_output=True, text=True, timeout=timeout)
+    # stdin=DEVNULL: `claude -p` otherwise re-reads the launcher's inherited stdin (a heredoc) and appends it to its prompt
+    return subprocess.run(cmd, cwd=cwd, capture_output=True, text=True, timeout=timeout, stdin=subprocess.DEVNULL)
 
 
 def latest(qa, pattern):

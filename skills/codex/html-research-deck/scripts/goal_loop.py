@@ -45,7 +45,7 @@ def probe(model):
     """Return (ok, message). A usage-limit answer comes back as an error result or a non-JSON failure."""
     try:
         r = subprocess.run(['claude', '-p', 'Reply with exactly the word OK.', '--model', model, '--effort', 'low', '--output-format', 'json', '--permission-mode', 'plan'],
-                           capture_output=True, text=True, timeout=300)
+                           capture_output=True, text=True, timeout=300, stdin=subprocess.DEVNULL)
     except subprocess.TimeoutExpired:
         return False, 'probe timeout'
     try:
@@ -125,7 +125,7 @@ def main():
         log(qa, f'iteration {n} start')
         with open(qa / f'{pre}-{n}.log', 'w', encoding='utf-8') as lf:
             r = subprocess.run([sys.executable, '-I', str(HERE / a.iterate), str(deck), '--n', str(n), '--builder', '--model', a.model, '--effort', a.effort,
-                                '--note', a.note], stdout=lf, stderr=subprocess.STDOUT, timeout=4 * 3600)
+                                '--note', a.note], stdout=lf, stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL, timeout=4 * 3600)
         rec_p = qa / f'{pre}-{n}.json'
         rec = json.loads(rec_p.read_text(encoding='utf-8')) if rec_p.exists() else {}
         b_p = qa / f'{bpre}-{n}.json'

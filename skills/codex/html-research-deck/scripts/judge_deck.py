@@ -36,7 +36,7 @@ def main():
     cmd = ['claude', '-p', prompt, '--model', a.model, '--effort', a.effort, '--output-format', 'json', '--allowedTools', 'Read']
     t0 = datetime.datetime.now()
     try:
-        r = subprocess.run(cmd, cwd=str(shots), capture_output=True, text=True, timeout=a.timeout)
+        r = subprocess.run(cmd, cwd=str(shots), capture_output=True, text=True, timeout=a.timeout, stdin=subprocess.DEVNULL)
     except subprocess.TimeoutExpired:
         sys.exit(f'judge run exceeded {a.timeout}s')
     try:
