@@ -33,7 +33,7 @@ def main():
     prompt = ((SKILL / 'references' / 'judge-prompt.md').read_text(encoding='utf-8') + '\n\n---\n채점표 심사 항목:\n' + judged +
               f'\n\n---\n슬라이드 PNG ({n}장, 이 폴더): ' + ', '.join(p.name for p in pngs) +
               f'\n내용 슬라이드 = 2 … {n - 1} (1장 표지, {n}장 정리 제외). 모든 PNG를 Read 도구로 열어 본 뒤 JSON만 출력하라.')
-    cmd = ['claude', '-p', '--model', a.model, '--effort', a.effort, '--output-format', 'json', '--allowedTools', 'Read', prompt]
+    cmd = ['claude', '-p', prompt, '--model', a.model, '--effort', a.effort, '--output-format', 'json', '--allowedTools', 'Read']
     t0 = datetime.datetime.now()
     try:
         r = subprocess.run(cmd, cwd=str(shots), capture_output=True, text=True, timeout=a.timeout)
