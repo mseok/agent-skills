@@ -93,7 +93,8 @@ def main():
     pre = a.prefix; bpre = 'builder' + pre[4:]  # iter → builder, iter-msg → builder-msg
     t_end = time.time() + a.max_hours * 3600
     log(qa, f'loop start target={a.target} model={a.model}/{a.effort} max_hours={a.max_hours} iterate={a.iterate} prefix={pre}')
-    status(qa, phase='start', target=a.target, pid=os.getpid())
+    (qa / 'loop-status.json').write_text('{}\n', encoding='utf-8')  # a new loop starts from a clean status (no totals of an earlier loop)
+    status(qa, phase='start', target=a.target, pid=os.getpid(), iterate=a.iterate, prefix=pre)
     while time.time() < t_end:
         if (qa / 'STOP').exists():
             log(qa, 'STOP file present; ending')
