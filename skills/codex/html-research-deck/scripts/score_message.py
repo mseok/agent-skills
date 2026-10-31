@@ -89,7 +89,7 @@ def main():
         if BAN.search(t): why.append('금지 토큰')
         D['title'][s['n']] = why or 'ok'
         ok += not why
-    M1 = round(10 * ok / nc, 2)
+    M1 = round(8 * ok / nc, 2)
     # M2 kickers
     ok = 0; sections = set()
     for s in content:
@@ -113,7 +113,7 @@ def main():
             if j >= 0.6: why.append(f'제목 되풀이 (jaccard {j:.2f})')
         D['closing'][s['n']] = why or 'ok'
         ok += not why
-    M3 = round(10 * ok / nc, 2)
+    M3 = round(8 * ok / nc, 2)
     # M4 jargon: (a) banned tokens incl. closing slide, (b) first-use gloss
     scope = [s for s in S if s['n'] > 1]
     clean = 0
@@ -153,7 +153,14 @@ def main():
             D['honesty'][s['n']] = 'ok' if shown else '노트에는 있으나 화면 표시 없음'
             ok += shown
     M7 = round(6 * ok / app, 2) if app else 6.0
-    measured = {'M1': M1, 'M2': M2, 'M3': M3, 'M4': M4, 'M5': M5, 'M6': M6, 'M7': M7}
+    # M8 no colon constructions in title, closing line and lane headers (user decision 2026-10-31)
+    ok = 0; D['colon'] = {}
+    for s in content:
+        cnt = sum(t.count(':') + t.count('：') for t in [s['h2'], s['closing']] + s['lanes'])
+        D['colon'][s['n']] = cnt
+        ok += cnt == 0
+    M8 = round(4 * ok / nc, 2)
+    measured = {'M1': M1, 'M2': M2, 'M3': M3, 'M4': M4, 'M5': M5, 'M6': M6, 'M7': M7, 'M8': M8}
     measured_total = round(sum(measured.values()), 2)
 
     judged = {'N1': 0.0, 'N2': 0.0, 'N3': 0.0, 'N4': 0.0, 'N5': 0.0, 'missing_slides': []}
