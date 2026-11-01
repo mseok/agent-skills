@@ -6,7 +6,7 @@ usage: goal_chain.py /abs/deck-folder [--design-target 90] [--message-target 90]
                      [--model claude-opus-5-5] [--effort max] [--judge-model claude-opus-5-5] [--judge-effort max]
                      [--design-note "…"] [--message-note "…"] [--skip-baseline] [--skip-design]
   stages  : baseline (iterate_deck.py --n 1 without --builder) → design loop (goal_loop.py) → message loop (goal_loop.py --iterate iterate_message.py)
-  cap     : every two minutes the summed costs_usd of deck/qa/iter-*.json and iter-msg-*.json are compared with --cost-cap-usd; above it the
+  cap     : every two minutes the summed costs_usd of deck/qa/iter-*.json (iter-msg-*.json included by the pattern) are compared with --cost-cap-usd; above it the
             running loop gets deck/qa/STOP and the chain ends with phase 'cost-cap' (the user said to keep going across quota windows, not
             across any amount of money — the cap is the agreed estimate plus margin and is reported, never silently raised)
   status  : deck/qa/chain-status.json (phase, spend, last totals), log deck/qa/chain.log; stop: deck/qa/STOP
@@ -44,7 +44,7 @@ def status(qa, **kw):
 
 def spend(qa):
     total = 0.0; rows = []
-    for p in sorted(list(qa.glob('iter-*.json')) + list(qa.glob('iter-msg-*.json'))):
+    for p in sorted(qa.glob('iter-*.json')):  # also matches iter-msg-*.json; a second glob counted every message iteration twice (Latent SI, 2026-11-01)
         try:
             d = json.loads(p.read_text(encoding='utf-8'))
         except json.JSONDecodeError:
