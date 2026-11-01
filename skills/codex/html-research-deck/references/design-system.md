@@ -32,7 +32,7 @@ Korean slide copy is noun phrases (`research-talk/references/korean-slide-copy.m
 | drug or path of interest | blue `#4C72B0` (`url(#gBlue)`, stroke `#2F4C7D`); the L2 segment, transfer arrows |
 | substrate / transcription factor | amber `url(#gAmber)`, stroke `#B7793A`, strand `#C8692E` |
 | mutation, blocked step, key phrase | red `#D1495B` (dot, ×, one bold phrase); return arrow coral `#E76F51` |
-| absent / ghost state | dashed outline `#AEB7C0`, muted text `#9AA5B1` |
+| absent / ghost state | dashed outline `#AEB7C0`, muted text `#66727F` |
 
 At most two hue families besides gray on a slide. Nucleotides are dark capsules (`GDP` `#52606D`, `GTP` `#1F2933`), ubiquitin beads `#52606D` with white `Ub`.
 

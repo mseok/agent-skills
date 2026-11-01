@@ -74,7 +74,11 @@ def main():
     S = doc['slides']; n = len(S)
     content = [s for s in S if 1 < s['n'] < n]
     nc = max(1, len(content))
-    D = {'title': {}, 'kicker': {}, 'closing': {}, 'banned': {}, 'jargon': {}, 'numbers': {}, 'guide': {}, 'honesty': {}}
+    D = {'title': {}, 'kicker': {}, 'closing': {}, 'banned': {}, 'jargon': {}, 'glossary': {}, 'numbers': {}, 'guide': {}, 'honesty': {}, 'marks': {}}
+    # the storyline's glossary (caller-owned, work/storyline-v1.json): one name per quantity, the forms to avoid
+    glossary = []
+    if a.storyline_v1 and Path(a.storyline_v1).exists():
+        glossary = [g for g in (json.loads(Path(a.storyline_v1).read_text(encoding='utf-8')).get('glossary') or []) if g.get('use') and g.get('avoid')]
 
     def vis_text(s):
         return ' '.join([s['kicker'], s['h2']] + s['lanes'] + s['visible'] + [s['closing']])
@@ -89,7 +93,7 @@ def main():
         if BAN.search(t): why.append('금지 토큰')
         D['title'][s['n']] = why or 'ok'
         ok += not why
-    M1 = round(8 * ok / nc, 2)
+    M1 = round(6 * ok / nc, 2)
     # M2 kickers
     ok = 0; sections = set()
     for s in content:
@@ -113,8 +117,9 @@ def main():
             if j >= 0.6: why.append(f'제목 되풀이 (jaccard {j:.2f})')
         D['closing'][s['n']] = why or 'ok'
         ok += not why
-    M3 = round(8 * ok / nc, 2)
-    # M4 jargon: (a) banned tokens incl. closing slide, (b) jargon avoided (plain Korean instead of term + parenthetical gloss)
+    M3 = round(6 * ok / nc, 2)
+    # M4 jargon: (a) banned tokens incl. closing slide, (b) one name per quantity — the storyline glossary's `avoid` forms stay out of the
+    # visible copy (2026-11-01); a deck without a glossary is measured against the old fixed jargon list
     scope = [s for s in S if s['n'] > 1]
     clean = 0
     for s in scope:
@@ -122,15 +127,31 @@ def main():
         D['banned'][s['n']] = hits or 'ok'
         clean += not hits
     M4a = round(4 * clean / max(1, len(scope)), 2)
-    present = 0
-    for term in JARGON:
-        for s in S:
-            text = vis_text(s); idx = find_term(text, term)
-            if idx >= 0:
-                present += 1
-                D['jargon'][term] = {'first_slide': s['n'], 'glossed': glossed(text, idx, term), 'context': text[max(0, idx - 20): idx + len(term) + 36]}
-                break
-    M4b = round(6 * (1 - present / len(JARGON)), 2)
+    if glossary:
+        bad = 0
+        for g in glossary:
+            hit = None
+            for form in g['avoid']:
+                for s in S:
+                    text = vis_text(s); idx = text.find(form)
+                    if idx >= 0:
+                        hit = {'avoid': form, 'slide': s['n'], 'context': text[max(0, idx - 20): idx + len(form) + 30]}; break
+                if hit: break
+            D['glossary'][g['use']] = hit or 'ok'
+            bad += bool(hit)
+        M4b = round(6 * (1 - bad / len(glossary)), 2)
+        D['jargon'] = f'용어표 {len(glossary)}항목으로 잼 (storyline-v1 glossary)'
+    else:
+        present = 0
+        for term in JARGON:
+            for s in S:
+                text = vis_text(s); idx = find_term(text, term)
+                if idx >= 0:
+                    present += 1
+                    D['jargon'][term] = {'first_slide': s['n'], 'glossed': glossed(text, idx, term), 'context': text[max(0, idx - 20): idx + len(term) + 36]}
+                    break
+        M4b = round(6 * (1 - present / len(JARGON)), 2)
+        D['glossary'] = '용어표 없음 — 고정 용어 목록으로 잼'
     M4 = round(M4a + M4b, 2)
     # M5 number budget in kicker/h2/closing/lanes
     ok = 0
@@ -170,7 +191,16 @@ def main():
         D['paren'][s['n']] = tags or 'ok'
         ok += not tags
     M9 = round(4 * ok / nc, 2)
-    measured = {'M1': M1, 'M2': M2, 'M3': M3, 'M4': M4, 'M5': M5, 'M6': M6, 'M7': M7, 'M8': M8, 'M9': M9}
+    # M10 author/presenter marks live in the cite line only (user decision 2026-11-01 "여기부터는 발표자 생각 이런 멘트가 너무 별로다"):
+    # kicker, title, lane headers, visible runs and the closing line of every content slide and the closing slide carry none of the tokens
+    MARKS = re.compile(r'저자|발표자|모식|번역')
+    ok = 0
+    for s in scope:
+        hits = sorted(set(m.group(0) for t in [s['kicker'], s['h2'], s['closing']] + s['lanes'] + s['visible'] for m in MARKS.finditer(t)))
+        D['marks'][s['n']] = hits or 'ok'
+        ok += not hits
+    M10 = round(4 * ok / max(1, len(scope)), 2)
+    measured = {'M1': M1, 'M2': M2, 'M3': M3, 'M4': M4, 'M5': M5, 'M6': M6, 'M7': M7, 'M8': M8, 'M9': M9, 'M10': M10}
     measured_total = round(sum(measured.values()), 2)
 
     judged = {'N1': 0.0, 'N2': 0.0, 'N3': 0.0, 'N4': 0.0, 'N5': 0.0, 'missing_slides': []}

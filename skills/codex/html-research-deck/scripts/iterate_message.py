@@ -4,9 +4,12 @@ independent message judge → message score → storyline snapshot → iter-msg-
 
 usage: iterate_message.py /abs/deck-folder --n 1 [--builder] [--model claude-opus-5-5] [--effort max] [--note "..."]
                           [--reuse-design-judge /abs/deck/qa/judge-<ts>.json] [--skip-judges] [--design-target 90]
+                          [--judge-model claude-opus-5-5] [--judge-effort max] [--judges 3]
   deck-folder holds work/build.py, work/storyline.json, work/storyline-v1.json, paper/context-for-judge.txt,
   deck/index.html, deck/qa/ (rubric-frozen.json, rubric-message-frozen.json, score.json, score-message.json, judge*.json)
   --reuse-design-judge : accept an existing design judge file only if its frozen PNG folder is byte-identical to the current shots-full
+  --model picks the builder's backend through agent_cli.py (claude-* → claude -p, gpt-* → codex exec); both judges stay on --judge-model.
+  Storyline slides with owner: user are listed to the builder as untouchable.
 """
 import argparse
 import datetime
@@ -20,6 +23,8 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 SKILL = HERE.parent
 PY = sys.executable
+sys.path.insert(0, str(HERE))
+import agent_cli  # noqa: E402  (skill script, trusted)
 
 
 def sh(cmd, cwd=None, timeout=3600):
@@ -65,28 +70,30 @@ def main():
     ap.add_argument('--model', default='claude-opus-5-5'); ap.add_argument('--effort', default='max'); ap.add_argument('--note', default='')
     ap.add_argument('--reuse-design-judge'); ap.add_argument('--skip-judges', action='store_true'); ap.add_argument('--design-target', type=float, default=90)
     ap.add_argument('--judges', type=int, default=1, help='message-judge runs on the same copy dump; >1 scores the per-item median (judge_median.py)')
+    ap.add_argument('--judge-model', default='claude-opus-5-5'); ap.add_argument('--judge-effort', default='max')
     a = ap.parse_args()
     deck = Path(a.deck).resolve(); qa = deck / 'deck' / 'qa'; index = deck / 'deck' / 'index.html'; work = deck / 'work'
-    rec = {'n': a.n, 'kind': 'message', 'started': datetime.datetime.now().astimezone().isoformat(timespec='seconds'), 'model': a.model, 'effort': a.effort, 'costs_usd': {}}
+    rec = {'n': a.n, 'kind': 'message', 'started': datetime.datetime.now().astimezone().isoformat(timespec='seconds'), 'model': a.model, 'effort': a.effort,
+           'judge_model': a.judge_model, 'judge_effort': a.judge_effort, 'costs_usd': {}}
     if a.builder:
         shutil.copy(work / 'build.py', qa / f'build.before-msg-{a.n}.py')
         jm = latest(qa, 'judge-msg-*.json'); jd = latest(qa, 'judge-2*.json')
         brief = (SKILL / 'references' / 'builder-brief-message.md').read_text(encoding='utf-8')
         sm = json.loads((qa / 'score-message.json').read_text(encoding='utf-8')) if (qa / 'score-message.json').exists() else {}
         sd = json.loads((qa / 'score.json').read_text(encoding='utf-8')) if (qa / 'score.json').exists() else {}
+        owned = agent_cli.user_owned(work)
         prompt = (brief + f"\n\n---\n이번 반복: 메시지 {a.n}회차. 작업 폴더: {deck} (스킬: {SKILL}).\n"
                   f"현재 메시지 점수: 측정 {sm.get('measured_total')}/50, 심사 {sm.get('judged_total')}/50, 합계 {sm.get('total')}/100 (세부: deck/qa/score-message.json 의 detail; 심사 근거: {jm.name if jm else '(없음)'}).\n"
                   f"현재 디자인 점수: {sd.get('total')}/100 (심사 근거: {jd.name if jd else '(없음)'}) — 90 아래로 떨어뜨리지 말 것.\n" + a.note +
+                  (("\n손대지 않는 장(owner: user — 사용자가 발표마다 직접 쓰는 자리): " + ', '.join(owned) + ". 제목·문구·그림·노트 모두 그대로 둔다.\n") if owned else '') +
                   "\n끝나면 바꾼 장과 문구(제목·마무리줄 전후), 측정 점수 줄, check_deck/check_layout 결과 줄을 보고한다. 심사와 최종 점수는 호출자가 잰다.")
-        cmd = ['claude', '-p', prompt, '--model', a.model, '--effort', a.effort, '--output-format', 'json', '--permission-mode', 'acceptEdits',
-               '--allowedTools', 'Read,Edit,MultiEdit,Write,Bash,Glob,Grep', '--disallowedTools', 'Task,WebFetch,WebSearch', '--add-dir', str(SKILL)]
-        r = sh(cmd, cwd=str(deck), timeout=5400)
         try:
-            env = json.loads(r.stdout)
-        except json.JSONDecodeError:
-            env = {'result': r.stdout[-3000:], 'error_text': r.stderr[-1000:]}
+            env = agent_cli.run(prompt, a.model, a.effort, cwd=str(deck), role='builder', timeout=5400, add_dirs=[SKILL])
+        except subprocess.TimeoutExpired:
+            env = {'result': 'builder run exceeded 5400 s', 'is_error': True, 'error_text': 'timeout', 'backend': agent_cli.backend_of(a.model)}
         (qa / f'builder-msg-{a.n}.json').write_text(json.dumps(env, ensure_ascii=False, indent=1) + '\n', encoding='utf-8')
         rec['costs_usd']['builder'] = env.get('total_cost_usd'); rec['builder_turns'] = env.get('num_turns'); rec['builder_report'] = (env.get('result') or '')[-3000:]
+        rec['builder_backend'] = env.get('backend'); rec['builder_usage'] = env.get('usage'); rec['builder_duration_ms'] = env.get('duration_ms'); rec['user_owned'] = owned
     # rebuild from the builder script (idempotent when nothing changed) and refresh every QA artefact the judges read
     b = sh([PY, '-I', str(work / 'build.py')], cwd=str(deck)); rec['build_stdout'] = b.stdout.strip()[-200:] + b.stderr.strip()[-300:]
     cd = sh([PY, '-I', str(HERE / 'check_deck.py'), str(index)]); rec['check_deck'] = cd.stdout.strip().splitlines()[-1:] 
@@ -109,7 +116,7 @@ def main():
         frozen = qa / f'judge-shots-msg-{a.n}'
         shutil.rmtree(frozen, ignore_errors=True); shutil.copytree(qa / 'shots-full', frozen)
         ts = datetime.datetime.now().strftime('%Y%m%dT%H%M%S'); jd = qa / f'judge-{ts}.json'
-        j = sh([PY, '-I', str(HERE / 'judge_deck.py'), str(frozen), '--out', str(jd), '--model', a.model, '--effort', a.effort, '--timeout', '2400'], timeout=2700)
+        j = sh([PY, '-I', str(HERE / 'judge_deck.py'), str(frozen), '--out', str(jd), '--model', a.judge_model, '--effort', a.judge_effort, '--timeout', '2400'], timeout=2700)
         rec['design_judge_stdout'] = j.stdout.strip()[-300:]
         if jd.exists():
             m = json.loads(jd.read_text(encoding='utf-8')); rec['costs_usd']['design_judge'] = m.get('cost_usd'); rec['design_judge_parse_error'] = m.get('parse_error')
@@ -131,7 +138,7 @@ def main():
         ts = datetime.datetime.now().strftime('%Y%m%dT%H%M%S'); jm = qa / f'judge-msg-{ts}.json'
         n = json.loads((qa / 'copy.json').read_text(encoding='utf-8'))['n']
         judge_cmd = [PY, '-I', str(HERE / 'judge_message.py'), '--copy', str(qa / 'copy.txt'), '--context', str(deck / 'paper' / 'context-for-judge.txt'), '--contact', str(qa / 'contact.png'),
-                     '--slides', str(n), '--model', a.model, '--effort', a.effort, '--timeout', '2400']
+                     '--slides', str(n), '--model', a.judge_model, '--effort', a.judge_effort, '--timeout', '2400']
         if a.judges <= 1:
             j = sh(judge_cmd + ['--out', str(jm)], timeout=2700)
             rec['message_judge_stdout'] = j.stdout.strip()[-300:]

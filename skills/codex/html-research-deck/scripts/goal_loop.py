@@ -3,10 +3,12 @@
 score reaches the target, pausing for the Claude usage window when a run hits the usage limit.
 
 usage: goal_loop.py /abs/deck-folder [--target 90] [--model claude-opus-5-5] [--effort max] [--max-hours 72] [--quota-sleep 18300]
+                    [--judge-model claude-opus-5-5] [--judge-effort max] [--iterate iterate_message.py --prefix iter-msg --judges 3]
   status  : deck/qa/loop-status.json (phase, iteration, last totals, next wake time), log deck/qa/loop.log
   stop    : create deck/qa/STOP (checked between steps); the loop also ends when total >= target and valid, or after --max-hours
-  quota   : before each iteration a cheap probe (`claude -p "OK"`) checks the account; a usage-limit error there or in a run
+  quota   : before each iteration a cheap probe (agent_cli.probe: `claude -p "OK"` or `codex exec`) checks the builder's account; a usage-limit error there or in a run
             puts the loop to sleep until the reset time parsed from the message, else --quota-sleep seconds (5 h + 5 min)
+  backend : --model claude-* runs the builder with `claude -p`, gpt-* with `codex exec` (agent_cli.py); the judges stay on --judge-model
 """
 import argparse
 import datetime
@@ -19,7 +21,9 @@ import time
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-LIMIT = re.compile(r'(usage limit|rate limit|rate_limit|limit reached|too many requests|429|quota|overloaded)', re.I)
+sys.path.insert(0, str(HERE))
+import agent_cli  # noqa: E402  (skill script, trusted)
+LIMIT = agent_cli.LIMIT
 
 
 def now():
@@ -42,27 +46,11 @@ def status(qa, **kw):
 
 
 def probe(model):
-    """Return (ok, message). A usage-limit answer comes back as an error result or a non-JSON failure."""
-    try:
-        r = subprocess.run(['claude', '-p', 'Reply with exactly the word OK.', '--model', model, '--effort', 'low', '--output-format', 'json', '--permission-mode', 'plan'],
-                           capture_output=True, text=True, timeout=300, stdin=subprocess.DEVNULL)
-    except subprocess.TimeoutExpired:
-        return False, 'probe timeout'
-    try:
-        d = json.loads(r.stdout)
-    except json.JSONDecodeError:
-        return False, (r.stdout + r.stderr)[-600:]
-    if d.get('is_error'):
-        return False, str(d.get('result'))[-600:]
-    return True, str(d.get('result'))[:40]
+    """Return (ok, message) for the builder's backend (agent_cli.probe)."""
+    return agent_cli.probe(model)
 
 
-def reset_wait(text, default):
-    """Seconds to sleep: a reset time in the message ('resets in 2h 15m') when parseable, else the default."""
-    m = re.search(r'(\d+)\s*h(?:ours?)?\s*(\d+)?\s*m?', text or '', re.I)
-    if m and 'reset' in (text or '').lower():
-        return int(m.group(1)) * 3600 + int(m.group(2) or 0) * 60 + 300
-    return default
+reset_wait = agent_cli.reset_wait
 
 
 def alive_iteration(qa):
@@ -88,12 +76,13 @@ def main():
     ap.add_argument('--prefix', default='iter', help='record file prefix: iter (design) or iter-msg (message)')
     ap.add_argument('--note', default='심사 근거(evidence)에 적힌 장을 우선 고친다. 측정 항목 만점을 유지한다.')
     ap.add_argument('--judges', type=int, default=1, help='message-judge runs per iteration (median of N); only iterate_message.py understands it')
+    ap.add_argument('--judge-model', default='claude-opus-5-5'); ap.add_argument('--judge-effort', default='max')
     a = ap.parse_args()
     deck = Path(a.deck).resolve()
     qa = deck / 'deck' / 'qa'
     pre = a.prefix; bpre = 'builder' + pre[4:]  # iter → builder, iter-msg → builder-msg
     t_end = time.time() + a.max_hours * 3600
-    log(qa, f'loop start target={a.target} model={a.model}/{a.effort} max_hours={a.max_hours} iterate={a.iterate} prefix={pre}')
+    log(qa, f'loop start target={a.target} model={a.model}/{a.effort} judge={a.judge_model}/{a.judge_effort} max_hours={a.max_hours} iterate={a.iterate} prefix={pre}')
     (qa / 'loop-status.json').write_text('{}\n', encoding='utf-8')  # a new loop starts from a clean status (no totals of an earlier loop)
     status(qa, phase='start', target=a.target, pid=os.getpid(), iterate=a.iterate, prefix=pre)
     while time.time() < t_end:
@@ -126,6 +115,7 @@ def main():
         log(qa, f'iteration {n} start')
         with open(qa / f'{pre}-{n}.log', 'w', encoding='utf-8') as lf:
             r = subprocess.run([sys.executable, '-I', str(HERE / a.iterate), str(deck), '--n', str(n), '--builder', '--model', a.model, '--effort', a.effort,
+                                '--judge-model', a.judge_model, '--judge-effort', a.judge_effort,
                                 '--note', a.note] + (['--judges', str(a.judges)] if a.judges > 1 else []), stdout=lf, stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL, timeout=4 * 3600)
         rec_p = qa / f'{pre}-{n}.json'
         rec = json.loads(rec_p.read_text(encoding='utf-8')) if rec_p.exists() else {}

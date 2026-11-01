@@ -19,7 +19,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 SKILL = HERE.parent
 WATCHED = [SKILL / 'references' / 'rubric.md', SKILL / 'references' / 'judge-prompt.md', HERE / 'score_deck.py', HERE / 'check_layout.py', HERE / 'check_deck.py']
-MUTED = ('rgb(154,165,177)', 'rgb(138,150,163)')  # --muted #9AA5B1 and the builder's MUTED #8A96A3: reference-style gray text
+MUTED = ('rgb(154,165,177)', 'rgb(138,150,163)', 'rgb(102,114,127)')  # gray reference text: #9AA5B1, the old MUTED #8A96A3 and #66727F (4.9:1 on white since 2026-11-01)
 SOURCE = re.compile(r'(§|Table|Tab\.|Fig\.?|Figure|Appendix|Observation|Abstract|Eq\.)', re.I)
 
 

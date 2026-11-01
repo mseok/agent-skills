@@ -29,6 +29,9 @@ errors   : text-outside-panel, text-outside-stage,
 warnings : box-unbalanced      text inside a rect sits off-centre vertically by > 10 px,
            fx-offcentre        a near-full-width .fx.box (≥ 60 % of the inner width) whose left and right gaps to the panel differ by > 16 px
                                (Latent SI v5 slides 8–10: 20 vs 60 px while the neighbouring panel's boxes sat at 60/60),
+           low-contrast        text whose contrast against what it sits on (the white panel, the shape or card behind it, the stage for the
+                               cite line) is below 4.5:1, or below 3:1 for bold text ≥ 22 px (Latent SI v5 design judge: 3.0:1 grey notes and a
+                               2.84:1 cite line unreadable at 2 m; the theme's --muted moved from #8A96A3 to #66727F, 4.9:1, the same day),
            shape-overlap       two shapes ≥ 24 px intersect without one containing the other (stacked cards, badges over boxes) —
                                fix, or name the reason in the report,
            panel-underfilled   a top or bottom gap > 80 px,  panel-unbalanced  |top gap − bottom gap| > 24 px,  panel-tight  a gap < 12 px
@@ -120,6 +123,23 @@ MEASURE = r'''
   };
   const STAGE = { x: 0, y: 0, w: 1920, h: 1080 };
   const SOLID = new Set(['rect', 'circle', 'ellipse', 'use', 'polygon', 'image']);
+  const LUM = c => {  // relative luminance of a CSS colour string, alpha blended over white; null when transparent or not a colour
+    const m = /rgba?\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)\s*(?:,\s*([\d.]+))?\s*\)/.exec(c || ''); if (!m) return null;
+    const a = m[4] === undefined ? 1 : parseFloat(m[4]); if (a <= 0) return null;
+    const f = v => { v = a * (parseFloat(v) / 255) + (1 - a); return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); };
+    return 0.2126 * f(m[1]) + 0.7152 * f(m[2]) + 0.0722 * f(m[3]);
+  };
+  const CONTRAST = (c, bgL) => { const l = LUM(c); if (l === null || bgL === null || bgL === undefined) return null; return (Math.max(l, bgL) + 0.05) / (Math.min(l, bgL) + 0.05); };
+  const STAGE_LUM = (() => { for (const sel of ['.stage', 'body', 'html']) { const e = document.querySelector(sel); if (e) { const l = LUM(getComputedStyle(e).backgroundColor); if (l !== null) return l; } } return LUM('rgb(250,248,243)'); })();
+  const shapeLum = el => {  // fill of a solid shape with its fill-opacity over white: the background of a label inside it (null for none / gradients)
+    const cs = getComputedStyle(el); const fo = parseFloat(cs.fillOpacity); const l = LUM(cs.fill); if (l === null) return null;
+    return isNaN(fo) || fo >= 1 ? l : fo * l + (1 - fo);
+  };
+  const bgOf = el => {  // nearest painted background behind an HTML block inside a panel (a card, a formula strip), else the white panel
+    for (let e = el; e && !(e.classList && e.classList.contains('panel')); e = e.parentElement) { const l = LUM(getComputedStyle(e).backgroundColor); if (l !== null) return l; }
+    return 1;
+  };
+  const NEED = t => (t.fw >= 600 && t.fs >= 22) ? 3 : 4.5;  // WCAG: 3:1 for large bold text, 4.5:1 otherwise
   for (let i = 0; i < slides.length; i++) {
     const n = i + 1;
     report.progress = 'slide ' + n; flush();
@@ -145,9 +165,9 @@ MEASURE = r'''
         add(b);
         const svgBox = el.ownerSVGElement ? box(el.ownerSVGElement) : null;
         const clipped = !!(svgBox && !contains(svgBox, b, 0.5));
-        if (tag === 'text') { texts.push({ b, fs: R(parseFloat(getComputedStyle(el).fontSize) || 0), t: snip(el), fill: getComputedStyle(el).fill, chars: (el.textContent || '').replace(/\s+/g, '').length, clipped, kind: 'svg' }); return; }
+        if (tag === 'text') { texts.push({ b, fs: R(parseFloat(getComputedStyle(el).fontSize) || 0), fw: parseInt(getComputedStyle(el).fontWeight) || 400, t: snip(el), fill: getComputedStyle(el).fill, chars: (el.textContent || '').replace(/\s+/g, '').length, clipped, kind: 'svg' }); return; }
         if (clipped) S.findings.push({ kind: 'shape-clipped', panel: pi + 1, shape: tag, box: b, svgBox });
-        if (SOLID.has(tag)) shapes.push({ b, tag });
+        if (SOLID.has(tag)) shapes.push({ b, tag, lum: shapeLum(el) });
         if (tag === 'line') { const e = endpoints(el); if (e) segs.push({ p: e[0], q: e[1], kind: 'line' }); }
         else if (tag === 'path' || tag === 'polyline' || tag === 'polygon') { const pts = sampled(el); if (pts) for (let k = 1; k < pts.length; k++) segs.push({ p: pts[k - 1], q: pts[k], kind: tag }); }
       });
@@ -167,7 +187,7 @@ MEASURE = r'''
           const gl = R(b.x - pb.x), gr = R(pb.x + pb.w - b.x - b.w);
           if (Math.abs(gl - gr) > 16) S.findings.push({ kind: 'fx-offcentre', panel: pi + 1, box: b, gapLeft: gl, gapRight: gr, text: blk.t });
         }
-        texts.push({ b, fs: blk.fs, t: blk.t, fill: getComputedStyle(el).color, chars: blk.chars, clipped: false, kind: 'html', box: isBox });
+        texts.push({ b, fs: blk.fs, fw: parseInt(getComputedStyle(el).fontWeight) || 400, t: blk.t, fill: getComputedStyle(el).color, chars: blk.chars, clipped: false, kind: 'html', box: isBox, bgL: bgOf(el) });
       });
       // bordered HTML rows/cards count as content for the fill measurement (their text may end above the border)
       Array.from(p.children).filter(el => !(el instanceof SVGElement) && vis(el)).forEach(el => { const b = box(el); if (b.w > 0 && b.h > 0) add(b); });
@@ -190,6 +210,12 @@ MEASURE = r'''
         else if (t.clipped) S.findings.push({ kind: 'text-clipped', panel: pi + 1, text: t.t, box: t.b, fs: t.fs });
         else if (!contains(inner, t.b, 0.5)) S.findings.push({ kind: 'text-in-padding', panel: pi + 1, text: t.t, box: t.b, fs: t.fs });
         if (!contains(STAGE, t.b, 0)) S.findings.push({ kind: 'text-outside-stage', panel: pi + 1, text: t.t, box: t.b });
+      });
+      texts.forEach(t => {  // contrast against what the text actually sits on: a painted HTML ancestor, else the smallest solid shape holding it, else the white panel
+        let bgL = (t.kind === 'html' && t.bgL !== 1) ? t.bgL : null;
+        if (bgL === null) { const e = em(t); const holder = shapes.filter(sh => sh.lum !== null && sh.lum !== undefined && holds(sh, e, 1.5)).sort((p, q) => p.b.w * p.b.h - q.b.w * q.b.h)[0]; bgL = holder ? holder.lum : 1; }
+        const cr = CONTRAST(t.fill, bgL);
+        if (cr !== null && cr < NEED(t)) S.findings.push({ kind: 'low-contrast', panel: pi + 1, text: t.t, box: t.b, fs: t.fs, fw: t.fw, color: t.fill, ratio: R(cr * 100) / 100, need: NEED(t) });
       });
       for (let a = 0; a < texts.length; a++) for (let b = a + 1; b < texts.length; b++) {
         const o = inter(em(texts[a]), em(texts[b]));
@@ -234,6 +260,8 @@ MEASURE = r'''
     Array.from(s.querySelectorAll('.katex-error')).filter(vis).forEach(el => S.findings.push({ kind: 'tex-unrendered', text: snip(el), box: box(el), why: el.getAttribute('title') || 'katex-error' }));
     Array.from(s.querySelectorAll('*')).filter(el => vis(el) && el.children.length === 0 && !el.closest('.katex, .katex-error, script, style, aside') && RAW.test(el.textContent || ''))
       .forEach(el => S.findings.push({ kind: 'tex-unrendered', text: snip(el), box: box(el), why: 'raw TeX or an HTML entity in visible text' }));
+    const cite = s.querySelector(':scope > .cite');  // the cite line sits on the warm stage, not on a white panel
+    if (cite && vis(cite)) { const cs = getComputedStyle(cite); const cr = CONTRAST(cs.color, STAGE_LUM); if (cr !== null && cr < 4.5) S.findings.push({ kind: 'low-contrast', panel: 0, text: snip(cite), box: box(cite), fs: R(parseFloat(cs.fontSize) || 0), fw: parseInt(cs.fontWeight) || 400, color: cs.color, ratio: R(cr * 100) / 100, need: 4.5, on: 'stage' }); }
     const blocks = Array.from(s.querySelectorAll(':scope > h1, :scope > h2, :scope > .kicker, :scope > .subtitle, :scope > .who, :scope > .aff, :scope > .venue, :scope > .takeaway, :scope > .cite, :scope > .panel, :scope > .lines, :scope > p, :scope > .cap'))
       .filter(vis).map(el => ({ b: box(el), name: ((el.className && String(el.className).trim().split(/\s+/)[0]) || el.tagName.toLowerCase()), t: snip(el) })).filter(x => x.b.w > 0 && x.b.h > 0);
     for (let a = 0; a < blocks.length; a++) for (let b = a + 1; b < blocks.length; b++) {
@@ -313,6 +341,8 @@ def describe(f):
         return f"{k}: rect {fmt_box(f['box'])} text gap left {f['gapLeft']:g} · right {f['gapRight']:g} · top {f['gapTop']:g} · bottom {f['gapBottom']:g} (\"{f['text']}\" …)"
     if k == 'fx-offcentre':
         return f"{k}: .fx.box {fmt_box(f['box'])} gap left {f['gapLeft']:g} · right {f['gapRight']:g} (\"{f['text'][:30]}\" …)"
+    if k == 'low-contrast':
+        return f"{k}: \"{f['text'][:40]}\" {f['fs']:g}px/{f['fw']} {f['color']} {f['ratio']:g}:1 < {f['need']:g}:1{' on the stage' if f.get('on') == 'stage' else ''}"
     if k == 'closing-wraps':
         return f"{k}: closing line is {f['box']['h']:g} px tall: \"{f['text']}\""
     return json.dumps(f, ensure_ascii=False)

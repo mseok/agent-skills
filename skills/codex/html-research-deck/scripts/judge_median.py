@@ -39,6 +39,11 @@ def main():
     if len(runs) < 2:
         raise SystemExit('need at least two runs')
     tags = [f'r{i + 1}' for i in range(len(runs))]
+    # two judge-file shapes: message (slides N1/N2/N4 + deck N3/N5) and design (slides G/H/I/J, no deck block)
+    first_slide = (runs[0]['judge'].get('slides') or [{}])[0]
+    design = 'G' in first_slide
+    ITEMS = ('G', 'H', 'I', 'J') if design else ('N1', 'N2', 'N4')
+    DECK_ITEMS = () if design else ('N3', 'N5')
     slides = {}
     for tag, d in zip(tags, runs):
         for s in d['judge'].get('slides', []):
@@ -47,30 +52,41 @@ def main():
     for n in sorted(slides):
         rows = slides[n]
         item = {'n': n}
-        for k in ('N1', 'N2', 'N4'):
+        for k in ITEMS:
             vals = [int(s.get(k, 0) or 0) for _, s in rows]
             item[k] = low_median(vals)
-        item['runs'] = {tag: {k: s.get(k) for k in ('N1', 'N2', 'N4')} for tag, s in rows}
+        item['runs'] = {tag: {k: s.get(k) for k in ITEMS} for tag, s in rows}
         item['evidence'] = ' | '.join(f"[{tag}] {s.get('evidence', '')}" for tag, s in rows)
         merged.append(item)
     deck = {}
-    for k in ('N3', 'N5'):
+    for k in DECK_ITEMS:
         vals = [float(d['judge'].get('deck', {}).get(k, 0) or 0) for d in runs]
         deck[k] = low_median(vals)
         deck[f'{k}_runs'] = dict(zip(tags, vals))
         deck[f'{k}_evidence'] = ' | '.join(f"[{tag}] {d['judge'].get('deck', {}).get(f'{k}_evidence', '')}" for tag, d in zip(tags, runs))
-    summary = {'worst': [f'[{tag}] {w}' for tag, d in zip(tags, runs) for w in (d['judge'].get('summary', {}).get('worst') or [])],
-               'best': ' | '.join(f"[{tag}] {d['judge'].get('summary', {}).get('best', '')}" for tag, d in zip(tags, runs)),
-               'memorable': ' | '.join(f"[{tag}] {d['judge'].get('summary', {}).get('memorable', '')}" for tag, d in zip(tags, runs))}
+    summary = {}
+    for tag, d in zip(tags, runs):  # keep every run's summary fields, tagged, whatever keys the judge used
+        sm = d['judge'].get('summary') or {}
+        if isinstance(sm, str):
+            sm = {'text': sm}
+        for k, v in sm.items():
+            if isinstance(v, list):
+                summary.setdefault(k, []).extend(f'[{tag}] {x}' for x in v)
+            else:
+                summary[k] = (summary.get(k, '') + (' | ' if summary.get(k) else '') + f'[{tag}] {v}')
     out = {'at': datetime.datetime.now().isoformat(timespec='seconds'), 'model': runs[0].get('model'), 'effort': runs[0].get('effort'),
-           'copy': runs[0].get('copy'), 'slides_total': runs[0].get('slides_total'), 'median_of': len(runs), 'runs': [str(Path(r).resolve()) for r in a.runs],
+           'copy': runs[0].get('copy'), 'shots': runs[0].get('shots'), 'slides_total': runs[0].get('slides_total'), 'median_of': len(runs), 'runs': [str(Path(r).resolve()) for r in a.runs],
            'cost_usd': round(sum(float(d.get('cost_usd') or 0) for d in runs), 6), 'duration_ms': max(int(d.get('duration_ms') or 0) for d in runs),
-           'is_error': False, 'parse_error': '',
+           'is_error': False, 'parse_error': '', 'backend': runs[0].get('backend'), 'kind': 'design' if design else 'message',
            'judge': {'judge': f"median of {len(runs)} × {runs[0].get('model')}", 'slides': merged, 'deck': deck, 'summary': summary}}
     Path(a.out).write_text(json.dumps(out, ensure_ascii=False, indent=1) + '\n', encoding='utf-8')
     n = len(merged) or 1
-    judged = sum(s['N1'] for s in merged) / n / 2 * 12 + sum(s['N2'] for s in merged) / n / 2 * 8 + sum(s['N4'] for s in merged) / n / 2 * 8 + deck['N3'] + deck['N5']
-    print(f"median of {len(runs)} runs → judged {judged:.2f}/50 (N3 {deck['N3']:g} · N5 {deck['N5']:g}; per run N5 {deck['N5_runs']}) · cost ${out['cost_usd']} → {a.out}")
+    if design:
+        judged = sum(s['G'] for s in merged) / n * 5 + sum(s['H'] for s in merged) / n * 7 + sum(s['I'] for s in merged) / n * 4 + sum(s['J'] for s in merged) / n * 4
+        print(f"median of {len(runs)} design runs → judged {judged:.2f}/40 · cost ${out['cost_usd']} → {a.out}")
+    else:
+        judged = sum(s['N1'] for s in merged) / n / 2 * 12 + sum(s['N2'] for s in merged) / n / 2 * 8 + sum(s['N4'] for s in merged) / n / 2 * 8 + deck['N3'] + deck['N5']
+        print(f"median of {len(runs)} runs → judged {judged:.2f}/50 (N3 {deck['N3']:g} · N5 {deck['N5']:g}; per run N5 {deck['N5_runs']}) · cost ${out['cost_usd']} → {a.out}")
 
 
 if __name__ == '__main__':
