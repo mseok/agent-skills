@@ -33,7 +33,8 @@ def sh(cmd, cwd=None, timeout=3600):
 
 
 def latest_judge(qa):
-    files = [p for p in sorted(qa.glob('judge-*.json')) if p.is_file()]
+    # judge-2* only: judge-msg-*.json sorts after every design judge, so the old judge-* pattern pointed the design builder at the message judge
+    files = [p for p in sorted(qa.glob('judge-2*.json')) if p.is_file()]
     return files[-1] if files else None
 
 
