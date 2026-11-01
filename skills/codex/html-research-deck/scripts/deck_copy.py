@@ -50,7 +50,7 @@ class Deck(HTMLParser):
             self.buf.append('**')
         elif tag in ('em', 'i'):
             self.buf.append('*')
-        elif tag == 'br':
+        elif tag == 'br' or tag == 'small':  # <small> is the title slide's own-line English title: keep it off the Korean words
             self.buf.append(' / ')
         self.stack.append((tag, cls))
 
