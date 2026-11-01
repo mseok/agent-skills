@@ -28,7 +28,8 @@ warnings : box-unbalanced      text inside a rect sits off-centre vertically by 
            panel-underfilled   a top or bottom gap > 80 px,  panel-unbalanced  |top gap − bottom gap| > 24 px,  panel-tight  a gap < 12 px
 Delivery gate (references/qa.md): zero errors, and every warning either fixed or named with its reason.
 Why these exist: the first Latent SI deck (2026-11-01) passed with 0/0 while the title wrapped over the subtitle, a chart curve
-ran through a value label and a label was cut by the panel edge — HTML blocks, paths and clipping were not measured.
+ran through a value label and a label was cut by the panel edge — HTML blocks, paths and clipping were not measured; and until
+2026-11-01 the segment test rejected every exactly vertical or horizontal line, so axes and reference lines through labels were never seen.
 """
 import argparse
 import json
@@ -78,7 +79,8 @@ MEASURE = r'''
   const contains = (o, i, tol) => i.x >= o.x - tol && i.y >= o.y - tol && i.x + i.w <= o.x + o.w + tol && i.y + i.h <= o.y + o.h + tol;
   const segRect = (p, q, r) => {  // does segment p-q pass through rect r (Liang–Barsky clip)?
     let t0 = 0, t1 = 1; const dx = q.x - p.x, dy = q.y - p.y;
-    const clip = (den, num) => { if (den === 0) return num <= 0; const t = num / den; if (den < 0) { if (t > t1) return false; if (t > t0) t0 = t; } else { if (t < t0) return false; if (t < t1) t1 = t; } return true; };
+    const clip = (den, num) => { if (den === 0) return num >= 0;  // parallel to this edge: inside iff on the inner side
+      const t = num / den; if (den < 0) { if (t > t1) return false; if (t > t0) t0 = t; } else { if (t < t0) return false; if (t < t1) t1 = t; } return true; };
     return clip(-dx, p.x - r.x) && clip(dx, r.x + r.w - p.x) && clip(-dy, p.y - r.y) && clip(dy, r.y + r.h - p.y) && t0 <= t1;
   };
   const toStage = (m, x, y) => { const s = SB(); const k = s.width / 1920; const d = new DOMPoint(x, y).matrixTransform(m); return { x: R((d.x - s.left) / k), y: R((d.y - s.top) / k) }; };

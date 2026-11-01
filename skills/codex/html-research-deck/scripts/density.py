@@ -128,9 +128,11 @@ def write_png(path, w, h, rows):
     return path
 
 
-def density_png(dist, path, frame, tint='#7FA7C9', alpha=0.72, gamma=0.5, scale=1.0, floor=0.015):
+def density_png(dist, path, frame, tint='#7FA7C9', alpha=0.72, gamma=0.5, scale=1.0, floor=0.015, edge=0.12):
     """Raster of (p/p_max)^gamma as the alpha of one tint, the way the reference deck shades densities.
-    scale > 1 renders more pixels than the frame (crisper on retina / print); values below `floor` become fully transparent."""
+    scale > 1 renders more pixels than the frame (crisper on retina / print); values below `floor` become fully transparent;
+    `edge` is the fraction of the frame over which the alpha fades to zero at each border (a raised cosine), so a window that
+    is too tight for the tails never shows a flat cut edge — choose the window so the mass sits inside the inner 1-2*edge."""
     w, h = max(2, int(round(frame.w * scale))), max(2, int(round(frame.h * scale)))
     vals = []
     mx = -1e300
@@ -144,12 +146,18 @@ def density_png(dist, path, frame, tint='#7FA7C9', alpha=0.72, gamma=0.5, scale=
                 mx = v
         vals.append(row)
     r, g, b = _hex(tint)
+
+    def fade(i, n):
+        f = min(i + 0.5, n - i - 0.5) / max(1.0, n * edge)
+        return 1.0 if f >= 1.0 else 0.5 - 0.5 * math.cos(math.pi * f)
+    wx = [fade(i, w) for i in range(w)]
     rows = []
-    for row in vals:
+    for j, row in enumerate(vals):
+        wy = fade(j, h)
         out = bytearray()
-        for v in row:
+        for i, v in enumerate(row):
             a = math.exp(v - mx)
-            q = a ** gamma if a > floor else 0.0
+            q = (a ** gamma if a > floor else 0.0) * wx[i] * wy
             out += bytes((r, g, b, int(round(255 * alpha * q))))
         rows.append(bytes(out))
     write_png(path, w, h, rows)
