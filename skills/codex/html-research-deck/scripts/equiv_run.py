@@ -244,8 +244,12 @@ def main():
     log = Log(root)
     builders = [tuple(b.split(':', 1)) for b in a.builders.split(',') if b]
     todo = [(m, e) for m, e in builders if not a.only or f'{m}-{e}' == a.only]
-    log(f'equiv start phase={a.phase} builders={builders} judge={a.judge_model}/{a.judge_effort}×{a.judges}')
-    log.status(phase=a.phase, builders=[f'{m}:{e}' for m, e in builders], pid=__import__('os').getpid())
+    partial = bool(a.only) or a.phase != 'all'
+    log(f'equiv start phase={a.phase} only={a.only} builders={builders} judge={a.judge_model}/{a.judge_effort}×{a.judges}')
+    if partial:  # a side run (one builder, one phase) must not overwrite the main run's phase in the shared status file
+        log.status(last_partial_run={'phase': a.phase, 'only': a.only, 'pid': __import__('os').getpid(), 'started': now().isoformat(timespec='seconds')})
+    else:
+        log.status(phase=a.phase, builders=[f'{m}:{e}' for m, e in builders], pid=__import__('os').getpid())
     if a.phase in ('all', 'build'):
         for m, e in todo:
             prepare(root / f'{m}-{e}', Path(a.paper), Path(a.storyline), log)
@@ -268,7 +272,10 @@ def main():
             if (root / 'STOP').exists(): break
             judge(root / f'{m}-{e}', a.judge_model, a.judge_effort, a.judges, log, root)
     summary(root, builders, log)
-    log.status(phase='done')
+    if partial:
+        log.status(last_partial_run={'phase': a.phase, 'only': a.only, 'ended': now().isoformat(timespec='seconds')})
+    else:
+        log.status(phase='done')
     log('equiv end')
 
 
