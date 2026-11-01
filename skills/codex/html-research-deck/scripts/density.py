@@ -2,20 +2,22 @@
 """density.py — distributions drawn from numbers, not from hand-drawn blobs (standard library only).
 
 The reference deck (Yuanqi Du, 2026) draws every distribution the same way: a density raster whose alpha follows
-(p/p_max)^0.5 in one tint, real samples of that distribution on top, and 1-D densities as filled profiles along an
-axis. This module gives a builder the same pieces as SVG/PNG:
+(p/p_max)^0.5 in one tint and dies away with the density itself, real samples of that distribution on top, and 1-D
+densities as filled profiles along an axis. Paths between distributions are smooth curves. This module gives a builder
+the same pieces as SVG/PNG, and cloud() is the one call a scene normally needs:
 
-    from density import gaussian, gmm, laplace, uniform, density_png, samples, profile, bridge, Frame
+    from density import gaussian, gmm, laplace, uniform, cloud, profile, bridge, Frame
 
-    d = gmm([(0.3, (-1.2, 0.8), (0.45, 0.4)), (0.4, (0.9, 0.3), (0.5, 0.5)), (0.3, (0.1, -1.1), (0.4, 0.35))])
-    fr = Frame(x=420, y=140, w=300, h=220, xr=(-2.6, 2.6), yr=(-2.2, 2.2))     # scene px box ↔ data window
-    density_png(d, deck/'assets/figs/dens-data.png', fr, tint='#7FA7C9')         # writes an RGBA PNG (alpha = density)
-    svg  = fr.image('assets/figs/dens-data.png')                                  # <image …> element for the scene
-    pts  = [fr.px(x, y) for x, y in samples(d, 60, seed=7)]                        # real samples → circles
+    d = gmm([(0.3, (-1.35, 0.95), (0.38, 0.32)), (0.4, (1.25, 0.55), (0.42, 0.34)), (0.3, (-0.05, -1.2), (0.36, 0.3))])
+    fr = Frame(x=420, y=140, w=300, h=220, xr=(-3.4, 3.4), yr=(-2.8, 2.8))     # scene px box ↔ data window
+    svg = cloud(d, fr, deck/'assets/figs', 'data', tint='#7FA7C9', n=60, seed=7, dot='#4C72B0')   # raster + samples as SVG
+    pts = [fr.px(*xy) for _, xy in bridge(fr.data(100, 200), fr.data(300, 180), 0.4, seed=3)]     # a smooth path
 
-Distributions: gaussian(mu, sd), laplace(mu, b), uniform(lo, hi), gmm([(weight, mu, sd), …]); each has
-.logpdf(x, y) and .sample(rng). profile(pdf1d, lo, hi, n) returns a normalised 1-D curve; bridge(x0, x1, sigma, n, seed)
-returns a stochastic-interpolant path x_t = (1-t) x0 + t x1 + sigma * B_t with a Brownian bridge B_t (Var t(1-t)).
+Distributions: gaussian(mu, sd), laplace(mu, b), uniform(lo, hi), gmm([(weight, mu, sd), …]); each has .logpdf(x, y),
+.sample(rng) and .peak(). Keep the modes of a multi-modal distribution apart (centres at least 3 sd apart) or it reads
+as one blob. profile(pdf1d, lo, hi, n) returns a normalised 1-D curve; bridge(x0, x1, sigma, n, seed) returns a
+stochastic-interpolant path x_t = (1-t) x0 + t x1 + sigma * B_t with B_t a Brownian bridge built from its first Fourier
+terms, so the curve is smooth and still has the bridge's shape (Var close to t(1-t), zero at both ends).
 No reported number ever comes from these drawings; the cite line still says what is schematic.
 """
 import math
@@ -31,6 +33,10 @@ class _Dist:
 
     def sample(self, rng):
         raise NotImplementedError
+
+    def peak(self):
+        """The largest logpdf: at mu for one-peak distributions; gmm and uniform override it."""
+        return self.logpdf(*self.mu)
 
 
 class gaussian(_Dist):
@@ -72,6 +78,9 @@ class uniform(_Dist):
     def sample(self, rng):
         return (rng.uniform(self.lo[0], self.hi[0]), rng.uniform(self.lo[1], self.hi[1]))
 
+    def peak(self):
+        return 0.0
+
 
 class gmm(_Dist):
     def __init__(self, comps):
@@ -92,6 +101,9 @@ class gmm(_Dist):
                 return (rng.gauss(mu[0], sd[0]), rng.gauss(mu[1], sd[1]))
         w, mu, sd = self.comps[-1]
         return (rng.gauss(mu[0], sd[0]), rng.gauss(mu[1], sd[1]))
+
+    def peak(self):
+        return max(self.logpdf(*mu) for _, mu, _ in self.comps)
 
 
 class Frame:
@@ -128,11 +140,11 @@ def write_png(path, w, h, rows):
     return path
 
 
-def density_png(dist, path, frame, tint='#7FA7C9', alpha=0.72, gamma=0.5, scale=1.0, floor=0.015, edge=0.12):
-    """Raster of (p/p_max)^gamma as the alpha of one tint, the way the reference deck shades densities.
-    scale > 1 renders more pixels than the frame (crisper on retina / print); values below `floor` become fully transparent;
-    `edge` is the fraction of the frame over which the alpha fades to zero at each border (a raised cosine), so a window that
-    is too tight for the tails never shows a flat cut edge — choose the window so the mass sits inside the inner 1-2*edge."""
+def density_png(dist, path, frame, tint='#7FA7C9', alpha=0.72, gamma=0.5, scale=1.0, fade=0.22):
+    """Raster of (p/p_max)^gamma as the alpha of one tint, the way the reference deck shades densities. scale > 1 renders more
+    pixels than the frame (crisper on retina / print). The colour dies away along the density's own level sets: q_e, the largest
+    value on the frame border, and the band `fade` above it go smoothly to zero, so the cloud never shows the frame or a round
+    rim of its own (Latent SI v9: a raised-cosine window on the frame read as a circle drawn around the dots)."""
     w, h = max(2, int(round(frame.w * scale))), max(2, int(round(frame.h * scale)))
     vals = []
     mx = -1e300
@@ -145,28 +157,45 @@ def density_png(dist, path, frame, tint='#7FA7C9', alpha=0.72, gamma=0.5, scale=
             if v > mx:
                 mx = v
         vals.append(row)
+    border = [v for k, row in enumerate(vals) for i, v in enumerate(row) if k in (0, h - 1) or i in (0, w - 1)]
+    qe = math.exp(max(border) - mx) ** gamma
     r, g, b = _hex(tint)
-
-    def fade(i, n):
-        f = min(i + 0.5, n - i - 0.5) / max(1.0, n * edge)
-        return 1.0 if f >= 1.0 else 0.5 - 0.5 * math.cos(math.pi * f)
-    wx = [fade(i, w) for i in range(w)]
     rows = []
-    for j, row in enumerate(vals):
-        wy = fade(j, h)
+    for row in vals:
         out = bytearray()
-        for i, v in enumerate(row):
-            a = math.exp(v - mx)
-            q = (a ** gamma if a > floor else 0.0) * wx[i] * wy
-            out += bytes((r, g, b, int(round(255 * alpha * q))))
+        for v in row:
+            q = math.exp(v - mx) ** gamma
+            s = min(1.0, max(0.0, (q - qe) / (fade * (1.0 - qe))))
+            out += bytes((r, g, b, int(round(255 * alpha * q * s * s * (3.0 - 2.0 * s)))))
         rows.append(bytes(out))
     write_png(path, w, h, rows)
     return w, h
 
 
-def samples(dist, n, seed=0):
+def samples(dist, n, seed=0, core=None):
+    """n samples of dist. core keeps only those with p/p_max at or above it, so a dot never lands outside the visible cloud."""
     rng = random.Random(seed)
-    return [dist.sample(rng) for _ in range(n)]
+    if core is None:
+        return [dist.sample(rng) for _ in range(n)]
+    floor, out = dist.peak() + math.log(core), []
+    while len(out) < n:
+        xy = dist.sample(rng)
+        if dist.logpdf(*xy) >= floor:
+            out.append(xy)
+    return out
+
+
+def cloud(dist, frame, figs, name, tint='#7FA7C9', n=0, seed=0, r=2.6, dot=None, rim='#FFFFFF', alpha=0.72, scale=2.0, core=0.1, href_dir='assets/figs'):
+    """One distribution for an SVG scene: writes <figs>/dens-<name>.png and returns the <image> plus n samples as dots.
+    dot is the dot colour (default: tint); rim is a thin outline that keeps dots crisp over the raster. No outline around the cloud."""
+    Path(figs).mkdir(parents=True, exist_ok=True)
+    density_png(dist, Path(figs) / f'dens-{name}.png', frame, tint=tint, alpha=alpha, scale=scale)
+    out = [frame.image(f'{href_dir}/dens-{name}.png')]
+    for dx, dy in samples(dist, n, seed, core):
+        px, py = frame.px(dx, dy)
+        if frame.x + r < px < frame.x + frame.w - r and frame.y + r < py < frame.y + frame.h - r:
+            out.append(f'<circle cx="{px:.1f}" cy="{py:.1f}" r="{r:g}" fill="{dot or tint}" stroke="{rim}" stroke-width="0.7"/>')
+    return ''.join(out)
 
 
 def profile(pdf, lo, hi, n=160):
@@ -194,22 +223,27 @@ def profile_path(curve, span_px, axis_x, bulge, vertical=True):
     return ' '.join(d)
 
 
-def bridge(x0, x1, sigma, n=48, seed=0):
-    """Stochastic-interpolant path between scalars (or equal-length tuples): [(t, x_t)], x_t = (1-t)x0 + t x1 + sigma*B_t."""
+def brownian(n=64, seed=0, modes=6, pin=True):
+    """Standard Brownian noise on t = k/n from its first `modes` Karhunen-Loeve terms: a smooth curve. pin=True is a bridge,
+    B_0 = B_1 = 0, sum of sqrt(2) sin(k pi t)/(k pi) Z_k (modes=6 keeps 93 % of the variance at t = 1/2); pin=False is a free
+    path from B_0 = 0, sum of sqrt(2) sin((k-1/2) pi t)/((k-1/2) pi) Z_k."""
     rng = random.Random(seed)
+    freq = [(k if pin else k - 0.5) * math.pi for k in range(1, modes + 1)]
+    z = [rng.gauss(0, 1) for _ in freq]
+    return [sum(zk * math.sqrt(2) * math.sin(f * k / n) / f for zk, f in zip(z, freq)) for k in range(n + 1)]
+
+
+def bridge(x0, x1, sigma, n=64, seed=0, modes=6):
+    """Stochastic-interpolant path between scalars (or equal-length tuples): [(t, x_t)], x_t = (1-t)x0 + t x1 + sigma*B_t,
+    with B_t = brownian(); a smooth curve, not a jagged walk (the reference deck draws its paths this way)."""
     dim = len(x0) if isinstance(x0, (tuple, list)) else 1
     x0v = list(x0) if dim > 1 else [x0]
     x1v = list(x1) if dim > 1 else [x1]
-    walks = []
-    for _ in range(dim):
-        w = [0.0]
-        for _ in range(n):
-            w.append(w[-1] + rng.gauss(0, math.sqrt(1 / n)))
-        walks.append(w)
+    noise = [brownian(n, seed + 7919 * d, modes) for d in range(dim)]
     out = []
     for k in range(n + 1):
         t = k / n
-        xt = [(1 - t) * a + t * b + sigma * (w[k] - t * w[n]) for a, b, w in zip(x0v, x1v, walks)]
+        xt = [(1 - t) * a + t * b + sigma * w[k] for a, b, w in zip(x0v, x1v, noise)]
         out.append((t, xt[0] if dim == 1 else tuple(xt)))
     return out
 
@@ -237,7 +271,7 @@ def uniform1(lo=-1.0, hi=1.0, soft=0.06):
 if __name__ == '__main__':
     import sys
     import tempfile
-    d = gmm([(0.3, (-1.2, 0.8), 0.45), (0.4, (0.9, 0.3), 0.5), (0.3, (0.1, -1.1), 0.4)])
+    d = gmm([(0.3, (-1.35, 0.95), 0.38), (0.4, (1.25, 0.55), 0.42), (0.3, (-0.05, -1.2), 0.36)])
     fr = Frame(0, 0, 240, 180, (-2.6, 2.6), (-2.2, 2.2))
     out = Path(tempfile.gettempdir()) / 'density-selftest.png'
-    print(density_png(d, out, fr), out, len(samples(d, 10, 1)), bridge(-1.0, 1.0, 0.5, 8, 1)[-1], file=sys.stdout)
+    print(density_png(d, out, fr), out, len(samples(d, 10, 1, core=0.1)), bridge(-1.0, 1.0, 0.5, 8, 1)[-1], file=sys.stdout)

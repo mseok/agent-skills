@@ -16,6 +16,7 @@ Roles. 'judge' = read-only tools and isolation from the user's own instructions:
 (2026-11-01: a judge loaded the global CLAUDE.md and ran a bio-safe-reading pre-screen on an ML deck); Codex gets a minimal CODEX_HOME
 (auth.json link + the bridge base-URL line only) and `-s read-only` — with the normal home a one-line probe answered "yes" to
 "do your instructions contain 'Shared working agreement'" and carried 28k input tokens, with the minimal home "no" and 14k.
+Builder prompts: Codex builders get references/builder-notes-gpt.md appended (builder_prompt); Claude builders get the prompt as written.
 'builder' = edit + shell in the user's normal environment (that is what the user's own sessions look like): Claude `acceptEdits`
 with Read/Edit/Write/Bash…, Codex `-s danger-full-access` because headless Chrome (check_layout.py, shots.sh) aborts inside the
 seatbelt sandbox of `-s workspace-write` (observed 2026-11-01: "Abort trap: 6", no DOM dump) — the same trust the Claude builder has.
@@ -34,6 +35,7 @@ from pathlib import Path
 
 LIMIT = re.compile(r'(usage limit|rate limit|rate_limit|limit reached|too many requests|429|quota|overloaded|insufficient_quota)', re.I)
 JUDGE_HOME = Path(os.environ.get('CODEX_JUDGE_HOME', str(Path.home() / '.codex-judge-home')))
+GPT_NOTES = Path(__file__).resolve().parent.parent / 'references' / 'builder-notes-gpt.md'
 
 
 def backend_of(model):
@@ -150,10 +152,20 @@ def _run_codex(prompt, model, effort, cwd, role, timeout, add_dirs):
         shutil.rmtree(td, ignore_errors=True) if last.exists() else None
 
 
+def builder_prompt(prompt, model):
+    """What a builder is told. Codex builders also get references/builder-notes-gpt.md (user 2026-11-01: GPT-specific comments, with
+    little effect on Claude runs); a Claude builder's prompt comes back unchanged."""
+    if backend_of(model) == 'claude':
+        return prompt
+    return prompt + '\n\n---\n' + GPT_NOTES.read_text(encoding='utf-8')
+
+
 def run(prompt, model, effort, cwd, role='judge', timeout=1800, add_dirs=()):
     """One blocking agent run. Raises subprocess.TimeoutExpired like subprocess.run does."""
     if role not in ('judge', 'builder'):
         raise ValueError(role)
+    if role == 'builder':
+        prompt = builder_prompt(prompt, model)
     fn = _run_claude if backend_of(model) == 'claude' else _run_codex
     env = fn(prompt, model, effort, str(cwd), role, timeout, add_dirs)
     env['started_wall'] = datetime.datetime.now().astimezone().isoformat(timespec='seconds')

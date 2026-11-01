@@ -15,3 +15,6 @@ archive/codex/manuscript-writing/
 **/fonts/.uuid
 # Host-local third-party skill kept off the public repo (MacBook)
 skills/codex/hwpx-skill/
+
+# Reference screens of accepted decks, kept local only (not approved for the public repository)
+skills/codex/html-research-deck/assets/reference/
