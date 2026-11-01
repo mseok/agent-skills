@@ -48,3 +48,22 @@ svg.sc .x { stroke: #D1495B; stroke-width: 4; stroke-linecap: round; }
 .figwrap svg text { font-family: var(--sans); font-size: 20px; font-weight: 600; fill: var(--ink); paint-order: stroke; stroke: #fff; stroke-width: 5px; stroke-linejoin: round; }
 .figwrap svg line { stroke: #1F2933; stroke-width: 1.5; }
 .figwrap svg circle { fill: #1F2933; }
+
+/* formulas and math labels: KaTeX in HTML blocks positioned in panel coordinates (scene x + 20, scene y + 20).
+   .fx        = a bare math/Korean label (nowrap, no background), anchored by its left edge unless transformed
+   .fx.box    = a formula strip: one or more <p> lines centred in a light rounded box; a line wider than the box is an
+                html-overflow error in check_layout.py (overflow hidden keeps clientWidth = box width)
+   .fx.blue   = navy text on the pale blue fill used for the deck's key equation
+   .fx .k     = a Korean caption line inside a strip (24 px, regular, ink-soft) */
+.panel > .fx { position: absolute; margin: 0; white-space: nowrap; line-height: 1.25; font-size: 24px; font-weight: 600; color: var(--ink); }
+.panel > .fx.box { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; box-sizing: border-box;
+  padding: 8px 18px; border-radius: 12px; background: #F4F6F8; font-size: 26px; overflow: hidden; }
+.panel > .fx.box.left { align-items: flex-start; }
+.panel > .fx.blue { background: #DCE6F5; color: var(--navy); }
+.panel > .fx p { margin: 0; }
+.panel > .fx .k { font-size: 24px; font-weight: 500; color: var(--ink-soft); }
+.panel > .fx .katex { font-size: 1.06em; }
+.panel > .fx .katex .mord.text, .panel > .fx .katex .text { font-family: "Pretendard Variable", Pretendard, sans-serif; }
+
+/* title slide: an English sub-line inside the h1 (the paper title under its Korean reading) */
+.title-slide h1 small { display: block; font-size: .6em; font-weight: 600; letter-spacing: 0; color: var(--ink-soft); margin-top: .12em; }

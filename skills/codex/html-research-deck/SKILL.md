@@ -54,3 +54,10 @@ This skill owns the production step only: the engine, the visual system and the 
 ## Maintenance
 
 A new shape that will recur goes into `assets/deck/sprite-research.svg`; an accepted style correction becomes a `check_deck.py` rule or a line in `references/qa.md` in the same turn; an entry in User decisions is never dropped or narrowed without asking. Validate with the system skill-creator's `quick_validate.py` (`uv run --with pyyaml`).
+
+## User decisions (2026-11-01, Latent Stochastic Interpolants deck)
+
+- "글자들의 배열이나 이런 것들이 좀 선이랑 안 맞아서 튀어나오거나 아니면 자기들끼리 겹치는 경우가 있는데 … 앞으로 이런 거는 반드시 캐치하도록 … 캐치해서 고치도록" → `scripts/check_layout.py` now measures paths/polylines/polygons, rasters, clipping and slide-level HTML blocks, and crossings/clipping/overlaps are errors (see `references/qa.md`, delivery gate = 0 errors). The deck that prompted it had a title over its subtitle, curves through value labels, a label cut by the panel edge and sub-labels across trapezoid edges, all at 0/0 under the old checker.
+- "첨자 같은 것도 다 LaTeX이나 … TeX 기반으로" → formulas and math labels are KaTeX `.fx` blocks (`design-system.md`, Formulas); `deck_copy.py` keeps TeX out of the measured copy (`math` field), the message rubric records the exemption.
+- "디스트리뷰션 … prior … 양키 두 그 처음 HTML 페이지에서 했던 거랑 비슷하게 … 코드 기반으로" → `scripts/density.py`: density rasters + real samples + 1-D profiles + bridge paths (`design-system.md`, Distributions); blobs and dashed ellipses are out.
+- "분자나 PDB 구조 … 리서치톡에 있는 방식으로 … 파이몰 같은 프로그램으로 … 렌더링 … 한 다음에 넣는 식" → `design-system.md`, Structure renders: research-talk's PyMOL/RDKit pipeline produces the PNG, the `figure-render` template places it; nothing generated stands in for a structure.

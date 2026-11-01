@@ -5,7 +5,9 @@ usage: deck_copy.py /abs/deck/index.html --json /abs/deck/qa/copy.json [--text /
 
 Per slide: data-title, data-section, kicker, h2, lane headers (SVG text at 24px/650 — the builder's lane()), every other
 visible text run in DOM order (SVG <text>, HTML blocks), the closing line (.takeaway) with its bold phrases, the cite line and
-the speaker notes. Used by score_message.py (measured items) and judge_message.py (what the independent judge reads).
+the speaker notes. Formulas live in `.fx` HTML blocks as KaTeX source: `display` keeps each run as shown (math inline, for the
+judge's text dump), `math` lists the $…$ segments, and `visible` holds only the plain words so that score_message.py never
+measures a formula's parentheses, digits or symbols as slide copy (user decision 2026-11-01: subscripts and formulas in TeX). Used by score_message.py (measured items) and judge_message.py (what the independent judge reads).
 """
 import argparse
 import json
@@ -76,9 +78,19 @@ class Deck(HTMLParser):
             self.buf.append(data)
 
 
+MATH = re.compile(r'\$[^$]+\$')
+
+
+def split_math(text):
+    """'$x_t = …$ 를 만듦' → ('를 만듦', ['$x_t = …$']): KaTeX source is kept for the judge's dump but never measured as copy."""
+    maths = MATH.findall(text)
+    plain = re.sub(r'\s+', ' ', MATH.sub(' ', text)).strip()
+    return plain, maths
+
+
 def classify(slide):
     out = {'n': slide['n'], 'title': slide['title'], 'section': slide['section'], 'cls': slide['cls'], 'kicker': '', 'h2': '', 'h1': '',
-           'lanes': [], 'visible': [], 'closing': '', 'closing_bold': [], 'cite': '', 'notes': ''}
+           'lanes': [], 'visible': [], 'display': [], 'math': [], 'closing': '', 'closing_bold': [], 'cite': '', 'notes': ''}
     in_notes = False
     for meta, text in slide['_lines']:
         tag, cls, style, path = meta['tag'], meta['cls'], meta['style'], meta['path']
@@ -86,6 +98,13 @@ def classify(slide):
             in_notes = True
         if in_notes:
             out['notes'] += (' ' if out['notes'] else '') + text
+            continue
+        if '$' in text and ('fx' in cls.split() or any('fx' in p.split() for p in path)):
+            plain, maths = split_math(text)
+            out['display'].append(text)
+            out['math'] += maths
+            if plain:
+                out['visible'].append(plain)
             continue
         if 'kicker' in cls:
             out['kicker'] = text
@@ -102,6 +121,7 @@ def classify(slide):
             out['lanes'].append(text)
         else:
             out['visible'].append(text)
+            out['display'].append(text)
     return out
 
 
@@ -125,8 +145,8 @@ def render_text(doc, notes_chars=400):
             lines.append(f"  h2     : {s['h2']}")
         for l in s['lanes']:
             lines.append(f"  lane   : {l}")
-        if s['visible']:
-            lines.append('  text   : ' + ' | '.join(s['visible']))
+        if s.get('display') or s['visible']:
+            lines.append('  text   : ' + ' | '.join(s.get('display') or s['visible']))
         if s['closing']:
             lines.append(f"  closing: {s['closing']}")
         if s['cite']:
