@@ -6,6 +6,8 @@ usage: judge_deck.py /abs/deck/qa/shots-full --out /abs/deck/qa/judge-<ts>.json 
 The judge gets only the PNGs, references/judge-prompt.md and the judged rows of references/rubric.md: it runs `claude -p` from the
 PNG folder with the Read tool only, so it cannot see the builder's code, notes or earlier scores. The raw model output is kept in
 the result file next to the parsed JSON.
+`--setting-sources ''` and `--strict-mcp-config` keep the user's global CLAUDE.md, settings and MCP servers out of the judge: on 2026-11-01 a judge run
+loaded the shared working agreement, applied its bio-safe-reading rule to an ML deck (an Opus 5 pre-screen, $1.06) and reported itself non-independent.
 """
 import argparse
 import datetime
@@ -33,7 +35,7 @@ def main():
     prompt = ((SKILL / 'references' / 'judge-prompt.md').read_text(encoding='utf-8') + '\n\n---\n채점표 심사 항목:\n' + judged +
               f'\n\n---\n슬라이드 PNG ({n}장, 이 폴더): ' + ', '.join(p.name for p in pngs) +
               f'\n내용 슬라이드 = 2 … {n - 1} (1장 표지, {n}장 정리 제외). 모든 PNG를 Read 도구로 열어 본 뒤 JSON만 출력하라.')
-    cmd = ['claude', '-p', prompt, '--model', a.model, '--effort', a.effort, '--output-format', 'json', '--allowedTools', 'Read']
+    cmd = ['claude', '-p', prompt, '--model', a.model, '--effort', a.effort, '--output-format', 'json', '--allowedTools', 'Read', '--setting-sources', '', '--strict-mcp-config']
     t0 = datetime.datetime.now()
     try:
         r = subprocess.run(cmd, cwd=str(shots), capture_output=True, text=True, timeout=a.timeout, stdin=subprocess.DEVNULL)

@@ -18,11 +18,17 @@ errors   : text-outside-panel, text-outside-stage,
            text-crosses-image  a label lies on a raster (<image> or <img>) — labels sit beside renders, never on them,
            shape-clipped       a shape or image leaves its <svg> viewport,
            html-overflow       a clipping HTML block whose content scrolls (a formula wider than its .fx.box, a wrapped title column),
+           tex-unrendered      a KaTeX error span, or TeX / an HTML entity still visible as text (Latent SI v5: a card's '$\beta &gt; 0$' was
+                               escaped twice by the card path and reached KaTeX as '&', so the slide showed the raw string in red),
+           box-tight           text inside a leaf rect within 6 px of its left/right edge or 3 px of its top/bottom (Latent SI v5 slide 17:
+                               '+ 잡음 0.1' touching both sides of its box),
            html-overlap        two slide-level HTML blocks intersect (h1 / subtitle / who / aff on the title slide; h2, kicker,
                                panels, closing line, cite on content slides),
            h2-wraps            the slide title takes two lines,
            closing-wraps       the closing line takes two lines
 warnings : box-unbalanced      text inside a rect sits off-centre vertically by > 10 px,
+           fx-offcentre        a near-full-width .fx.box (≥ 60 % of the inner width) whose left and right gaps to the panel differ by > 16 px
+                               (Latent SI v5 slides 8–10: 20 vs 60 px while the neighbouring panel's boxes sat at 60/60),
            shape-overlap       two shapes ≥ 24 px intersect without one containing the other (stacked cards, badges over boxes) —
                                fix, or name the reason in the report,
            panel-underfilled   a top or bottom gap > 80 px,  panel-unbalanced  |top gap − bottom gap| > 24 px,  panel-tight  a gap < 12 px
@@ -44,7 +50,7 @@ from pathlib import Path
 CHROME = os.environ.get('CHROME', '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome')
 ERRORS = ('text-outside-panel', 'text-outside-stage', 'text-clipped', 'text-in-padding', 'text-overlap', 'text-crosses-shape',
           'text-crosses-line', 'text-crosses-path', 'text-crosses-image', 'shape-clipped', 'html-overflow', 'html-overlap',
-          'h2-wraps', 'closing-wraps')
+          'h2-wraps', 'closing-wraps', 'tex-unrendered', 'box-tight')
 
 MEASURE = r'''
 <script id="qa-layout-script">
@@ -157,6 +163,10 @@ MEASURE = r'''
         const isFx = el.classList.contains('fx'), isBox = isFx && el.classList.contains('box');
         const blk = { b, t: snip(el), tag: isFx ? 'fx' : tag, chars: textOf(el).replace(/\s+/g, '').length, fs: R(parseFloat(getComputedStyle(el).fontSize) || 0), box: isBox };
         htmlBlocks.push(blk);
+        if (isBox && b.w >= 0.6 * (pb.w - 2 * PAD)) {  // a formula strip that spans the panel should sit centred in it
+          const gl = R(b.x - pb.x), gr = R(pb.x + pb.w - b.x - b.w);
+          if (Math.abs(gl - gr) > 16) S.findings.push({ kind: 'fx-offcentre', panel: pi + 1, box: b, gapLeft: gl, gapRight: gr, text: blk.t });
+        }
         texts.push({ b, fs: blk.fs, t: blk.t, fill: getComputedStyle(el).color, chars: blk.chars, clipped: false, kind: 'html', box: isBox });
       });
       // bordered HTML rows/cards count as content for the fill measurement (their text may end above the border)
@@ -208,6 +218,9 @@ MEASURE = r'''
         const top = Math.min(...inside.map(t => t.b.y)), bot = Math.max(...inside.map(t => t.b.y + t.b.h));
         const gt = R(top - sh.b.y), gb = R(sh.b.y + sh.b.h - bot);
         if (Math.abs(gt - gb) > 10) S.findings.push({ kind: 'box-unbalanced', panel: pi + 1, box: sh.b, gapTop: gt, gapBottom: gb, text: inside[0].t });
+        const lft = Math.min(...inside.map(t => t.b.x)), rgt = Math.max(...inside.map(t => t.b.x + t.b.w));
+        const gl = R(lft - sh.b.x), gr = R(sh.b.x + sh.b.w - rgt);
+        if (Math.min(gl, gr) < 6 || Math.min(gt, gb) < 3) S.findings.push({ kind: 'box-tight', panel: pi + 1, box: sh.b, gapLeft: gl, gapRight: gr, gapTop: gt, gapBottom: gb, text: inside[0].t });
       });
       if (P.gap) {
         if (P.gap.bottom > 80 || P.gap.top > 80) S.findings.push({ kind: 'panel-underfilled', panel: pi + 1, gap: P.gap });
@@ -216,6 +229,11 @@ MEASURE = r'''
       }
     });
     // slide-level HTML blocks: none may intersect another (title slide h1 over its subtitle, a wrapped h2 over the panels …)
+    // formulas that did not render: KaTeX error spans, or TeX / HTML entities still visible as text
+    const RAW = /\\[A-Za-z]{2,}|&(?:gt|lt|amp|quot|#\d+);|\$[^$]{1,200}\$/;
+    Array.from(s.querySelectorAll('.katex-error')).filter(vis).forEach(el => S.findings.push({ kind: 'tex-unrendered', text: snip(el), box: box(el), why: el.getAttribute('title') || 'katex-error' }));
+    Array.from(s.querySelectorAll('*')).filter(el => vis(el) && el.children.length === 0 && !el.closest('.katex, .katex-error, script, style, aside') && RAW.test(el.textContent || ''))
+      .forEach(el => S.findings.push({ kind: 'tex-unrendered', text: snip(el), box: box(el), why: 'raw TeX or an HTML entity in visible text' }));
     const blocks = Array.from(s.querySelectorAll(':scope > h1, :scope > h2, :scope > .kicker, :scope > .subtitle, :scope > .who, :scope > .aff, :scope > .venue, :scope > .takeaway, :scope > .cite, :scope > .panel, :scope > .lines, :scope > p, :scope > .cap'))
       .filter(vis).map(el => ({ b: box(el), name: ((el.className && String(el.className).trim().split(/\s+/)[0]) || el.tagName.toLowerCase()), t: snip(el) })).filter(x => x.b.w > 0 && x.b.h > 0);
     for (let a = 0; a < blocks.length; a++) for (let b = a + 1; b < blocks.length; b++) {
@@ -289,6 +307,12 @@ def describe(f):
         return f"{k}: gaps top {g['top']:g} · bottom {g['bottom']:g} · left {g['left']:g} · right {g['right']:g}"
     if k == 'html-overflow':
         return f"{k}: {f['sel']} \"{f['text']}\" scroll {f['scroll']} > client {f['client']}"
+    if k == 'tex-unrendered':
+        return f"{k}: \"{f['text']}\" {fmt_box(f['box'])} — {f.get('why', '')}"
+    if k == 'box-tight':
+        return f"{k}: rect {fmt_box(f['box'])} text gap left {f['gapLeft']:g} · right {f['gapRight']:g} · top {f['gapTop']:g} · bottom {f['gapBottom']:g} (\"{f['text']}\" …)"
+    if k == 'fx-offcentre':
+        return f"{k}: .fx.box {fmt_box(f['box'])} gap left {f['gapLeft']:g} · right {f['gapRight']:g} (\"{f['text'][:30]}\" …)"
     if k == 'closing-wraps':
         return f"{k}: closing line is {f['box']['h']:g} px tall: \"{f['text']}\""
     return json.dumps(f, ensure_ascii=False)

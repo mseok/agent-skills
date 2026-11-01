@@ -6,6 +6,8 @@ usage: judge_message.py --copy /abs/deck/qa/copy.txt --context /abs/paper/contex
 
 The judge runs `claude -p` inside a temporary folder that holds only copy.txt, context.txt and contact.png (Read tool only), so it
 cannot see the builder's code, scores or earlier judgements. The raw model output is kept next to the parsed JSON.
+`--setting-sources ''` and `--strict-mcp-config` keep the user's global CLAUDE.md, settings and MCP servers out of the judge: on 2026-11-01 a judge run
+loaded the shared working agreement, applied its bio-safe-reading rule to an ML deck (an Opus 5 pre-screen, $1.06) and reported itself non-independent.
 """
 import argparse
 import datetime
@@ -35,7 +37,7 @@ def main():
     t0 = datetime.datetime.now()
     with tempfile.TemporaryDirectory(prefix='judge-msg-') as td:
         shutil.copy(a.copy, Path(td) / 'copy.txt'); shutil.copy(a.context, Path(td) / 'context.txt'); shutil.copy(a.contact, Path(td) / 'contact.png')
-        cmd = ['claude', '-p', prompt, '--model', a.model, '--effort', a.effort, '--output-format', 'json', '--allowedTools', 'Read']
+        cmd = ['claude', '-p', prompt, '--model', a.model, '--effort', a.effort, '--output-format', 'json', '--allowedTools', 'Read', '--setting-sources', '', '--strict-mcp-config']
         try:
             r = subprocess.run(cmd, cwd=td, capture_output=True, text=True, timeout=a.timeout, stdin=subprocess.DEVNULL)
         except subprocess.TimeoutExpired:
