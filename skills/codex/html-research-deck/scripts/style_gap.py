@@ -12,6 +12,7 @@ Limits come from the accepted Opus decks rendered under the stage-first theme (L
 anchor 0.9 or above emptyrect 11.7 there, a result slide never below mass 3.8 or above emptyrect 20; their medians on figure slides were mass 13-23, anchor 3.8-12.6, emptyrect 6.8-8.3, and a GPT
 build before this script had 11.8, 3.2, 11.0. A kit-built deck can also overshoot, with big filled boxes in place of drawings (medians 33-38 on CausalGame), hence the upper limit on mass.
 This measures resemblance, not quality: it has no view on the argument.
+Also flagged: a formula row that starts with an operator, which is one relation split over two rows (user 2026-11-02).
 The whitebox limit: the Yuanqi Du deck's median is 6, v10 with white figure panels 29, six chart cards on one slide 16 each. Also checked: the cover is the title-slide template with the title on the stage; titles and closing lines against the approved storyline.
 Prints one FIX line per finding and exits 0; the builder fixes them and runs it again.
 """
@@ -35,6 +36,7 @@ WHY = {'mass': '그림이 얇다: 선과 작은 상자 대신 채운 도형으�
        'emptyrect': '패널에 큰 빈 곳이 있다: 그림을 키워 그 자리를 채운다',
        'whitebox': '큰 흰 박스가 있다: 그림은 흰 패널 없이 무대 위에 바로 놓고, 흰색은 수식이나 작은 차트 하나만 담는 카드에만 쓴다'}
 NOT_SCORED = {'title', 'conclusion'}
+SPLIT_ROW = re.compile(r'^\s*\$\s*(?:\\[;,:!]|\\quad|\\qquad|\s)*(?:\+|-|−|=|\\ge\b|\\le\b|\\geq\b|\\leq\b|\\propto\b|\\approx\b)')
 
 
 def read_png(path):
@@ -164,6 +166,11 @@ def main():
             changed.append(f'{i}장 제목')
         if i > 1 and m_c and plain(m_c.group(1)) != plain(s.get('closing', '')):
             changed.append(f'{i}장 마무리줄')
+    for i, sec in enumerate(secs, 1):
+        body = re.sub(r'<aside class="notes">.*?</aside>', '', sec, flags=re.S)
+        for row in re.findall(r'<p[^>]*>(.*?)</p>', body, flags=re.S):
+            if SPLIT_ROW.match(html.unescape(row)):
+                fixes.append(f'FIX slide {i}: 식이 두 줄로 나뉘었다({plain(row)[:40]}…). 한 관계식은 한 줄에: 카드를 넓히거나 24 px까지 줄인다')
     rows = []
     for p in sorted(glob.glob(str(root / 'deck' / 'qa' / 'shots-full' / 'slide-*.png'))):
         n = int(re.search(r'slide-(\d+)', p).group(1))

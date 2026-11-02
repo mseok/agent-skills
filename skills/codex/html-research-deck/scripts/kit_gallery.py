@@ -1,16 +1,17 @@
 #!/usr/bin/env python3
-"""kit_gallery.py — fourteen worked slides drawn with scene_kit.py, with toy content and no paper in them. Copy a slide's code, keep its sizes and positions, change the content.
+"""kit_gallery.py — fifteen worked slides drawn with scene_kit.py, with toy content and no paper in them. Copy a slide's code, keep its sizes and positions, change the content.
 
 usage: kit_gallery.py /abs/deck   (a folder scaffolded by new_deck.py). Renders are kept in assets/kit-gallery/ of this skill.
 Numbers, names and curves here are invented to show the drawing; nothing on these slides is a result.
 """
+import math
 import random
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from scene_kit import *  # noqa: E402,F403
-from scene_kit import AMBER, AMBERD, BAR_OTHER, BIMODAL, BLUE, CORAL, FULL, GHOST, GRAY, INK, L2, MUTED, NAVY, R2, RED, SOFT, STEEL, STEELD  # noqa: E402
+from scene_kit import AMBER, AMBERD, BAR_OTHER, BIMODAL, BLUE, CORAL, FULL, GHOST, GRAY, GRAYL, INK, L2, MUTED, NAVY, R2, RED, SOFT, STEEL, STEELD  # noqa: E402
 
 CITE = '예시 내용 · 숫자와 이름은 그리는 법을 보이려고 지어낸 것'
 F = Field(0.62, BIMODAL, sig=1.0)
@@ -349,6 +350,36 @@ def g14_cards():
                  '같은 base model에서 <b>sampling</b>만 바꿔 여섯 target', CITE + ' · 곡선은 예시 분포에서 계산', notes('작은 차트 여러 개만 흰 카드에 하나씩 담습니다. 큰 그림 하나는 카드에 넣지 않습니다.'))
 
 
+def g15_derivation():
+    """A derivation: the formulas are the content. One table row per step, one relation on each line, the result on the key-equation card, and beside it a picture of what the result means. Never a chain of boxes holding step names."""
+    theta, sig, z0 = 1.6, 1.3, 1.7
+    fr = Frame(40, 92, 560, 396, (0, 1), (-3.4, 3.2))
+    sd = lambda t: sig * math.sqrt((1 - math.exp(-2 * theta * t)) / (2 * theta))
+    mean = lambda t: z0 * math.exp(-theta * t)
+    l = lane(0, 24, '어느 시점이든 바로 뽑는 sample')
+    for k, end in enumerate((1.1, 0.2, -0.8)):
+        l += strand([fr.px(t, v) for t, v in bridge(z0, end, 0.8, 40, 40 + k)], GRAYL, 2, 1)
+    l += strand([fr.px(i / 40, mean(i / 40)) for i in range(41)], NAVY, 3, 1, '10 8')
+    h = tex(40, fr.px(0, z0)[1] - 38, r'$z_0$', 26, 700, AMBERD, 'middle') + tex(320, 80, r'mean은 $e^{-\theta t} z_0$로 감소', 24, 650, NAVY, 'middle')
+    for t, draw in ((0.25, 0.9), (0.5, -0.8), (0.75, 0.6)):
+        x, m, s_ = fr.px(t, 0)[0], mean(t), sd(t)
+        l += vprof(gauss1(m, s_), m - 2.6 * s_, m + 2.6 * s_, x, fr.px(t, m - 2.6 * s_)[1], fr.px(t, m + 2.6 * s_)[1], 52, '#DCE6F5', BLUE, 0.9)
+        l += circle(x, fr.px(t, m + draw * s_)[1], 9, RED, '#fff', 2) + line(x, 500, x, 512, GRAY, 2)
+        h += tex(x, 548, f'$t = {t:g}$', 22, 600, SOFT, 'middle')
+    l += line(40, 506, 600, 506, GRAY, 2) + circle(*fr.px(0, z0), 15, '#F8E3BF', AMBERD, 2.6)
+    h += tex(320, 592, r'폭은 $s_t$, $t$와 함께 증가', 24, 650, BLUE, 'middle') + fx(0, 610, 624, 50, ['어느 $t$든 Gaussian에서 한 번에 뽑음'], 24)
+    rows = [(r'$dz_t = -\theta\,z_t\,dt + \sigma\,dw_t$', 'linear drift와 additive noise'),
+            (r'$z_t\,|\,z_0 \sim \mathcal N\big(e^{-\theta t} z_0,\; s_t^2 I\big)$', 'transition이 Gaussian'),
+            (r'$s_t^2 = \frac{\sigma^2}{2\theta}\big(1 - e^{-2\theta t}\big)$', 'variance가 식으로 풀림'),
+            (r'$z_t = e^{-\theta t} z_0 + s_t\,\epsilon$', 'noise 하나로 씀')]
+    r, hr = derive(rows)
+    r = lane(0, 24, 'linear SDE에서 sample 식까지 네 단계') + r + arrow(120, 356, 120, 420)
+    hr += tex(140, 396, r'$\epsilon \sim \mathcal N(0, I)$이면 경로를 풀 필요 없음', 26, 700)
+    hr += fx(0, 428, 972, 232, [r'$z_t = e^{-\theta t} z_0 + \frac{\sigma}{\sqrt{2\theta}}\sqrt{1 - e^{-2\theta t}}\;\epsilon$', '<span style="color:#1D3A5F;font-weight:700;font-size:26px">한 줄에 한 식, 줄바꿈은 서로 다른 식 사이에서만</span>'], 34, 'box blue')
+    return slide('예시', '예시 · 식이 내용인 유도', '식으로 풀리는 transition으로 바로 뽑는 sample', [panel(110, 176, 664, 722, l, h), panel(798, 176, 1012, 722, r, hr)],
+                 '경로를 풀지 않아도 <b>어느 $t$든</b> 한 번에 sample', CITE + ' · Ornstein-Uhlenbeck 과정의 교과서 식', notes('유도를 말하는 장은 식이 내용입니다. 단계 이름만 적은 상자로 바꾸지 않습니다. 한 식은 한 줄에 둡니다.'))
+
+
 if __name__ == '__main__':
     init(sys.argv[1])
-    write_deck([g() for g in (g1_cover, g2_two_chains, g3_table, g4_hero, g5_mechanism, g6_bars, g7_lines, g8_closing, g9_causal, g10_matrix, g11_rank, g12_tiers, g13_boxes, g14_cards)])
+    write_deck([g() for g in (g1_cover, g2_two_chains, g3_table, g4_hero, g5_mechanism, g6_bars, g7_lines, g8_closing, g9_causal, g10_matrix, g11_rank, g12_tiers, g13_boxes, g14_cards, g15_derivation)])

@@ -21,6 +21,7 @@ same coordinates and add the padding themselves.
     enc(), dec(), model_box(), grid(), photo(), picture()   one actor, one drawing on every slide
     bars(), legend(), big()                charts from numbers, with bold value labels and the key number large
     T(), lines(), tex(), fx()              text, several lines, a label with KaTeX, a KaTeX card (cls 'box' white, 'box blue' the deck's key equation)
+    derive()           a derivation as a table: one row per step, its formula on one line and a phrase of what it gives
     node(), edge()     a causal graph: circles and arrows trimmed to their rims
     plot_axes(), dots(), fit_line(), swarm(), box_stat()   small plots: scatter with a fit, dots on a number line, box plots
     arrow(), qarrow(), curve(), arr(), line(), rect(), card(), circle(), strand(), badge(), check_mark(), lock(), cross()
@@ -118,7 +119,8 @@ def big(x, y, s, size=36, fill=BLUE, a='middle'):
 
 
 def fx(x, y, w, h, rows, size=26, cls='box'):
-    """A formula card (HTML + KaTeX). A row without $ is a caption line. cls: 'box' white card, 'box blue' the deck's key equation."""
+    """A formula card (HTML + KaTeX). Each row is one whole relation: never split a formula over two rows, widen the card or lower size to 24 instead.
+    A row without $ is a caption line. cls: 'box' white card, 'box blue' the deck's key equation."""
     ps = ''.join(f'<p>{r}</p>' if '$' in r else f'<p class="k">{r}</p>' for r in rows)
     return f'<div class="fx {cls}" style="left:{x + 20:g}px;top:{y + 20:g}px;width:{w:g}px;height:{h:g}px;font-size:{size}px">{ps}</div>'
 
@@ -487,6 +489,16 @@ def bars(x0, x1, base, top, groups, vmax, colors=(BLUE, BAR_OTHER), inks=(BLUE, 
             s += T(left + j * (bw + 8) + bw / 2, yt - 12, fmt.format(v), val_size, 700, hl_color if on else inks[j % len(inks)], 'middle')
         h += tex(cx, base + 42, nm, name_size, 650, None, 'middle')
     return s + line(x0, base, x1, base, GRAY, 2), h
+
+
+def derive(rows, w=972, y0=52, rh=74, size=28, note_size=24):
+    """A derivation: rows = [(tex, phrase), …], one relation on each line. The formulas are the content, so a step is never a box holding only its name. Returns (svg, html)."""
+    s, h = '', ''
+    for k, (formula, phrase) in enumerate(rows):
+        y = y0 + k * rh
+        s += line(0, y, w, y, '#D9DEE3', 1.5) + T(8, y + rh * 0.64, str(k + 1), 26, 700, NAVY) + T(w, y + rh * 0.64, phrase, note_size, 600, INK, 'end')
+        h += tex(44, y + rh * 0.66, formula, size, 500)
+    return s + line(0, y0 + len(rows) * rh, w, y0 + len(rows) * rh, '#D9DEE3', 1.5), h
 
 
 # ---------- slides ----------
