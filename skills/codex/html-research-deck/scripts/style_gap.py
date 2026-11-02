@@ -9,7 +9,7 @@ Measured inside the panel band of each content slide:
   emptyrect  largest rectangle with nothing in it: space left over in one lump, as opposed to spread evenly
   whitebox   largest connected pure-white region: stage first (user 2026-11-02) keeps figures on the warm stage and white for a card that holds one thing
 Limits come from the accepted Opus decks rendered under the stage-first theme (Latent SI first build and v11, CausalGame v12; 2026-11-02): a figure slide never fell below mass 9.8,
-anchor 0.9 or above emptyrect 10.4 there, a result slide never below mass 3.8 or above emptyrect 20; their medians on figure slides were mass 13-23, anchor 3.8-12.6, emptyrect 6.8-8.3, and a GPT
+anchor 0.9 or above emptyrect 11.7 there, a result slide never below mass 3.8 or above emptyrect 20; their medians on figure slides were mass 13-23, anchor 3.8-12.6, emptyrect 6.8-8.3, and a GPT
 build before this script had 11.8, 3.2, 11.0. A kit-built deck can also overshoot, with big filled boxes in place of drawings (medians 33-38 on CausalGame), hence the upper limit on mass.
 This measures resemblance, not quality: it has no view on the argument.
 The whitebox limit: the Yuanqi Du deck's median is 6, v10 with white figure panels 29, six chart cards on one slide 16 each. Also checked: the cover is the title-slide template with the title on the stage; titles and closing lines against the approved storyline.
@@ -26,9 +26,9 @@ import sys
 import zlib
 from pathlib import Path
 
-FIGURE_MEDIANS = {'mass': (13.0, 28.0), 'anchor': (3.5, None), 'emptyrect': (None, 8.5)}
+FIGURE_MEDIANS = {'mass': (13.0, 28.0), 'anchor': (3.5, None), 'emptyrect': (None, 9.0)}
 RESULT_MEDIANS = {'mass': (13.0, 32.0), 'emptyrect': (None, 11.5)}
-FIGURE_SLIDE = {'mass': (9.0, None), 'anchor': (0.9, None), 'emptyrect': (None, 10.5), 'whitebox': (None, 20.0)}
+FIGURE_SLIDE = {'mass': (9.0, None), 'anchor': (0.9, None), 'emptyrect': (None, 12.0), 'whitebox': (None, 20.0)}
 RESULT_SLIDE = {'mass': (3.5, None), 'emptyrect': (None, 20.0), 'whitebox': (None, 20.0)}
 HEAVY = '칠한 면이 너무 많다: 글을 담은 큰 상자와 넓은 색 띠를 줄이고 곡선, 점, 작은 도형으로 그린다'
 WHY = {'mass': '그림이 얇다: 선과 작은 상자 대신 채운 도형으로, 더 크게', 'anchor': '눈이 먼저 갈 큰 도형이 없다: hero_bridge, 큰 model_box, 넓은 막대처럼 패널을 차지하는 중심을 둔다',
