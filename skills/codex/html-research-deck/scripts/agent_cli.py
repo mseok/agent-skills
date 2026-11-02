@@ -38,6 +38,13 @@ JUDGE_HOME = Path(os.environ.get('CODEX_JUDGE_HOME', str(Path.home() / '.codex-j
 GPT_NOTES = Path(__file__).resolve().parent.parent / 'references' / 'builder-notes-gpt.md'
 
 
+def codex_bin():
+    """The Codex CLI a builder runs on: CODEX_BIN, else the desktop app's bundled CLI, else `codex` on PATH. A login shell's PATH can hold an old standalone release that
+    rejects current models (2026-11-02: 0.153.4 answered model_not_found for gpt-6.1-sol while the app's CLI ran it)."""
+    app = '/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS/codex'
+    return os.environ.get('CODEX_BIN') or (app if os.path.exists(app) else 'codex')
+
+
 def backend_of(model):
     return 'claude' if str(model).startswith('claude') else 'codex'
 
@@ -110,7 +117,7 @@ def _run_claude(prompt, model, effort, cwd, role, timeout, add_dirs):
 def _run_codex(prompt, model, effort, cwd, role, timeout, add_dirs):
     td = tempfile.mkdtemp(prefix='agent-cli-codex.')
     last = Path(td) / 'last.txt'; events = Path(td) / 'events.jsonl'
-    cmd = ['codex', 'exec', '-m', model, '-c', f'model_reasoning_effort="{effort}"', '--skip-git-repo-check', '--ephemeral', '-C', str(cwd),
+    cmd = [codex_bin(), 'exec', '-m', model, '-c', f'model_reasoning_effort="{effort}"', '--skip-git-repo-check', '--ephemeral', '-C', str(cwd),
            '--json', '-o', str(last), '-s', 'read-only' if role == 'judge' else 'danger-full-access', '-']
     env_vars = dict(os.environ)
     if role == 'judge':
@@ -140,7 +147,7 @@ def _run_codex(prompt, model, effort, cwd, role, timeout, add_dirs):
                 errors.append(json.dumps(e, ensure_ascii=False)[:600])
         result = last.read_text(encoding='utf-8') if last.exists() else (messages[-1] if messages else '')
         stderr_tail = '\n'.join(l for l in (r.stderr or '').splitlines() if ' WARN ' not in l and 'rmcp::' not in l and '426 Upgrade Required' not in l)[-1500:]
-        env = {'backend': 'codex', 'model_requested': model, 'effort': effort, 'role': role, 'cli_version': cli_version('codex'), 'exit_code': r.returncode,
+        env = {'backend': 'codex', 'model_requested': model, 'effort': effort, 'role': role, 'cli_version': cli_version(codex_bin()), 'exit_code': r.returncode,
                'result': result, 'total_cost_usd': None, 'num_turns': turns or None, 'duration_ms': int((time.time() - t0) * 1000), 'usage': usage,
                'is_error': bool(r.returncode) or usage is None, 'error_text': ('\n'.join(errors) + '\n' + stderr_tail).strip(), 'no_json': usage is None and not result,
                'model_reported': None, 'events_file': str(events)}
@@ -187,7 +194,7 @@ def probe(model):
             return True, str(d.get('result'))[:40]
         with tempfile.TemporaryDirectory(prefix='agent-cli-probe.') as td:
             env_vars = dict(os.environ); env_vars['CODEX_HOME'] = str(judge_home())
-            r = subprocess.run(['codex', 'exec', '-m', model, '-c', 'model_reasoning_effort="low"', '-s', 'read-only', '--skip-git-repo-check', '--ephemeral', '-C', td,
+            r = subprocess.run([codex_bin(), 'exec', '-m', model, '-c', 'model_reasoning_effort="low"', '-s', 'read-only', '--skip-git-repo-check', '--ephemeral', '-C', td,
                                 '--json', '-o', f'{td}/last.txt', '-'], input='Reply with exactly the word OK.', capture_output=True, text=True, timeout=300, env=env_vars)
             last = Path(td, 'last.txt').read_text(encoding='utf-8') if Path(td, 'last.txt').exists() else ''
             if r.returncode or 'OK' not in last:
