@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""kit_gallery.py — fifteen worked slides drawn with scene_kit.py, with toy content and no paper in them. Copy a slide's code, keep its sizes and positions, change the content.
+"""kit_gallery.py — sixteen worked slides drawn with scene_kit.py, with toy content and no paper in them. Copy a slide's code, keep its sizes and positions, change the content.
 
 usage: kit_gallery.py /abs/deck   (a folder scaffolded by new_deck.py). Renders are kept in assets/kit-gallery/ of this skill.
 Numbers, names and curves here are invented to show the drawing; nothing on these slides is a result.
@@ -353,7 +353,7 @@ def g14_cards():
 def g15_derivation():
     """A derivation: the formulas are the content. One table row per step, one relation on each line, the result on the key-equation card, and beside it a picture of what the result means. Never a chain of boxes holding step names."""
     theta, sig, z0 = 1.6, 1.3, 1.7
-    fr = Frame(40, 92, 560, 396, (0, 1), (-3.4, 3.2))
+    fr = Frame(40, 92, 560, 396, (0, 1), (-1.9, 2.6))
     sd = lambda t: sig * math.sqrt((1 - math.exp(-2 * theta * t)) / (2 * theta))
     mean = lambda t: z0 * math.exp(-theta * t)
     l = lane(0, 24, '어느 시점이든 바로 뽑는 sample')
@@ -372,14 +372,33 @@ def g15_derivation():
             (r'$z_t\,|\,z_0 \sim \mathcal N\big(e^{-\theta t} z_0,\; s_t^2 I\big)$', 'transition이 Gaussian'),
             (r'$s_t^2 = \frac{\sigma^2}{2\theta}\big(1 - e^{-2\theta t}\big)$', 'variance가 식으로 풀림'),
             (r'$z_t = e^{-\theta t} z_0 + s_t\,\epsilon$', 'noise 하나로 씀')]
-    r, hr = derive(rows)
-    r = lane(0, 24, 'linear SDE에서 sample 식까지 네 단계') + r + arrow(120, 356, 120, 420)
-    hr += tex(140, 396, r'$\epsilon \sim \mathcal N(0, I)$이면 경로를 풀 필요 없음', 26, 700)
-    hr += fx(0, 428, 972, 232, [r'$z_t = e^{-\theta t} z_0 + \frac{\sigma}{\sqrt{2\theta}}\sqrt{1 - e^{-2\theta t}}\;\epsilon$', '<span style="color:#1D3A5F;font-weight:700;font-size:26px">한 줄에 한 식, 줄바꿈은 서로 다른 식 사이에서만</span>'], 34, 'box blue')
+    r, hr = derive(rows, rh=96, size=32, note_size=26)
+    r = lane(0, 24, 'linear SDE에서 sample 식까지 네 단계') + r + arrow(120, 446, 120, 510)
+    hr += tex(140, 486, r'$\epsilon \sim \mathcal N(0, I)$이면 경로를 풀 필요 없음', 26, 700)
+    hr += fx(0, 524, 972, 136, [r'$z_t = e^{-\theta t} z_0 + \frac{\sigma}{\sqrt{2\theta}}\sqrt{1 - e^{-2\theta t}}\;\epsilon$'], 38, 'box blue')
     return slide('예시', '예시 · 식이 내용인 유도', '식으로 풀리는 transition으로 바로 뽑는 sample', [panel(110, 176, 664, 722, l, h), panel(798, 176, 1012, 722, r, hr)],
                  '경로를 풀지 않아도 <b>어느 $t$든</b> 한 번에 sample', CITE + ' · Ornstein-Uhlenbeck 과정의 교과서 식', notes('유도를 말하는 장은 식이 내용입니다. 단계 이름만 적은 상자로 바꾸지 않습니다. 한 식은 한 줄에 둡니다.'))
 
 
+def g16_transform():
+    """Whole figure to whole figure: a thick arrow in the empty gap between the two drawings. An arrow from a node to a node reads as one more edge. What changed is coloured where it happened; the bars show what the steps add up to."""
+    pos = {'a': (-125, -75), 'b': (0, -150), 'c': (125, -75), 'd': (125, 75), 'e': (0, 150), 'f': (-125, 75)}
+    ring = [('a', 'b'), ('b', 'c'), ('c', 'd'), ('d', 'e'), ('e', 'f'), ('f', 'a')]
+    cxs, cy = (230, 830, 1430), 270
+    s = graph_fig(cxs[0], cy, pos, ring + [('a', 'd')], gone=[('a', 'd'), ('c', 'd')])
+    s += graph_fig(cxs[1], cy, pos, [e for e in ring if e != ('c', 'd')])
+    s += graph_fig(cxs[2], cy, pos, [e for e in ring if e != ('c', 'd')], new=[('b', 'e')], new_nodes=['c'])
+    s += gap_arrow(410, 650, cy, '2곳 지움') + gap_arrow(1010, 1250, cy, '2곳 더함')
+    for cx, lab in zip(cxs, ('출발 graph', '중간 graph', '도착 graph')):
+        s += T(cx, 28, lab, 26, 650, SOFT, 'middle')
+    for cx, left in zip(cxs, (4, 2, 0)):
+        s += T(cx - 150, 500, '도착까지 남은 변경', 24, None, SOFT)
+        s += rect(cx - 150, 520, max(8, 300 * left / 4), 60, 6, BLUE if left else BAR_OTHER, 'none', 0) + T(cx - 150 + max(8, 300 * left / 4) + 16, 563, str(left), 34, 700, NAVY)
+    s += T(830, 650, '빨간 점선은 지울 edge, 빨간 실선은 새 edge, 노란 node는 바뀐 node', 24, 600, RED, 'middle')
+    return slide('예시', '예시 · 그림에서 그림으로', '한 번에 바꾸지 않고 작은 변경으로 잇는 graph', [panel(*FULL, s)],
+                 '남은 변경이 <b>4에서 0으로</b> 줄어드는 두 걸음', CITE, notes('변환 화살표는 두 그림 사이의 빈 곳에 두고, 바뀐 곳은 그 자리의 색으로 표시합니다.'))
+
+
 if __name__ == '__main__':
     init(sys.argv[1])
-    write_deck([g() for g in (g1_cover, g2_two_chains, g3_table, g4_hero, g5_mechanism, g6_bars, g7_lines, g8_closing, g9_causal, g10_matrix, g11_rank, g12_tiers, g13_boxes, g14_cards, g15_derivation)])
+    write_deck([g() for g in (g1_cover, g2_two_chains, g3_table, g4_hero, g5_mechanism, g6_bars, g7_lines, g8_closing, g9_causal, g10_matrix, g11_rank, g12_tiers, g13_boxes, g14_cards, g15_derivation, g16_transform)])

@@ -23,6 +23,7 @@ same coordinates and add the padding themselves.
     T(), lines(), tex(), fx()              text, several lines, a label with KaTeX, a KaTeX card (cls 'box' white, 'box blue' the deck's key equation)
     derive()           a derivation as a table: one row per step, its formula on one line and a phrase of what it gives
     node(), edge()     a causal graph: circles and arrows trimmed to their rims
+    graph_fig(), gap_arrow()     one graph as one figure, and the arrow from one whole figure to the next, which sits in the gap and touches neither
     plot_axes(), dots(), fit_line(), swarm(), box_stat()   small plots: scatter with a fit, dots on a number line, box plots
     arrow(), qarrow(), curve(), arr(), line(), rect(), card(), circle(), strand(), badge(), check_mark(), lock(), cross()
 No reported number ever comes from these drawings; the cite line says what is schematic.
@@ -272,6 +273,23 @@ def node(cx, cy, label, r=36, hidden=False, outcome=False, size=24, stroke=None)
     for k, part in enumerate(parts):
         out += T(cx, cy - (len(parts) - 1) * lh / 2 + k * lh + size * 0.36, part, size, 700, SOFT if hidden else None, 'middle')
     return out
+
+
+def graph_fig(cx, cy, pos, edges, gone=(), new=(), new_nodes=(), r=26, labels=False):
+    """One graph as one figure. pos = {name: (dx, dy)} around (cx, cy); edges = [(a, b)]; gone: edges about to be removed (red dashed); new: edges just added (red); new_nodes: changed nodes (amber)."""
+    out = ''
+    for a, b in list(edges) + [e for e in new if e not in edges]:
+        (ax, ay), (bx, by) = pos[a], pos[b]
+        hit_gone, hit_new = (a, b) in gone, (a, b) in new
+        out += line(cx + ax, cy + ay, cx + bx, cy + by, RED if hit_gone or hit_new else '#5F718A', 4 if hit_gone or hit_new else 3, '9 7' if hit_gone else None)
+    for name, (dx, dy) in pos.items():
+        out += node(cx + dx, cy + dy, name if labels else '', r, outcome=name in new_nodes)
+    return out
+
+
+def gap_arrow(x1, x2, y, label='', color=GRAY):
+    """A transformation from one whole figure to the next: thick, straight, in the empty gap between them, with what changes written above it. It never touches a node or a small box."""
+    return arr(x1, y, x2, y, color, 7, size=30) + (T((x1 + x2) / 2, y - 30, label, 26, 650, SOFT, 'middle') if label else '')
 
 
 def edge(x1, y1, x2, y2, r1=36, r2=36, color=GRAY, dash=None, sw=2.6):

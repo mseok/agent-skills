@@ -12,7 +12,7 @@ Limits come from the accepted Opus decks rendered under the stage-first theme (L
 anchor 0.9 or above emptyrect 11.7 there, a result slide never below mass 3.8 or above emptyrect 20; their medians on figure slides were mass 13-23, anchor 3.8-12.6, emptyrect 6.8-8.3, and a GPT
 build before this script had 11.8, 3.2, 11.0. A kit-built deck can also overshoot, with big filled boxes in place of drawings (medians 33-38 on CausalGame), hence the upper limit on mass.
 This measures resemblance, not quality: it has no view on the argument.
-Also flagged: a formula row that starts with an operator, which is one relation split over two rows (user 2026-11-02).
+Also flagged: a formula row that starts with an operator, which is one relation split over two rows (user 2026-11-02), and a formula card taller than 170 px that holds one row (the judges' empty blue card, 2026-11-02).
 The whitebox limit: the Yuanqi Du deck's median is 6, v10 with white figure panels 29, six chart cards on one slide 16 each. Also checked: the cover is the title-slide template with the title on the stage; titles and closing lines against the approved storyline.
 Prints one FIX line per finding and exits 0; the builder fixes them and runs it again.
 """
@@ -171,6 +171,9 @@ def main():
         for row in re.findall(r'<p[^>]*>(.*?)</p>', body, flags=re.S):
             if SPLIT_ROW.match(html.unescape(row)):
                 fixes.append(f'FIX slide {i}: 식이 두 줄로 나뉘었다({plain(row)[:40]}…). 한 관계식은 한 줄에: 카드를 넓히거나 24 px까지 줄인다')
+        for m in re.finditer(r'<div class="fx box[^"]*"[^>]*height:([\d.]+)px[^>]*>(.*?)</div>', body, flags=re.S):
+            if float(m.group(1)) > 170 and len(re.findall(r'<p[ >]', m.group(2))) == 1:
+                fixes.append(f'FIX slide {i}: 식 한 줄에 높이 {float(m.group(1)):g} px 카드는 휑하다. 카드 높이를 내용에 맞춘다(한 줄이면 130 px 안팎)')
     rows = []
     for p in sorted(glob.glob(str(root / 'deck' / 'qa' / 'shots-full' / 'slide-*.png'))):
         n = int(re.search(r'slide-(\d+)', p).group(1))
