@@ -234,15 +234,18 @@ def photo(x, y, s, name):
     return f'<image href="assets/figs/{name}.png" x="{x:g}" y="{y:g}" width="{s:g}" height="{s:g}"/>'
 
 
-def paper_crop(name, pdf, page, box, x, y, w, h=None, dpi=300):
+def paper_crop(name, pdf, page, box, x, y, w, h=None, dpi=None):
     """A line drawing of the objects the paper studies, cut out of the rendered PDF page: vector drawings come out too (pdfimages finds only bitmaps), and no white box sits on the stage, because its white is
     multiplied by the stage colour (a CSS blend mode does not survive the PDF export). At most four slides of a deck, each with a drawing of its own beside the crop. Never a distribution, path, curve, chart, table,
     mechanism or model diagram: those are drawn with this kit even when the paper has them. box = (left, top, right, bottom) as fractions of the page, read off paper/pages/*.png; leave out the caption, the a./b.
-    letters and neighbouring figures, then open the PNG to check; white margins are trimmed. Width at least 300 px; never the same region twice. h follows the crop's shape when omitted. x, y, w, h are scene coordinates."""
+    letters and neighbouring figures, then open the PNG to check; white margins are trimmed. Width at least 480 px, 300 px on the cover; never the same region twice. dpi defaults to twice the shown size, so the crop stays sharp. h follows the crop's shape when omitted. x, y, w, h are scene coordinates."""
+    info = subprocess.run(['pdfinfo', '-f', str(page), '-l', str(page), str(pdf)], capture_output=True, text=True, check=True).stdout
+    m = re.search(rf'Page\s+{page} size:\s+([\d.]+) x ([\d.]+)', info)
+    if dpi is None:
+        dpi = max(300, min(1200, math.ceil(72 * 2 * w / ((box[2] - box[0]) * float(m.group(1))))))
+
     def make(path):
         from style_gap import read_png
-        info = subprocess.run(['pdfinfo', '-f', str(page), '-l', str(page), str(pdf)], capture_output=True, text=True, check=True).stdout
-        m = re.search(rf'Page\s+{page} size:\s+([\d.]+) x ([\d.]+)', info)
         pw, ph = float(m.group(1)) * dpi / 72, float(m.group(2)) * dpi / 72
         area = [int(box[0] * pw), int(box[1] * ph), int((box[2] - box[0]) * pw), int((box[3] - box[1]) * ph)]
         with tempfile.TemporaryDirectory() as td:
@@ -257,7 +260,8 @@ def paper_crop(name, pdf, page, box, x, y, w, h=None, dpi=300):
             row, line_ = bytearray(), rows[py]
             for px in range(x0, x1):
                 o = px * bpp
-                row += bytes((line_[o] * st[0] // 255, line_[o + 1] * st[1] // 255, line_[o + 2] * st[2] // 255, 255))
+                r, g, b = (255, 255, 255) if min(line_[o:o + 3]) >= 250 else line_[o:o + 3]  # a page ground of 254 would show as a faint box
+                row += bytes((r * st[0] // 255, g * st[1] // 255, b * st[2] // 255, 255))
             out.append(bytes(row))
         write_png(path, x1 - x0, y1 - y0, out)
     href = _once(f'crop-{name}', ('crop', str(pdf), page, tuple(box), dpi), make)
