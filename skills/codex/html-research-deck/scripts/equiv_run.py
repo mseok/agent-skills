@@ -81,16 +81,18 @@ def prepare(dest, paper, storyline, log):
     if not (dest / 'paper').exists():
         shutil.copytree(paper, dest / 'paper')
     for name in ('storyline-v1.json', 'storyline.json'):
-        if not (dest / 'work' / name).exists():
+        if storyline and not (dest / 'work' / name).exists():
             shutil.copy(storyline, dest / 'work' / name)
     log(f'prepared {dest.name}')
 
 
-def build(dest, model, effort, timeout, log, root):
+def build(dest, model, effort, timeout, log, root, own_storyline=False):
     rec_p = dest / 'deck' / 'qa' / 'equiv-build.json'
     if rec_p.exists():
         log(f'{dest.name}: build record exists, skipping'); return json.loads(rec_p.read_text(encoding='utf-8'))
     brief = (SKILL / 'references' / 'builder-brief-fresh.md').read_text(encoding='utf-8')
+    if own_storyline:
+        brief += '\n\n' + (SKILL / 'references' / 'builder-brief-own-storyline.md').read_text(encoding='utf-8')
     prompt = (brief + f"\n\n---\n스킬 폴더: {SKILL}\n작업 폴더: {dest}\n스토리라인: {dest / 'work' / 'storyline-v1.json'}\n논문: {dest / 'paper'}\n"
               f"빌더: {model} ({effort}). 시작 시각 {now().isoformat(timespec='minutes')}. 끝나면 위 '보고' 항목대로 적는다.")
     attempts = 0
@@ -234,7 +236,7 @@ def summary(root, builders, log):
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument('root'); ap.add_argument('--paper', required=True); ap.add_argument('--storyline', required=True)
+    ap.add_argument('root'); ap.add_argument('--paper', required=True); ap.add_argument('--storyline'); ap.add_argument('--own-storyline', action='store_true', help='no shared storyline: each builder reads the paper and writes its own first (references/builder-brief-own-storyline.md)')
     ap.add_argument('--builders', required=True, help='comma-separated model:effort; the first is the baseline')
     ap.add_argument('--judge-model', default='claude-opus-5-5'); ap.add_argument('--judge-effort', default='max'); ap.add_argument('--judges', type=int, default=3)
     ap.add_argument('--phase', default='all', choices=['all', 'build', 'measure', 'judge', 'summary']); ap.add_argument('--build-timeout', type=int, default=12600)
@@ -252,18 +254,18 @@ def main():
         log.status(phase=a.phase, builders=[f'{m}:{e}' for m, e in builders], pid=__import__('os').getpid())
     if a.phase in ('all', 'build'):
         for m, e in todo:
-            prepare(root / f'{m}-{e}', Path(a.paper), Path(a.storyline), log)
+            prepare(root / f'{m}-{e}', Path(a.paper), Path(a.storyline) if a.storyline else None, log)
         codex = [(m, e) for m, e in todo if agent_cli.backend_of(m) == 'codex']; claude = [(m, e) for m, e in todo if agent_cli.backend_of(m) == 'claude']
         if a.codex_parallel and len(codex) > 1:
-            ths = [threading.Thread(target=build, args=(root / f'{m}-{e}', m, e, a.build_timeout, log, root), daemon=True) for m, e in codex]
+            ths = [threading.Thread(target=build, args=(root / f'{m}-{e}', m, e, a.build_timeout, log, root, a.own_storyline), daemon=True) for m, e in codex]
             for t in ths: t.start()
             for t in ths: t.join()
         else:
             for m, e in codex:
-                build(root / f'{m}-{e}', m, e, a.build_timeout, log, root)
+                build(root / f'{m}-{e}', m, e, a.build_timeout, log, root, a.own_storyline)
         for m, e in claude:
             if (root / 'STOP').exists(): break
-            build(root / f'{m}-{e}', m, e, a.build_timeout, log, root)
+            build(root / f'{m}-{e}', m, e, a.build_timeout, log, root, a.own_storyline)
     if a.phase in ('all', 'measure'):
         for m, e in todo:
             measure(root / f'{m}-{e}', log)
