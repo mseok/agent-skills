@@ -15,15 +15,17 @@ same coordinates and add the padding themselves.
     slide(), panel(), notes(), lane()      a content slide; layout presets FULL, L2/R2, LW/RN, P3A/P3B/P3C pass check_deck.py's grid. Stage first: a panel is transparent and the
                        figure sits on the warm stage; panel(..., cls='panel card') is a white card for one thing among several, such as one small chart of six
     hero_bridge()      the big picture of a transport between two distributions: density field, sample paths, a filled profile at each end
-    field(), strands(), vprof()            its parts, for a smaller or partial version; Field is the density of x_t between the ends
+    field(), strands(), vprof(), hprof()   its parts, for a smaller or partial version; Field is the density of x_t between the ends
     dens()             a 2-D distribution: density raster plus real samples (density.cloud); no outline around it
     chain()            a left-to-right row of actors joined by arrows, sized to fill the given width
     enc(), dec(), model_box(), grid(), photo(), picture()   one actor, one drawing on every slide
     bars(), legend(), big()                charts from numbers, with bold value labels and the key number large
     T(), lines(), tex(), fx()              text, several lines, a label with KaTeX, a KaTeX card (cls 'box' white, 'box blue' the deck's key equation)
     derive()           a derivation as a table: one row per step, its formula on one line and a phrase of what it gives
-    node(), edge()     a causal graph: circles and arrows trimmed to their rims
-    graph_fig(), gap_arrow()     one graph as one figure, and the arrow from one whole figure to the next, which sits in the gap and touches neither
+    node(), edge()     a causal graph only: variables and directed arrows trimmed to their rims
+    ggraph(), ring_pts(), RING_TAIL, pair_line()     a graph as a structure: pale discs, thin lines, red outline on the change (gallery 16)
+    paper_crop()       a figure of the paper itself, cut from the PDF page with no white box (gallery 17); use it when the paper draws the thing
+    gap_arrow()        the thin arrow from one whole figure to the next, in the gap between them
     plot_axes(), dots(), fit_line(), swarm(), box_stat()   small plots: scatter with a fit, dots on a number line, box plots
     arrow(), qarrow(), curve(), arr(), line(), rect(), card(), circle(), strand(), badge(), check_mark(), lock(), cross()
 No reported number ever comes from these drawings; the cite line says what is schematic.
@@ -32,7 +34,11 @@ import hashlib
 import json
 import math
 import random
+import re
+import struct
+import subprocess
 import sys
+import tempfile
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -228,6 +234,37 @@ def photo(x, y, s, name):
     return f'<image href="assets/figs/{name}.png" x="{x:g}" y="{y:g}" width="{s:g}" height="{s:g}"/>'
 
 
+def paper_crop(name, pdf, page, box, x, y, w, h=None, dpi=300):
+    """A figure of the paper itself, cut out of the rendered PDF page: vector drawings come out too (pdfimages finds only bitmaps), and no white box sits on the stage, because its white is multiplied by the
+    stage colour (a CSS blend mode does not survive the PDF export). box = (left, top, right, bottom) as fractions of the page, read off paper/pages/*.png; keep the caption out and white margins are trimmed.
+    h follows the crop's shape when omitted. x, y, w, h are scene coordinates like every other shape; numbers in the crop must still be readable at the size you place it."""
+    def make(path):
+        from style_gap import read_png
+        info = subprocess.run(['pdfinfo', '-f', str(page), '-l', str(page), str(pdf)], capture_output=True, text=True, check=True).stdout
+        m = re.search(rf'Page\s+{page} size:\s+([\d.]+) x ([\d.]+)', info)
+        pw, ph = float(m.group(1)) * dpi / 72, float(m.group(2)) * dpi / 72
+        area = [int(box[0] * pw), int(box[1] * ph), int((box[2] - box[0]) * pw), int((box[3] - box[1]) * ph)]
+        with tempfile.TemporaryDirectory() as td:
+            subprocess.run(['pdftoppm', '-f', str(page), '-l', str(page), '-r', str(dpi), '-x', str(area[0]), '-y', str(area[1]), '-W', str(area[2]), '-H', str(area[3]), '-png', '-singlefile', str(pdf), f'{td}/c'], check=True)
+            iw, ih, bpp, rows = read_png(f'{td}/c.png')
+        ink = [(px, py) for py in range(0, ih) for px in range(0, iw) if min(rows[py][px * bpp:px * bpp + 3]) < 245]
+        x0, x1 = max(0, min(p[0] for p in ink) - 8), min(iw, max(p[0] for p in ink) + 9)
+        y0, y1 = max(0, min(p[1] for p in ink) - 8), min(ih, max(p[1] for p in ink) + 9)
+        st = [int(STAGE[k:k + 2], 16) for k in (1, 3, 5)]
+        out = []
+        for py in range(y0, y1):
+            row, line_ = bytearray(), rows[py]
+            for px in range(x0, x1):
+                o = px * bpp
+                row += bytes((line_[o] * st[0] // 255, line_[o + 1] * st[1] // 255, line_[o + 2] * st[2] // 255, 255))
+            out.append(bytes(row))
+        write_png(path, x1 - x0, y1 - y0, out)
+    href = _once(name, ('crop', str(pdf), page, tuple(box), dpi), make)
+    iw, ih = struct.unpack('>II', (_S.deck / href).read_bytes()[16:24])
+    h = w * ih / iw if h is None else h
+    return f'<image href="{href}" x="{x:g}" y="{y:g}" width="{w:g}" height="{h:g}"/>'
+
+
 def picture(x, y, s):
     """A stand-in when the paper has no image to show: a framed hill and sun."""
     w, h = s, s
@@ -275,21 +312,44 @@ def node(cx, cy, label, r=36, hidden=False, outcome=False, size=24, stroke=None)
     return out
 
 
-def graph_fig(cx, cy, pos, edges, gone=(), new=(), new_nodes=(), r=26, labels=False):
-    """One graph as one figure. pos = {name: (dx, dy)} around (cx, cy); edges = [(a, b)]; gone: edges about to be removed (red dashed); new: edges just added (red); new_nodes: changed nodes (amber)."""
+def ring_pts(n=6, r=1.0, phase=-math.pi / 2):
+    """The n vertices of a regular n-gon in unit coordinates, first vertex at the top."""
+    return [(r * math.cos(phase + 2 * math.pi * k / n), r * math.sin(phase + 2 * math.pi * k / n)) for k in range(n)]
+
+
+RING_TAIL = (ring_pts(6) + [(1.9, 0.52), (2.75, -0.02), (-1.9, -0.52)], [(0, 1), (1, 2), (2, 3), (3, 4), (4, 5), (5, 0), (2, 6), (6, 7), (5, 8)])
+
+
+def ggraph(cx, cy, pts, edges, s=70, nr=None, sw=None, mark_nodes=(), mark_edges=(), ghost_edges=(), labels=None, size=22):
+    """One graph as the accepted decks draw it: pale discs, thin lines, a red outline on what this cell changes, no flooded node. pts are unit coordinates multiplied by s; RING_TAIL is a neutral shape when the
+    paper shows none. nr defaults to 0.3 s and sw to 3.4 from s = 60 up, 2.6 below; both are capped (a 44 px disc, a 3.4 px line). Hero figure s = 70, table icon s = 22. labels = one letter per node, only on a slide
+    about which node is which. Do not write your own graph function and do not scale this up to fill a panel: put a table or a chart under it (gallery 16). If the paper draws the thing, crop it instead (paper_crop)."""
+    nr = min(22, 0.3 * s if nr is None else nr)
+    sw = min(3.4, (3.4 if s >= 60 else 2.6) if sw is None else sw)
+    P = [(cx + x * s, cy + y * s) for x, y in pts]
     out = ''
-    for a, b in list(edges) + [e for e in new if e not in edges]:
-        (ax, ay), (bx, by) = pos[a], pos[b]
-        hit_gone, hit_new = (a, b) in gone, (a, b) in new
-        out += line(cx + ax, cy + ay, cx + bx, cy + by, RED if hit_gone or hit_new else '#5F718A', 4 if hit_gone or hit_new else 3, '9 7' if hit_gone else None)
-    for name, (dx, dy) in pos.items():
-        out += node(cx + dx, cy + dy, name if labels else '', r, outcome=name in new_nodes)
+    for k, (i, j) in enumerate(edges):
+        if k in ghost_edges:
+            out += line(P[i][0], P[i][1], P[j][0], P[j][1], GHOST, 2.4, '7 5')
+        else:
+            hit = k in mark_edges
+            out += line(P[i][0], P[i][1], P[j][0], P[j][1], RED if hit else '#5F718A', 4.4 if hit else sw)
+    for k, (x, y) in enumerate(P):
+        hit = k in mark_nodes
+        out += circle(x, y, nr, '#FBE7EA' if hit else '#EEF2F7', RED if hit else '#5F718A', 3.2 if hit else 2.4)
+        if labels:
+            out += T(x, y + size * 0.36, labels[k], size, 700, None, 'middle')
     return out
 
 
+def pair_line(x1, y1, x2, y2, color=GRAY, sw=2.2, dash='8 6'):
+    """One dashed correspondence line between two graphs, thin enough that five of them can cross."""
+    return line(x1, y1, x2, y2, color, sw, dash)
+
+
 def gap_arrow(x1, x2, y, label='', color=GRAY):
-    """A transformation from one whole figure to the next: thick, straight, in the empty gap between them, with what changes written above it. It never touches a node or a small box."""
-    return arr(x1, y, x2, y, color, 7, size=30) + (T((x1 + x2) / 2, y - 30, label, 26, 650, SOFT, 'middle') if label else '')
+    """From one whole figure to the next: thin and straight in the empty gap between them, with what changes written above it. It never touches a node or a small box."""
+    return arr(x1, y, x2, y, color, 3.2, size=16) + (T((x1 + x2) / 2, y - 18, label, 24, 650, SOFT, 'middle') if label else '')
 
 
 def edge(x1, y1, x2, y2, r1=36, r2=36, color=GRAY, dash=None, sw=2.6):
@@ -350,6 +410,13 @@ def dens(name, dist, x, y, w, h, xr=XR2, yr=YR2, tint=STEEL, n=36, seed=1, r=Non
 def vprof(pdf, lo, hi, axis_x, ybot, ytop, bulge, fill, stroke, op=0.75, sw=2, dash=None):
     """A 1-D density on a vertical axis: value lo at ybot, hi at ytop, bulging sideways by bulge px (negative = to the left)."""
     d = profile_path(profile(pdf, lo, hi, 160), (ybot, ytop), axis_x, bulge, vertical=True)
+    ds = f' stroke-dasharray="{dash}"' if dash else ''
+    return f'<path d="{d}" fill="{fill}" fill-opacity="{op}" stroke="{stroke}" stroke-width="{sw:g}"{ds}/>'
+
+
+def hprof(pdf, lo, hi, x0, x1, axis_y, bulge, fill, stroke, op=0.78, sw=2.4, dash=None):
+    """A 1-D density on a horizontal axis: value lo at x0, hi at x1, rising bulge px above axis_y."""
+    d = profile_path(profile(pdf, lo, hi, 160), (x0, x1), axis_y, bulge, vertical=False)
     ds = f' stroke-dasharray="{dash}"' if dash else ''
     return f'<path d="{d}" fill="{fill}" fill-opacity="{op}" stroke="{stroke}" stroke-width="{sw:g}"{ds}/>'
 

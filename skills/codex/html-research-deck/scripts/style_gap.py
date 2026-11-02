@@ -11,8 +11,9 @@ Measured inside the panel band of each content slide:
 Limits come from the accepted Opus decks rendered under the stage-first theme (Latent SI first build and v11, CausalGame v12; 2026-11-02): a figure slide never fell below mass 9.8,
 anchor 0.9 or above emptyrect 11.7 there, a result slide never below mass 3.8 or above emptyrect 20; their medians on figure slides were mass 13-23, anchor 3.8-12.6, emptyrect 6.8-8.3, and a GPT
 build before this script had 11.8, 3.2, 11.0. A kit-built deck can also overshoot, with big filled boxes in place of drawings (medians 33-38 on CausalGame), hence the upper limit on mass.
+The Opus 5 and Sonnet 5.5 decks of the DDSBM paper were accepted as they are (user 2026-11-03: '지금 이대로가 좋은거같고') and widened the lower and upper limits: Opus 5's slide 2, a thin graph over a table, has mass 7.5 and emptyrect 13.3, and a stricter limit would tell a builder to inflate exactly what the user liked.
 This measures resemblance, not quality: it has no view on the argument.
-Also flagged: a formula row that starts with an operator, which is one relation split over two rows (user 2026-11-02), and a formula card taller than 170 px that holds one row (the judges' empty blue card, 2026-11-02).
+Also flagged: a graph drawn heavier than the accepted decks (user 2026-11-03: lines over 4.6 px or unlabelled discs over 48 px wide; the GPT decks that drew 68-82 px discs and 8 px sticks had passed mass and anchor), a formula row that starts with an operator, which is one relation split over two rows (user 2026-11-02), and a formula card taller than 170 px that holds one row (the judges' empty blue card, 2026-11-02).
 The whitebox limit: the Yuanqi Du deck's median is 6, v10 with white figure panels 29, six chart cards on one slide 16 each. Also checked: the cover is the title-slide template with the title on the stage; titles and closing lines against the approved storyline.
 Prints one FIX line per finding and exits 0; the builder fixes them and runs it again.
 """
@@ -20,6 +21,7 @@ import argparse
 import glob
 import html
 import json
+import math
 import re
 import statistics
 import struct
@@ -27,13 +29,13 @@ import sys
 import zlib
 from pathlib import Path
 
-FIGURE_MEDIANS = {'mass': (13.0, 28.0), 'anchor': (3.5, None), 'emptyrect': (None, 9.0)}
-RESULT_MEDIANS = {'mass': (13.0, 32.0), 'emptyrect': (None, 11.5)}
-FIGURE_SLIDE = {'mass': (9.0, None), 'anchor': (0.9, None), 'emptyrect': (None, 12.0), 'whitebox': (None, 20.0)}
+FIGURE_MEDIANS = {'mass': (13.0, 24.0), 'anchor': (3.5, None), 'emptyrect': (None, 10.0)}
+RESULT_MEDIANS = {'mass': (13.0, 26.0), 'emptyrect': (None, 12.0)}
+FIGURE_SLIDE = {'mass': (6.0, None), 'anchor': (0.9, None), 'emptyrect': (None, 16.0), 'whitebox': (None, 20.0)}
 RESULT_SLIDE = {'mass': (3.5, None), 'emptyrect': (None, 20.0), 'whitebox': (None, 20.0)}
 HEAVY = '칠한 면이 너무 많다: 글을 담은 큰 상자와 넓은 색 띠를 줄이고 곡선, 점, 작은 도형으로 그린다'
-WHY = {'mass': '그림이 얇다: 선과 작은 상자 대신 채운 도형으로, 더 크게', 'anchor': '눈이 먼저 갈 큰 도형이 없다: hero_bridge, 큰 model_box, 넓은 막대처럼 패널을 차지하는 중심을 둔다',
-       'emptyrect': '패널에 큰 빈 곳이 있다: 그림을 키워 그 자리를 채운다',
+WHY = {'mass': '그림이 부족하다: 분포, 막대, 곡선, 논문 그림을 더한다. 원을 키우거나 선을 굵게 하지 않는다', 'anchor': '눈이 먼저 갈 큰 도형이 없다: hero_bridge, 큰 model_box, 넓은 막대처럼 패널을 차지하는 중심을 둔다',
+       'emptyrect': '패널에 큰 빈 곳이 있다: 표나 차트를 더하거나 그림을 옮긴다. 원과 선은 키우지 않는다',
        'whitebox': '큰 흰 박스가 있다: 그림은 흰 패널 없이 무대 위에 바로 놓고, 흰색은 수식이나 작은 차트 하나만 담는 카드에만 쓴다'}
 NOT_SCORED = {'title', 'conclusion'}
 SPLIT_ROW = re.compile(r'^\s*\$\s*(?:\\[;,:!]|\\quad|\\qquad|\s)*(?:\+|-|−|=|\\ge\b|\\le\b|\\geq\b|\\leq\b|\\propto\b|\\approx\b)')
@@ -135,6 +137,31 @@ def features(path, step=3):
     return {'mass': round(sum(map(sum, g)) / n * 100, 1), 'anchor': round(anchor / n * 100, 1), 'emptyrect': round(empty / (cw * ch) * 100, 1), 'whitebox': round(whitebox / n * 100, 1)}
 
 
+def graph_weight(body):
+    """Node-link figures on a slide, panel by panel: (edges, widest edge in px, median radius of discs with no letter in them). An edge is a line with both ends at a disc of r ≥ 8."""
+    def num(tag, name):
+        m = re.search(rf'\b{name}="(-?[\d.]+)"', tag)
+        return float(m.group(1)) if m else None
+    edges, widest, radii = 0, 0.0, []
+    for svg in re.findall(r'<svg\b.*?</svg>', body, flags=re.S):
+        discs = [(num(t, 'cx'), num(t, 'cy'), num(t, 'r')) for t in re.findall(r'<circle\b[^>]*>', svg)]
+        discs = [d for d in discs if None not in d and d[2] >= 8]
+        labels = [(num(t, 'x'), num(t, 'y')) for t in re.findall(r'<text\b[^>]*>', svg)]
+        here = 0
+        for t in re.findall(r'<line\b[^>]*>', svg):
+            x1, y1, x2, y2 = (num(t, a) for a in ('x1', 'y1', 'x2', 'y2'))
+            if None in (x1, y1, x2, y2) or math.hypot(x2 - x1, y2 - y1) <= 6:
+                continue
+            if all(any(math.hypot(px - a, py - b) <= r + 20 for a, b, r in discs) for px, py in ((x1, y1), (x2, y2))):
+                here += 1
+                m = re.search(r'stroke-width[=:]"?\s*([\d.]+)', t)
+                widest = max(widest, float(m.group(1)) if m else 0.0)
+        if here >= 3:
+            edges += here
+            radii += [r for a, b, r in discs if not any(x is not None and y is not None and math.hypot(x - a, y - b) <= r + 2 for x, y in labels)]
+    return edges, widest, statistics.median(radii) if radii else 0.0
+
+
 def plain(s):
     return re.sub(r'\s+', ' ', html.unescape(re.sub(r'<[^>]+>', '', s))).strip()
 
@@ -168,6 +195,9 @@ def main():
             changed.append(f'{i}장 마무리줄')
     for i, sec in enumerate(secs, 1):
         body = re.sub(r'<aside class="notes">.*?</aside>', '', sec, flags=re.S)
+        gedges, gwide, gr = graph_weight(body)
+        if gedges >= 3 and (gwide > 4.6 or gr > 24):
+            fixes.append(f'FIX slide {i}: graph가 무겁다(선 {gwide:g} px, 글자 없는 원 지름 {2 * gr:g} px; 받아들여진 덱은 3.4 px, 44 px). 논문 그림이 있으면 paper_crop(), 없으면 ggraph()로 다시 그린다(갤러리 16·17장)')
         for row in re.findall(r'<p[^>]*>(.*?)</p>', body, flags=re.S):
             if SPLIT_ROW.match(html.unescape(row)):
                 fixes.append(f'FIX slide {i}: 식이 두 줄로 나뉘었다({plain(row)[:40]}…). 한 관계식은 한 줄에: 카드를 넓히거나 24 px까지 줄인다')

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""kit_gallery.py — sixteen worked slides drawn with scene_kit.py, with toy content and no paper in them. Copy a slide's code, keep its sizes and positions, change the content.
+"""kit_gallery.py — seventeen worked slides drawn with scene_kit.py, with toy content and no paper in them. Copy a slide's code, keep its sizes and positions, change the content.
 
 usage: kit_gallery.py /abs/deck   (a folder scaffolded by new_deck.py). Renders are kept in assets/kit-gallery/ of this skill.
 Numbers, names and curves here are invented to show the drawing; nothing on these slides is a result.
@@ -7,11 +7,12 @@ Numbers, names and curves here are invented to show the drawing; nothing on thes
 import math
 import random
 import sys
+import tempfile
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from scene_kit import *  # noqa: E402,F403
-from scene_kit import AMBER, AMBERD, BAR_OTHER, BIMODAL, BLUE, CORAL, FULL, GHOST, GRAY, GRAYL, INK, L2, MUTED, NAVY, R2, RED, SOFT, STEEL, STEELD  # noqa: E402
+from scene_kit import AMBER, AMBERD, BAR_OTHER, BIMODAL, BLUE, CORAL, FULL, GHOST, GRAY, GRAYL, INK, L2, MUTED, NAVY, R2, RED, RING_TAIL, SOFT, STEEL, STEELD  # noqa: E402
 
 CITE = '예시 내용 · 숫자와 이름은 그리는 법을 보이려고 지어낸 것'
 F = Field(0.62, BIMODAL, sig=1.0)
@@ -380,25 +381,79 @@ def g15_derivation():
                  '경로를 풀지 않아도 <b>어느 $t$든</b> 한 번에 sample', CITE + ' · Ornstein-Uhlenbeck 과정의 교과서 식', notes('유도를 말하는 장은 식이 내용입니다. 단계 이름만 적은 상자로 바꾸지 않습니다. 한 식은 한 줄에 둡니다.'))
 
 
-def g16_transform():
-    """Whole figure to whole figure: a thick arrow in the empty gap between the two drawings. An arrow from a node to a node reads as one more edge. What changed is coloured where it happened; the bars show what the steps add up to."""
-    pos = {'a': (-125, -75), 'b': (0, -150), 'c': (125, -75), 'd': (125, 75), 'e': (0, 150), 'f': (-125, 75)}
-    ring = [('a', 'b'), ('b', 'c'), ('c', 'd'), ('d', 'e'), ('e', 'f'), ('f', 'a')]
-    cxs, cy = (230, 830, 1430), 270
-    s = graph_fig(cxs[0], cy, pos, ring + [('a', 'd')], gone=[('a', 'd'), ('c', 'd')])
-    s += graph_fig(cxs[1], cy, pos, [e for e in ring if e != ('c', 'd')])
-    s += graph_fig(cxs[2], cy, pos, [e for e in ring if e != ('c', 'd')], new=[('b', 'e')], new_nodes=['c'])
-    s += gap_arrow(410, 650, cy, '2곳 지움') + gap_arrow(1010, 1250, cy, '2곳 더함')
-    for cx, lab in zip(cxs, ('출발 graph', '중간 graph', '도착 graph')):
+def g16_graph_cells():
+    """A graph that changes, in three cells: discs of 44 px, lines of 3.4 px, the change in a red outline, the figures in the top third and a table under them. Copy this for a graph; never make the graph bigger to fill the panel."""
+    pts, ed = RING_TAIL
+    cxs, cy = (270, 830, 1390), 170
+    s = ''
+    for cx, lab in zip(cxs, ('출발 graph', '한 번 바꿈', '도착 graph')):
         s += T(cx, 28, lab, 26, 650, SOFT, 'middle')
-    for cx, left in zip(cxs, (4, 2, 0)):
-        s += T(cx - 150, 500, '도착까지 남은 변경', 24, None, SOFT)
-        s += rect(cx - 150, 520, max(8, 300 * left / 4), 60, 6, BLUE if left else BAR_OTHER, 'none', 0) + T(cx - 150 + max(8, 300 * left / 4) + 16, 563, str(left), 34, 700, NAVY)
-    s += T(830, 650, '빨간 점선은 지울 edge, 빨간 실선은 새 edge, 노란 node는 바뀐 node', 24, 600, RED, 'middle')
-    return slide('예시', '예시 · 그림에서 그림으로', '한 번에 바꾸지 않고 작은 변경으로 잇는 graph', [panel(*FULL, s)],
-                 '남은 변경이 <b>4에서 0으로</b> 줄어드는 두 걸음', CITE, notes('변환 화살표는 두 그림 사이의 빈 곳에 두고, 바뀐 곳은 그 자리의 색으로 표시합니다.'))
+    s += ggraph(cxs[0], cy, pts, ed) + ggraph(cxs[1], cy, pts, ed, ghost_edges=(8,)) + ggraph(cxs[2], cy, pts, ed, ghost_edges=(8,), mark_nodes=(7,), mark_edges=(7,))
+    s += gap_arrow(520, 610, cy, '지움') + gap_arrow(1080, 1170, cy, '더함')
+    y0, rh = 300, 92
+    rows = [('바꾼 곳', ('없음', 'edge 하나', 'node와 edge 하나')), ('남은 변경', ('2', '1', '0')), ('계산량', ('1.0배', '0.6배', '0.4배'))]
+    for k, (name, vals) in enumerate(rows):
+        y = y0 + k * rh
+        s += line(0, y, 1660, y, '#D9DEE3', 1.5) + T(0, y + 58, name, 26, 650, SOFT)
+        for cx, v in zip(cxs, vals):
+            s += T(cx, y + 58, v, 30, 700, RED if k == 1 and v == '0' else None, 'middle')
+    s += line(0, y0 + len(rows) * rh, 1660, y0 + len(rows) * rh, '#D9DEE3', 1.5)
+    s += T(830, 650, '빨간 표시는 그 칸에서 바뀐 곳, 회색 점선은 지운 edge', 24, 600, SOFT, 'middle')
+    return slide('예시', '예시 · 바뀌는 graph', '한 번에 바꾸지 않고 작은 변경으로 잇는 graph', [panel(*FULL, s)],
+                 '남은 변경이 <b>2에서 0으로</b> 줄어드는 두 걸음', CITE, notes('graph는 지름 44 px 원과 3.4 px 선으로 위쪽에 두고, 아래에 표를 둡니다. 바뀐 곳은 빨간 테두리로만 표시합니다.'))
+
+
+def _toy_paper():
+    """A one-page PDF of plain line drawings on white, standing in for a paper so that the crop below runs the real route: page render, trim, white multiplied by the stage colour."""
+    path = Path(tempfile.gettempdir()) / 'kit-gallery-toy-paper.pdf'
+    pts, ed = RING_TAIL
+
+    def drawing(ox, oy, s, drop=None):
+        out = ['1.3 w']
+        for k, (i, j) in enumerate(ed):
+            if k != drop:
+                out.append(f'{ox + pts[i][0] * s:.1f} {oy - pts[i][1] * s:.1f} m {ox + pts[j][0] * s:.1f} {oy - pts[j][1] * s:.1f} l S')
+        return out
+
+    ops = []
+    for oy, drops in ((680, (None, 8, 7)), (590, (8, 7, None)), (400, (7, None, 8)), (310, (None, 7, 8))):
+        for ox, drop in zip((130, 300, 470), drops):
+            ops += drawing(ox, oy, 26, drop)
+    ops += [f'BT /F1 11 Tf 72 {y} Td (Figure {n}. A stand-in caption, left out of the crop.) Tj ET' for y, n in ((530, 1), (240, 2))]
+    stream = '\n'.join(ops).encode()
+    objs = [b'<< /Type /Catalog /Pages 2 0 R >>', b'<< /Type /Pages /Kids [3 0 R] /Count 1 >>',
+            b'<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>',
+            b'<< /Length ' + str(len(stream)).encode() + b' >>\nstream\n' + stream + b'\nendstream', b'<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>']
+    data, offs = bytearray(b'%PDF-1.4\n'), []
+    for k, o in enumerate(objs, 1):
+        offs.append(len(data))
+        data += str(k).encode() + b' 0 obj\n' + o + b'\nendobj\n'
+    xref = len(data)
+    data += b'xref\n0 ' + str(len(objs) + 1).encode() + b'\n0000000000 65535 f \n' + b''.join(f'{x:010d} 00000 n \n'.encode() for x in offs)
+    data += b'trailer\n<< /Size ' + str(len(objs) + 1).encode() + b' /Root 1 0 R >>\nstartxref\n' + str(xref).encode() + b'\n%%EOF\n'
+    path.write_bytes(bytes(data))
+    return path
+
+
+def g17_paper_figure():
+    """The paper's own figure on the problem slide: two crops joined by the model on the left, the distributions on the right. When the paper draws the thing, crop it; do not redraw it as circles and lines."""
+    pdf = _toy_paper()
+    l = lane(0, 24, '출발 쌍') + paper_crop('g17a', pdf, 1, (0.08, 0.06, 0.92, 0.31), 49, 40, 700)
+    l += arrow(399, 272, 399, 306, 'ar') + model_box(399, 334, 200, 56, '모델') + arrow(399, 362, 399, 398, 'ar')
+    l += T(516, 342, '한 번에 바꿈', 24, 600, SOFT) + T(0, 428, '도착 쌍', 24, 650, SOFT) + paper_crop('g17b', pdf, 1, (0.08, 0.44, 0.92, 0.66), 49, 440, 700)
+    r = lane(0, 24, '분포로 보면 흩어진 두 집단')
+    base, x0, x1 = (200, 400, 600), 60, 740
+    rows = ((gauss1(-1.1, 0.6), '출발', AMBER, AMBERD), (mixture1([(0.5, -1.1, 0.5), (0.5, 1.2, 0.5)]), '중간', '#DCE6F5', BLUE), (gauss1(1.2, 0.55), '도착', STEEL, STEELD))
+    for y, (pdf1, lab, fill, stroke) in zip(base, rows):
+        r += hprof(pdf1, -3, 3, x0, x1, y, 118, fill, stroke) + line(x0, y, x1, y, SOFT, 2) + T(0, y - 8, lab, 26, 650, SOFT)
+    for v, lab in ((-3, '−3'), (0, '0'), (3, '3')):
+        vx = x0 + (v + 3) / 6 * (x1 - x0)
+        r += line(vx, base[2], vx, base[2] + 9, SOFT, 2) + T(vx, base[2] + 40, lab, 24, 600, SOFT, 'middle')
+    r += arr(776, base[0] - 90, 776, base[2], BLUE, 4, size=18) + T(776, base[0] - 104, 't', 26, 700, BLUE, 'middle')
+    return slide('예시', '예시 · 논문 그림 잘라 쓰기', '짝을 이룬 출발과 도착을 잇는 생성 모델', [panel(*L2, l), panel(*R2, r)],
+                 '출발 분포를 <b>도착 분포로 옮기는</b> 문제', CITE + ' · 왼쪽은 논문 그림을 자르는 경로를 보이려고 만든 가짜 쪽', notes('논문이 그 대상을 그려 놓았으면 그 그림을 paper_crop으로 잘라 씁니다. 흰 박스 없이 무대 위에 놓입니다.'))
 
 
 if __name__ == '__main__':
     init(sys.argv[1])
-    write_deck([g() for g in (g1_cover, g2_two_chains, g3_table, g4_hero, g5_mechanism, g6_bars, g7_lines, g8_closing, g9_causal, g10_matrix, g11_rank, g12_tiers, g13_boxes, g14_cards, g15_derivation, g16_transform)])
+    write_deck([g() for g in (g1_cover, g2_two_chains, g3_table, g4_hero, g5_mechanism, g6_bars, g7_lines, g8_closing, g9_causal, g10_matrix, g11_rank, g12_tiers, g13_boxes, g14_cards, g15_derivation, g16_graph_cells, g17_paper_figure)])
