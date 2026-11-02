@@ -7,10 +7,12 @@ Measured inside the panel band of each content slide:
   mass       share that is drawn at all (neither white nor stage)
   anchor     largest connected drawn region: the shape the eye lands on (a density field, wide bars, a solid box)
   emptyrect  largest rectangle with nothing in it: space left over in one lump, as opposed to spread evenly
-Limits come from the two Opus builds of the Latent SI deck (first build and the accepted v10, 2026-11-01): a figure slide never fell below mass 16,
-anchor 3.9 or above emptyrect 10.3 there; a result slide never fell below mass 5 or above emptyrect 15.4. The GPT builds before this script had medians of
-mass 18, anchor 5, emptyrect 8 on figure slides against 26-34, 10-13, 6. This measures resemblance, not quality: it has no view on the argument.
-Also checked: the cover is the title-slide template with the title on the stage; titles and closing lines against the approved storyline.
+  whitebox   largest connected pure-white region: stage first (user 2026-11-02) keeps figures on the warm stage and white for a card that holds one thing
+Limits come from the accepted Opus decks rendered under the stage-first theme (Latent SI first build and v11, CausalGame v12; 2026-11-02): a figure slide never fell below mass 9.8,
+anchor 0.9 or above emptyrect 10.4 there, a result slide never below mass 3.8 or above emptyrect 20; their medians on figure slides were mass 13-23, anchor 3.8-12.6, emptyrect 6.8-8.3, and a GPT
+build before this script had 11.8, 3.2, 11.0. A kit-built deck can also overshoot, with big filled boxes in place of drawings (medians 33-38 on CausalGame), hence the upper limit on mass.
+This measures resemblance, not quality: it has no view on the argument.
+The whitebox limit: the Yuanqi Du deck's median is 6, v10 with white figure panels 29, six chart cards on one slide 16 each. Also checked: the cover is the title-slide template with the title on the stage; titles and closing lines against the approved storyline.
 Prints one FIX line per finding and exits 0; the builder fixes them and runs it again.
 """
 import argparse
@@ -24,12 +26,14 @@ import sys
 import zlib
 from pathlib import Path
 
-FIGURE_MEDIANS = {'mass': (24.0, None), 'anchor': (9.0, None), 'emptyrect': (None, 7.5)}
-RESULT_MEDIANS = {'mass': (18.0, None), 'emptyrect': (None, 9.0)}
-FIGURE_SLIDE = {'mass': (16.0, None), 'anchor': (3.9, None), 'emptyrect': (None, 10.5)}
-RESULT_SLIDE = {'mass': (5.0, None), 'emptyrect': (None, 15.5)}
+FIGURE_MEDIANS = {'mass': (13.0, 28.0), 'anchor': (3.5, None), 'emptyrect': (None, 8.5)}
+RESULT_MEDIANS = {'mass': (13.0, 32.0), 'emptyrect': (None, 11.5)}
+FIGURE_SLIDE = {'mass': (9.0, None), 'anchor': (0.9, None), 'emptyrect': (None, 10.5), 'whitebox': (None, 20.0)}
+RESULT_SLIDE = {'mass': (3.5, None), 'emptyrect': (None, 20.0), 'whitebox': (None, 20.0)}
+HEAVY = '칠한 면이 너무 많다: 글을 담은 큰 상자와 넓은 색 띠를 줄이고 곡선, 점, 작은 도형으로 그린다'
 WHY = {'mass': '그림이 얇다: 선과 작은 상자 대신 채운 도형으로, 더 크게', 'anchor': '눈이 먼저 갈 큰 도형이 없다: hero_bridge, 큰 model_box, 넓은 막대처럼 패널을 차지하는 중심을 둔다',
-       'emptyrect': '패널에 큰 빈 곳이 있다: 그림을 키워 그 자리를 채운다'}
+       'emptyrect': '패널에 큰 빈 곳이 있다: 그림을 키워 그 자리를 채운다',
+       'whitebox': '큰 흰 박스가 있다: 그림은 흰 패널 없이 무대 위에 바로 놓고, 흰색은 수식이나 작은 차트 하나만 담는 카드에만 쓴다'}
 NOT_SCORED = {'title', 'conclusion'}
 
 
@@ -78,31 +82,38 @@ def features(path, step=3):
     y0, y1, x0, x1 = 176, 898, 110, 1810
     gw, gh = (x1 - x0) // step, (y1 - y0) // step
     g = [[0] * gw for _ in range(gh)]
+    w = [[0] * gw for _ in range(gh)]
     for j in range(gh):
         row = rows[y0 + j * step]
         for i in range(gw):
             x = (x0 + i * step) * bpp
             r, gr, b = row[x], row[x + 1], row[x + 2]
+            w[j][i] = int(min(r, gr, b) >= 254)
             if min(r, gr, b) >= 250 or (abs(r - 250) <= 3 and abs(gr - 248) <= 3 and abs(b - 243) <= 4):
                 continue
             g[j][i] = 1
     n = gw * gh
-    seen = [[False] * gw for _ in range(gh)]
-    anchor = 0
-    for j0 in range(gh):
-        for i0 in range(gw):
-            if not g[j0][i0] or seen[j0][i0]:
-                continue
-            stack, a = [(i0, j0)], 0
-            seen[j0][i0] = True
-            while stack:
-                i, j = stack.pop()
-                a += 1
-                for u, v in ((i + 1, j), (i - 1, j), (i, j + 1), (i, j - 1)):
-                    if 0 <= u < gw and 0 <= v < gh and g[v][u] and not seen[v][u]:
-                        seen[v][u] = True
-                        stack.append((u, v))
-            anchor = max(anchor, a)
+
+    def largest(mask):
+        seen = [[False] * gw for _ in range(gh)]
+        best = 0
+        for j0 in range(gh):
+            for i0 in range(gw):
+                if not mask[j0][i0] or seen[j0][i0]:
+                    continue
+                stack, a = [(i0, j0)], 0
+                seen[j0][i0] = True
+                while stack:
+                    i, j = stack.pop()
+                    a += 1
+                    for u, v in ((i + 1, j), (i - 1, j), (i, j + 1), (i, j - 1)):
+                        if 0 <= u < gw and 0 <= v < gh and mask[v][u] and not seen[v][u]:
+                            seen[v][u] = True
+                            stack.append((u, v))
+                best = max(best, a)
+        return best
+
+    anchor, whitebox = largest(g), largest(w)
     c = 4
     cw, ch = gw // c, gh // c
     heights, empty = [0] * cw, 0
@@ -119,7 +130,7 @@ def features(path, step=3):
                 empty = max(empty, sh * (i - s))
                 start = s
             stack.append((start, hh))
-    return {'mass': round(sum(map(sum, g)) / n * 100, 1), 'anchor': round(anchor / n * 100, 1), 'emptyrect': round(empty / (cw * ch) * 100, 1)}
+    return {'mass': round(sum(map(sum, g)) / n * 100, 1), 'anchor': round(anchor / n * 100, 1), 'emptyrect': round(empty / (cw * ch) * 100, 1), 'whitebox': round(whitebox / n * 100, 1)}
 
 
 def plain(s):
@@ -160,7 +171,7 @@ def main():
             continue
         f = features(p)
         f['n'] = n
-        f['kind'] = 'result' if roles.get(n) in ('result', 'limitation') else 'figure'
+        f['kind'] = 'result' if roles.get(n) in ('result', 'limitation', 'finding', 'analysis', 'example') else 'figure'
         rows.append(f)
     if not rows:
         print('no rendered slides: run shots.sh into deck/qa/shots-full first', file=sys.stderr)
@@ -178,10 +189,11 @@ def main():
             m = statistics.median(f[key] for f in sel)
             meds[f'{kind}.{key}'] = m
             if (lo is not None and m < lo) or (hi is not None and m > hi):
-                fixes.append(f"FIX deck {kind} median {key} {m:.1f} (목표 {'≥ ' + str(lo) if lo is not None else '≤ ' + str(hi)}) {WHY[key]}")
-    print('slide kind    mass anchor emptyrect')
+                over = hi is not None and m > hi
+                fixes.append(f"FIX deck {kind} median {key} {m:.1f} (목표 {'≤ ' + str(hi) if over else '≥ ' + str(lo)}) {HEAVY if key == 'mass' and over else WHY[key]}")
+    print('slide kind    mass anchor emptyrect whitebox')
     for f in rows:
-        print(f"{f['n']:5d} {f['kind']:6s} {f['mass']:5.1f} {f['anchor']:6.1f} {f['emptyrect']:9.1f}")
+        print(f"{f['n']:5d} {f['kind']:6s} {f['mass']:5.1f} {f['anchor']:6.1f} {f['emptyrect']:9.1f} {f['whitebox']:8.1f}")
     if changed:
         print(f"note: 스토리라인과 다른 문구 {len(changed)}곳: {', '.join(changed[:24])}. message-style.md 규칙에 걸린 곳이 아니면 스토리라인 문구로 되돌린다")
     print('\n'.join(fixes) if fixes else 'no findings')

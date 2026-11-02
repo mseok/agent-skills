@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""kit_gallery.py — thirteen worked slides drawn with scene_kit.py, with toy content and no paper in them. Copy a slide's code, keep its sizes and positions, change the content.
+"""kit_gallery.py — fourteen worked slides drawn with scene_kit.py, with toy content and no paper in them. Copy a slide's code, keep its sizes and positions, change the content.
 
 usage: kit_gallery.py /abs/deck   (a folder scaffolded by new_deck.py). Renders are kept in assets/kit-gallery/ of this skill.
 Numbers, names and curves here are invented to show the drawing; nothing on these slides is a result.
@@ -21,8 +21,8 @@ def g1_cover():
     fr, s = hero_bridge('g1', F, 70, 670, 44, 366, yr=(-2.5, 2.5), bulge=50, n=7, seed=3, axis=False, dots=False)
     s += line(275, 478, 70, 370, GRAYL, 2) + line(465, 478, 670, 370, GRAYL, 2)
     c, _ = chain(540, [('picture', 92), ('enc', 118, 104), ('model', 180, 104, '모델'), ('dec', 118, 104), ('picture', 92)], 0, 740)
-    s += c + T(370, 650, '한 손실로 함께 배우는 세 모델', 26, 700, NAVY, 'middle')
-    h = tex(20, 30, '$z_0$ 시작 분포', 24, 650, AMBERD) + tex(740, 30, '$z_1$ 잠재', 24, 650, STEELD, 'end')
+    s += c + T(370, 650, '한 loss로 jointly 학습하는 세 모델', 26, 700, NAVY, 'middle')
+    h = tex(20, 30, '$z_0$ prior', 24, 650, AMBERD) + tex(740, 30, '$z_1$ latent', 24, 650, STEELD, 'end')
     return cover('예시 논문의<br><em>강조할 말</em><br>제목 셋째 줄', 'English Title of the Paper', '이 발표가 무엇을 보여 주는지 한 줄',
                  '저자 이름 · 저자 이름', '소속 · 소속', '학회 2026 · arXiv:0000.00000 · 연구실 논문 세미나', s, h, notes('표지의 그림은 예시 분포에서 계산한 모식입니다.'))
 
@@ -32,20 +32,20 @@ def g2_two_chains():
     y1 = 180
     l = lane(0, 24, '지금의 습관은 두 단계') + badge(17, 62, 1) + T(46, 70, '먼저 앞뒤 모델만 학습해 고정', 24, 650)
     c, xs = chain(y1, [('picture', 110), ('enc', 132, 106), ('latent', 100), ('dec', 132, 106), ('picture', 110)], name='g2a')
-    l += c + lock(xs[1], y1 - 80, 1.15) + lock(xs[3], y1 - 80, 1.15) + T(xs[1], y1 + 90, '압축', 22, None, SOFT, 'middle') + T(xs[3], y1 + 90, '복원', 22, None, SOFT, 'middle')
+    l += c + lock(xs[1], y1 - 80, 1.15) + lock(xs[3], y1 - 80, 1.15) + T(xs[1], y1 + 90, 'encode', 22, None, SOFT, 'middle') + T(xs[3], y1 + 90, 'decode', 22, None, SOFT, 'middle')
     y2 = 428
-    l += badge(17, 326, 2) + T(46, 334, '굳은 잠재 위에 생성 모델 학습', 24, 650)
+    l += badge(17, 326, 2) + T(46, 334, '굳은 latent 위에 생성 모델 학습', 24, 650)
     c, xs = chain(y2, [('prior', 104), ('model', 224, 88, '생성 모델'), ('latent', 100)], 0, 560, 'arb', 'g2b')
-    l += c + T(xs[1], y2 + 74, '시작 분포를 굳은 잠재로 운반', 22, None, SOFT, 'middle')
-    hl = fx(0, 536, 798, 124, ['<b style="color:#1D3A5F;font-weight:700">표현이 먼저 정해지고</b>', '<b style="color:#1D3A5F;font-weight:700">생성 모델은 그 위에서 배움</b>'], 26)
-    r = lane(0, 24, '제안은 한 손실로 함께') + T(0, 70, '처음부터 세 모델을 함께 학습', 24, 650)
+    l += c + T(xs[1], y2 + 74, 'prior를 굳은 latent로 transport', 22, None, SOFT, 'middle')
+    hl = fx(0, 536, 798, 124, ['<b style="color:#1D3A5F;font-weight:700">representation이 먼저 정해지고</b>', '<b style="color:#1D3A5F;font-weight:700">생성 모델은 그 위에서 배움</b>'], 26)
+    r = lane(0, 24, '제안은 한 loss로 함께') + T(0, 70, '처음부터 세 모델을 joint training', 24, 650)
     c, xs = chain(y1, [('picture', 110), ('enc', 132, 106), ('latent', 100), ('dec', 132, 106), ('picture', 110)], name='g2c')
     r += c + arrow(xs[2], 342, xs[2], 234, 'arb') + model_box(xs[2], 384, 224, 84, '생성 모델')
     r += curve(f'M{xs[1]} 534 L{xs[1]} 282', 'grad') + curve(f'M{xs[2] - 60} 534 L{xs[2] - 60} 430', 'grad') + curve(f'M{xs[3]} 534 L{xs[3]} 282', 'grad')
-    r += T(xs[3] + 12, 404, '기울기', 22, 600, BLUE) + T(xs[2] + 12, 300, '운반', 22, 600, BLUE)
-    hr = fx(0, 536, 798, 124, [r'한 손실 $=$ 재구성 $+$ 잠재 맞추기', '세 모델이 같은 손실로 움직임'], 26, 'box blue')
-    return slide('예시', '예시 · 두 패널의 사슬', '먼저 굳히는 습관과 함께 배우는 제안', [panel(*L2, l, hl), panel(*R2, r, hr)],
-                 '<b>표현과 생성 모델</b>을 한 손실로 묶는 것이 제안', CITE, notes('사슬 두 줄과 기울기를 보여 주는 장입니다.'))
+    r += T(xs[3] + 12, 404, 'gradient', 22, 600, BLUE) + T(xs[2] + 12, 300, 'transport', 22, 600, BLUE)
+    hr = fx(0, 536, 798, 124, [r'한 loss $=$ reconstruction $+$ latent 맞추기', '세 모델이 같은 loss로 움직임'], 26, 'box blue')
+    return slide('예시', '예시 · 두 패널의 사슬', '먼저 굳히는 습관과 jointly 학습하는 제안', [panel(*L2, l, hl), panel(*R2, r, hr)],
+                 '<b>representation과 생성 모델</b>을 한 loss로 묶는 것이 제안', CITE, notes('사슬 두 줄과 gradient를 보여 주는 장입니다.'))
 
 
 def g3_table():
@@ -54,9 +54,9 @@ def g3_table():
     s = T(190, 28, '갈래', 24, 650, SOFT) + T(445, 28, '맞는 생각', 24, 650, SOFT) + T(830, 28, '그러나', 24, 650, RED)
     for cx, lab in zip(cols, ['조건 하나', '조건 둘', '조건 셋']):
         s += T(cx, 28, lab, 24, 650, SOFT, 'middle')
-    rows = [('첫째 갈래', '방법 A', ['압축한 공간에서', '모델을 학습'], ['앞단이 고정이라', '표현이 움직이지 않음'], (0, 1, 0)),
-            ('둘째 갈래', '방법 B · 방법 C', ['표현과 모델을', '한 틀에서 학습'], ['단순한 시작 분포에 묶임'], (0, 1, 1)),
-            ('셋째 갈래', '방법 D', ['어떤 두 분포든', '잇는 유연한 틀'], ['양 끝 표본이 보여야 함'], (1, 0, 0))]
+    rows = [('첫째 갈래', '방법 A', ['encode한 공간에서', '모델을 학습'], ['앞단이 고정이라', 'representation이 움직이지 않음'], (0, 1, 0)),
+            ('둘째 갈래', '방법 B · 방법 C', ['representation과 모델을', '한 틀에서 학습'], ['단순한 prior에 묶임'], (0, 1, 1)),
+            ('셋째 갈래', '방법 D', ['어떤 두 분포든', '잇는 유연한 틀'], ['양 끝 sample이 보여야 함'], (1, 0, 0))]
     for i, (name, sub, good, but, marks) in enumerate(rows):
         cy = y0 + i * rh + rh / 2
         s += line(0, y0 + i * rh, 1660, y0 + i * rh, '#E3E7EB', 2) + T(190, cy - 6, name, 26, 700) + T(190, cy + 26, sub, 22, None, SOFT)
@@ -73,7 +73,7 @@ def g3_table():
     c3 = y + (682 - y) / 2 - 2
     s = rect(0, y + 4, 1660, 682 - y - 8, 14, '#EEF3FA', 'none', 0) + s
     s += enc(34, c3, 52, 62, lab='') + model_box(90, c3, 46, 62, '') + dec(146, c3, 52, 62, lab='')
-    s += T(190, c3 - 6, '이 논문', 26, 700, NAVY) + lines(445, c3 - 6, ['임의의 시작 분포에서 출발해', '세 모델을 하나의 손실로 학습'], 24, 34, 650, NAVY)
+    s += T(190, c3 - 6, '이 논문', 26, 700, NAVY) + lines(445, c3 - 6, ['임의의 prior에서 출발해', '세 모델을 하나의 loss로 학습'], 24, 34, 650, NAVY)
     s += ''.join(check_mark(cx, c3, True) for cx in cols)
     return slide('예시', '예시 · 앞선 갈래들', '맞는 생각이었지만 저마다 빈칸을 남긴 세 갈래', [panel(*FULL, s)],
                  '세 칸을 다 채우는 이 논문의 출발점은 <b>셋째 갈래</b>', CITE, notes('체크 표는 발표자 정리입니다.'))
@@ -84,14 +84,14 @@ def g4_hero():
     x0, x1, y0, y1 = 300, 1360, 58, 420
     fr, s = hero_bridge('g4', F, x0, x1, y0, y1, bulge=170, n=9, seed=7)
     mid = (x0 + x1) / 2
-    h = tex(x0 - 150, 34, r'$x_0\sim p_0$ 시작 분포', 26, 700, AMBERD) + tex(x1 + 150, 34, r'$x_1\sim p_1$ 데이터', 26, 700, STEELD, 'end')
+    h = tex(x0 - 150, 34, r'$x_0\sim p_0$ prior', 26, 700, AMBERD) + tex(x1 + 150, 34, r'$x_1\sim p_1$ 데이터', 26, 700, STEELD, 'end')
     h += tex(x0, y1 + 52, '$t=0$', 24, 600, None, 'middle') + tex(x1, y1 + 52, '$t=1$', 24, 600, None, 'middle')
-    h += tex(mid, y1 + 54, r'$t=\frac{1}{2}$에서 잡음 폭 $\sqrt{t(1-t)}$ 최대', 24, 600, None, 'middle')
+    h += tex(mid, y1 + 54, r'$t=\frac{1}{2}$에서 noise 폭 $\sqrt{t(1-t)}$ 최대', 24, 600, None, 'middle')
     h += fx(190, 494, 1280, 76, [r'$x_t=(1-t)\,x_0+t\,x_1+\sqrt{t(1-t)}\,\epsilon,\quad \epsilon\sim\mathcal{N}(0,I)$'], 30, 'box blue')
-    s += lines(190, 620, ['이동 방향을 최소제곱으로 배워', '시작 표본을 데이터 표본으로 운반'], 24, 34, 600)
-    s += lines(1470, 620, ['단, 양 끝 표본이', '둘 다 관측되어야 함'], 26, 34, 700, RED, 'end')
-    return slide('예시', '예시 · 큰 그림 하나', '두 분포 사이에 잡음 섞인 다리를 놓는 방법', [panel(*FULL, s, h)],
-                 '양 끝 표본이 보여야만 놓을 수 있는 <b>다리</b>', CITE + ' · 밀도와 경로는 예시 분포에서 계산', notes('밀도와 경로는 예시 분포에서 계산한 모식입니다.'))
+    s += lines(190, 620, ['이동 방향을 least squares로 배워', '시작 sample을 데이터 sample로 transport'], 24, 34, 600)
+    s += lines(1470, 620, ['단, 양 끝 sample이', '둘 다 관측되어야 함'], 26, 34, 700, RED, 'end')
+    return slide('예시', '예시 · 큰 그림 하나', '두 분포를 noise 섞인 trajectory로 잇는 방법', [panel(*FULL, s, h)],
+                 '양 끝 sample이 보여야만 놓을 수 있는 <b>trajectory</b>', CITE + ' · density와 경로는 예시 분포에서 계산', notes('density와 경로는 예시 분포에서 계산한 모식입니다.'))
 
 
 def g5_mechanism():
@@ -100,45 +100,45 @@ def g5_mechanism():
     s = lane(0, 24, '학습은 위쪽 길, 생성은 아래쪽 길')
     s += dens('g5-z0', gaussian((0, 0), (0.85, 0.85)), 6, cy - 82, 164, 164, tint=AMBER, n=44, seed=5)
     Fm = Field(0.62, BIMODAL, sig=0.85)
-    fr, img = field('g5', Fm, 130, cy - 78, 760, 156, fade=0.08)
+    fr, img = field('g5', Fm, 170, cy - 78, 672, 156, fade=0.08)
     paths, _ = strands(fr, Fm, 6, 12)
     s += img + paths
     s += dens('g5-z1', gmm([(0.34, (-0.95, 0.8), (0.34, 0.3)), (0.36, (1.0, 0.45), (0.36, 0.34)), (0.3, (0.0, -1.1), (0.36, 0.3))]), 842, cy - 82, 164, 164, tint=STEEL, n=44, seed=6)
     s += picture(1490, cy - 82, 164)
     ey, dy = 78, 360
-    s += enc(1250, ey, 180, 112, lab='인코더', size=26) + qarrow(1508, cy - 86, 1470, ey, 1346, ey) + qarrow(1156, ey, 1040, ey, 972, cy - 58)
+    s += enc(1250, ey, 180, 112, lab='encoder', size=26) + qarrow(1508, cy - 86, 1470, ey, 1346, ey) + qarrow(1156, ey, 1040, ey, 972, cy - 58)
     s += model_box(506, 384, 340, 92, '생성 모델', 28)
     s += qarrow(88, cy + 72, 96, 384, 330, 384, 'arb') + qarrow(682, 384, 900, 384, 920, cy + 66, 'arb')
-    s += dec(1250, dy, 180, 112, lab='디코더', size=26) + qarrow(972, cy + 66, 1040, dy, 1156, dy) + qarrow(1346, dy, 1470, dy, 1508, cy + 86)
+    s += dec(1250, dy, 180, 112, lab='decoder', size=26) + qarrow(972, cy + 66, 1040, dy, 1156, dy) + qarrow(1346, dy, 1470, dy, 1508, cy + 86)
     zx, zy = fr.px(0.5, 0.15)
     s += arrow(zx, zy + 8, zx, 334, 'arb') + circle(zx, zy, 8, NAVY, '#fff', 2.5)
-    s += curve('M506 504 L506 434', 'grad') + curve('M1250 504 L1250 420', 'grad') + qarrow(1086, 504, 1096, 200, 1190, 138, 'grad') + T(1110, 470, '기울기', 24, 650, BLUE)
-    h = tex(88, cy - 94, '$z_0$', 26, 700, AMBERD, 'middle') + tex(924, cy - 94, '$z_1$', 26, 700, STEELD, 'middle') + tex(506, cy - 94, r'다리에서 $z_t$를 바로 뽑기', 25, 650, NAVY, 'middle')
+    s += curve('M506 504 L506 434', 'grad') + curve('M1250 504 L1250 420', 'grad') + qarrow(1086, 504, 1096, 200, 1190, 138, 'grad') + T(1110, 470, 'gradient', 24, 650, BLUE)
+    h = tex(88, cy - 94, '$z_0$', 26, 700, AMBERD, 'middle') + tex(924, cy - 94, '$z_1$', 26, 700, STEELD, 'middle') + tex(506, cy - 94, r'bridge에서 $z_t$를 바로 뽑기', 25, 650, NAVY, 'middle')
     h += tex(zx + 14, 324, r'$z_t,\ t$', 25, 650, NAVY) + tex(1572, cy - 94, '이미지', 26, 700, None, 'middle')
-    h += tex(790, 432, '여러 걸음', 24, 600, BLUE, 'middle') + tex(214, 432, r'$z_0$ 뽑기', 24, 600, BLUE, 'middle')
-    h += tex(1360, 56, '압축', 24, 600) + tex(1360, 412, '복원', 24, 600)
-    h += fx(150, 508, 1360, 152, [r'$\E\Big[\underbrace{-\ln p(x|z)}_{\text{재구성}}+\frac{\beta}{2}\underbrace{\big\|z_1-z_0-h(z_t,t)\big\|^2}_{\text{잠재 맞추기}}\Big]$'], 30, 'box blue')
-    return slide('예시', '예시 · 기전 한 장', '세 모델을 한 손실로 묶는 기전', [panel(*FULL, s, h)],
-                 '세 모델이 한 손실을 나눠 갖는 열쇠는 바로 뽑는 <b>$z_t$</b>', CITE + ' · 밀도와 경로는 모식', notes('파란 점선은 기울기가 흐르는 곳입니다. 손실에서 세 모델 모두로 갑니다.'))
+    h += tex(790, 432, '여러 step', 24, 600, BLUE, 'middle') + tex(214, 432, r'$z_0$ 뽑기', 24, 600, BLUE, 'middle')
+    h += tex(1360, 56, 'encode', 24, 600) + tex(1360, 412, 'decode', 24, 600)
+    h += fx(150, 508, 1360, 152, [r'$\E\Big[\underbrace{-\ln p(x|z)}_{\text{reconstruction}}+\frac{\beta}{2}\underbrace{\big\|z_1-z_0-h(z_t,t)\big\|^2}_{\text{latent 맞추기}}\Big]$'], 30, 'box blue')
+    return slide('예시', '예시 · 기전 한 장', '세 모델을 한 loss로 묶는 기전', [panel(*FULL, s, h)],
+                 '세 모델이 한 loss를 나눠 갖는 열쇠는 바로 뽑는 <b>$z_t$</b>', CITE + ' · density와 경로는 모식', notes('파란 점선은 gradient가 흐르는 곳입니다. loss에서 세 모델 모두로 갑니다.'))
 
 
 def g6_bars():
     """Two charts: wide bars, bold values, a legend under the lane header; the number the slide is about is the largest thing on the panel."""
     l = lane(0, 24, '품질은 세 크기에서 비슷함') + legend(0, 70, [('이 모델', BLUE), ('기준 모델', '#C5CDD5')])
-    b, h = bars(30, 790, 600, 130, [('$64^2$', (2.6, 2.5)), ('$128^2$', (3.1, 3.5)), ('$256^2$', (3.9, 3.8))], 4.2, fmt='{:.1f}')
+    b, h = bars(30, 790, 620, 130, [('$64^2$', (2.6, 2.5)), ('$128^2$', (3.1, 3.5)), ('$256^2$', (3.9, 3.8))], 4.2, fmt='{:.1f}')
     l += b
     h += tex(798, 24, '낮을수록 좋음', 22, 500, MUTED, 'end')
-    r = lane(0, 24, '한 걸음 계산량은 이 모델이 작음') + legend(0, 70, [('이 모델', BLUE), ('기준 모델', '#C5CDD5')])
+    r = lane(0, 24, '한 step 계산량은 이 모델이 작음') + legend(0, 70, [('이 모델', BLUE), ('기준 모델', '#C5CDD5')])
     b2, h2 = bars(140, 790, 470, 110, [('$64^2$', (160, 200)), ('$128^2$', (330, 470)), ('$256^2$', (450, 1290))], 1290, val_size=28)
-    r += b2 + line(0, 596, 798, 596, '#E3E7EB', 2) + T(0, 650, '백 걸음 절감', 23, 600, SOFT)
+    r += b2 + line(0, 596, 798, 596, '#E3E7EB', 2) + T(0, 650, '백 step 절감', 23, 600, SOFT)
     r += big(465, 652, '30%') + big(682, 652, '65%')
-    return slide('예시', '예시 · 막대 두 장', '비슷한 품질에 한 걸음이 더 가벼운 모델', [panel(*L2, l, h), panel(*R2, r, h2)],
-                 '가장 큰 크기에서 백 걸음이면 <b>65% 절감</b>', CITE, notes('막대는 숫자로 그리고 값을 바로 위에 적습니다.'))
+    return slide('예시', '예시 · 막대 두 장', '비슷한 품질에 한 step이 더 가벼운 모델', [panel(*L2, l, h), panel(*R2, r, h2)],
+                 '가장 큰 크기에서 백 step이면 <b>65% 절감</b>', CITE, notes('막대는 숫자로 그리고 값을 바로 위에 적습니다.'))
 
 
 def g7_lines():
     """Line charts: thick line, one point picked out, a dashed baseline with its value on the chart, the gain written next to the arrow."""
-    x0, x1, y0, y1 = 70, 790, 64, 566
+    x0, x1, y0, y1 = 70, 790, 64, 604
     xs = [-6, -5, -4, -3]
     px = lambda b: x0 + (b + 6.42) / 4.22 * (x1 - x0)
     py = lambda v: y1 - (v - 3.4) / 3.0 * (y1 - y0)
@@ -158,7 +158,7 @@ def g7_lines():
     l += T(pts[0][0], pts[0][1] + 38, '4.3', 26, 650, None, 'middle') + T(pts[1][0], pts[1][1] + 38, '3.9', 26, 650, None, 'middle') + T(pts[3][0] - 18, pts[3][1] + 8, '6.0', 26, 650, None, 'end')
     l += big(pts[2][0] + 22, pts[2][1] + 16, '3.7', 40, BLUE, None) + arrow(pts[2][0], py(4.5) + 6, pts[2][0], pts[2][1] - 18, 'arb', 3)
     h += tex(pts[2][0] - 14, py(4.2), '약 17% 개선', 27, 750, BLUE, 'end')
-    r = lane(0, 24, '같은 축의 복원 품질')
+    r = lane(0, 24, '같은 축의 reconstruction 품질')
     h2 = tex(798, 24, '높을수록 좋음', 22, 500, MUTED, 'end')
     py2 = lambda v: y1 - (v - 39.1) / 3.2 * (y1 - y0)
     r += line(x0, y1, x1, y1, GRAY, 2) + line(x0, y0, x0, y1, GRAY, 2)
@@ -171,18 +171,18 @@ def g7_lines():
     r += strand(pts2, CORAL, 4, 1)
     for (x, y), v in zip(pts2, (41.8, 41.8, 41.0, 39.6)):
         r += circle(x, y, 8, CORAL, '#fff', 2.5) + T(x + 16, y - 16, f'{v:.1f}', 26, 650)
-    r += lines(x0 + 30, py2(40.3), ['너무 큰 값에서는', '복원이 무너지고 품질도 나빠짐'], 25, 36, 650, CORAL)
-    return slide('예시', '예시 · 선 두 장', '함께 배우면 품질이 좋아지는 구간', [panel(*L2, l, h), panel(*R2, r, h2)],
-                 '이 모델에서 표현이 생성 과정에 맞춰 바뀌면 <b>약 17% 개선</b>', CITE, notes('곡선은 숫자로 그리고 핵심 점만 크게 표시합니다.'))
+    r += lines(x0 + 30, py2(40.3), ['너무 큰 값에서는', 'reconstruction이 무너지고 품질도 나빠짐'], 25, 36, 650, '#B4492F')
+    return slide('예시', '예시 · 선 두 장', 'jointly 학습하면 품질이 좋아지는 구간', [panel(*L2, l, h), panel(*R2, r, h2)],
+                 '이 모델에서 representation이 생성 과정에 맞춰 바뀌면 <b>약 17% 개선</b>', CITE, notes('곡선은 숫자로 그리고 핵심 점만 크게 표시합니다.'))
 
 
 def g8_closing():
     """The closing: four findings, each with a tiny drawing, on the left; the questions on the right are the presenter's slot."""
     l = lane(0, 24, '논문이 보여 준 것')
     ys = [50, 204, 358, 512]
-    rows = [('한 손실로 세 모델을 함께', '인코더, 디코더, 생성 모델'), ('비슷한 품질에 더 가벼운 걸음', '가장 큰 크기에서 65% 절감'), ('함께 학습이 분리 학습보다 좋음', '4.5에서 3.7로'), ('시작 분포와 샘플러의 자유', '여러 분포, 안내, 반전')]
+    rows = [('한 loss로 세 모델을 함께', 'encoder, decoder, 생성 모델'), ('비슷한 품질에 더 가벼운 step', '가장 큰 크기에서 65% 절감'), ('joint training이 separate training보다 좋음', '4.5에서 3.7로'), ('prior와 sampler의 자유', '여러 분포, guidance, inversion')]
     for y, (a, b) in zip(ys, rows):
-        l += rect(0, y, 798, 146, 14, '#F4F6F8', 'none', 0) + T(216, y + 65, a, 27, 700) + T(216, y + 101, b, 24, None, SOFT)
+        l += card(0, y, 798, 146) + T(216, y + 65, a, 27, 700) + T(216, y + 101, b, 24, None, SOFT)
     c = ys[0] + 73
     l += enc(40, c, 56, 62, lab='') + model_box(100, c, 48, 62, '') + dec(160, c, 56, 62, lab='')
     c = ys[1] + 73
@@ -192,11 +192,11 @@ def g8_closing():
     c = ys[3] + 73
     l += vprof(gauss1(0, 0.8), -2.4, 2.4, 100, c + 44, c - 44, -44, AMBER, AMBERD)
     r = lane(0, 24, '우리에게 던지는 질문')
-    for i, q in enumerate((['우리 모델의 표현은', '생성 모델보다 먼저 굳어 있는가'], ['잡음과 크기를', '우리는 어떻게 정해 왔는가'], ['시작 분포를 고를 수 있다면', '어떤 선택지가 있는가'])):
+    for i, q in enumerate((['우리 모델의 representation은', '생성 모델보다 먼저 굳어 있는가'], ['noise와 크기를', '우리는 어떻게 정해 왔는가'], ['prior를 고를 수 있다면', '어떤 선택지가 있는가'])):
         cy = 162 + i * 226
         r += circle(44, cy, 26, NAVY) + T(44, cy + 11, str(i + 1), 30, 700, '#fff', 'middle') + lines(96, cy - 8, q, 32, 46, 700, NAVY)
-    return slide('예시', '예시 · 정리와 질문', '함께 배우는 것이 우리에게 주는 뜻', [panel(*L2, l), panel(*R2, r)],
-                 '우리 표현에도 <b>누가 먼저 굳었나</b> 묻기', CITE, notes('오른쪽은 발표자가 발표마다 직접 쓰는 자리입니다.'))
+    return slide('예시', '예시 · 정리와 질문', 'jointly 학습하는 것이 우리에게 주는 뜻', [panel(*L2, l), panel(*R2, r)],
+                 '우리 representation에도 <b>누가 먼저 굳었나</b> 묻기', CITE, notes('오른쪽은 발표자가 발표마다 직접 쓰는 자리입니다.'))
 
 
 def g9_causal():
@@ -238,7 +238,7 @@ def g10_matrix():
     heads = ['자동 채점', '실험 설계', '재시도', '인과 관계', '설명 채점', '세 왜곡']
     y0, rh, colx = 54, 113, [540, 740, 940, 1140, 1340, 1560]
     bottom = y0 + rh * len(rows)
-    s = rect(colx[5] - 100, 2, 200, bottom - 2, 0, '#EEF2F7', 'none', 0) + rect(0, bottom - rh, 1660, rh, 0, '#EEF2F7', 'none', 0) + T(10, 36, '분류', 24, 650, SOFT)
+    s = rect(colx[5] - 100, 2, 200, bottom - 2, 0, '#EEF2F7', 'none', 0) + rect(0, bottom - rh, colx[5] - 100, rh, 0, '#EEF2F7', 'none', 0) + T(10, 36, '분류', 24, 650, SOFT)
     for i, h in enumerate(heads):
         s += T(colx[i], 36, h, 26 if i == 5 else 24, 700 if i == 5 else 650, NAVY if i == 5 else SOFT, 'middle')
     s += line(0, y0, 1660, y0, GHOST, 2)
@@ -259,7 +259,7 @@ def g11_rank():
     vals = [68.0, 67.8, 67.8, 66.9, 66.8, 66.5, 65.4, 65.4, 65.0, 64.6, 64.5, 64.4, 64.1, 63.4, 63.2, 62.3, 62.0, 61.5, 61.0, 60.4, 59.1, 59.0, 58.7, 58.2, 58.2, 57.6, 57.3, 56.0, 53.0, 48.5]
     y0, rh, axis_y = 72, 18.4, 640
     xv = lambda v: 40 + (v - 45) * 40.5
-    s = lane(0, 28, '여러 번 실행한 평균 점수 (%)') + rect(xv(78), 44, xv(85) - xv(78), axis_y - 45, 0, '#E3EAF4', 'none', 0) + line(xv(75), 44, xv(75), axis_y, SOFT, 2.4, '7 6')
+    s = lane(0, 28, '여러 번 실행한 평균 score (%)') + rect(xv(78), 44, xv(85) - xv(78), axis_y - 45, 0, '#E3EAF4', 'none', 0) + line(xv(75), 44, xv(75), axis_y, SOFT, 2.4, '7 6')
     s += T(xv(75) - 8, 32, '기준 75%', 24, 600, SOFT, 'end') + T(xv(78), 34, '이론 최적 78–85%', 30, 700, NAVY) + line(xv(45), axis_y, xv(85), axis_y, SOFT, 2)
     for v in (50, 60, 70, 80):
         s += line(xv(v), axis_y, xv(v), axis_y + 7, SOFT, 2) + T(xv(v), axis_y + 29, str(v), 22, 500, SOFT, 'middle')
@@ -284,7 +284,7 @@ def g12_tiers():
             o += T(46, sv(v) + 8, f'{v:.1f}' if v else '0', 24, 500, SOFT, 'end')
         for x, n in zip(xs, names):
             o += T(x, bot + 34, n, 24, 500, SOFT, 'middle')
-        return o + T(798, bot + 70, '점수 구간 (%)', 24, 500, SOFT, 'end')
+        return o + T(798, bot + 70, 'score 구간 (%)', 24, 500, SOFT, 'end')
     def series(vals, col, sw, r):
         return strand([(x, sv(v)) for x, v in zip(xs, vals)], col, sw, 1) + ''.join(circle(x, sv(v), r, col, '#fff', 1.5) for x, v in zip(xs, vals))
     l = lane(0, 24, '첫째 경우는 오르지만 만점과 먼 거리') + base() + series((0.2, 0.3, 0.25, 0.27, 0.26), '#9FB3D1', 2.6, 5) + series((0.53, 0.5, 0.5, 0.35, 0.09), CORAL, 3.4, 8) + series((0.05, 0.1, 0.2, 0.3, 0.42), BLUE, 4, 9)
@@ -312,6 +312,43 @@ def g13_boxes():
     return slide('예시', '예시 · 상자 그림', '설명을 맞힌 경우에 더 작았던 격차', [panel(*L2, l), panel(*R2, r)], '평균 격차 <b>+4.5</b>와 <b>−3.0</b>', CITE, notes('같은 눈금을 두 패널이 나눠 씁니다. 평균이 패널에서 가장 큰 글자입니다.'))
 
 
+def g14_cards():
+    """Six small charts of one kind, one on each white card: a small multiple is the one place a chart takes a card. Name and formula on top, a gray filled base, one thick curve for what changes."""
+    base = mixture1([(0.42, -1.5, 0.42), (0.36, 0.25, 0.38), (0.22, 1.7, 0.36)])
+    grid = [-3.2 + 6.4 * i / 150 for i in range(151)]
+    top = max(base(v) for v in grid)
+
+    def chart(cell, name, form, warp, second=None):
+        x, y, w, h = cell
+        iw, ih = w - 40, h - 40
+        bx0, bx1, by0, by1 = 10, iw - 10, 92, ih - 4
+        X = lambda v: bx0 + (v + 3.2) / 6.4 * (bx1 - bx0)
+        Y = lambda p: by1 - p * (by1 - by0)
+        tilt = [warp(v, base(v) / top) for v in grid]
+        mx = max(tilt) or 1
+        b = [(X(v), Y(0.5 * base(v) / top)) for v in grid]
+        area = 'M' + ' L'.join(f'{px:.1f} {py:.1f}' for px, py in b) + f' L{X(3.2):.1f} {by1:.1f} L{X(-3.2):.1f} {by1:.1f} Z'
+        s = T(0, 28, name, 26, 700) + f'<path d="{area}" fill="#DAD8D2" stroke="{MUTED}" stroke-width="2"/>'
+        if second:
+            s += strand([(X(v), Y(0.5 * second(v))) for v in grid], MUTED, 2.2, 1, '7 6')
+        s += strand([(X(v), Y(q / mx)) for v, q in zip(grid, tilt)], CORAL, 4.5, 1) + line(bx0, by1, bx1, by1, MUTED, 2)
+        return panel(x, y, w, h, s, tex(0, 66, form, 24, 500, SOFT), 'panel card')
+
+    H = 349
+    r2 = 176 + H + 24
+    gg = gauss1(1.7, 0.45)
+    cells = [(110, 176, 550, H), (684, 176, 552, H), (1260, 176, 550, H), (110, r2, 550, H), (684, r2, 552, H), (1260, r2, 550, H)]
+    specs = [('변환 하나', r'$q \propto p^{\beta},\ \beta = 3$', lambda v, p: p ** 3, None),
+             ('변환 둘', r'$q \propto p_1\, p_2$', lambda v, p: p * gauss1(0.6, 1.1)(v), gauss1(0.6, 1.1)),
+             ('변환 셋', r'$q \propto p\, e^{r}$', lambda v, p: p * 2.718 ** (1.1 * v), None),
+             ('변환 넷', r'$q \propto p\, p(y|x)$', lambda v, p: p * gauss1(0.3, 0.5)(v), gauss1(0.3, 0.5)),
+             ('변환 다섯', r'$q \propto p_c^{w}\, p^{1-w}$', lambda v, p: p ** 0.5 * gg(v), gg),
+             ('변환 여섯', r'$q \propto p\cdot 1_A$', lambda v, p: p if v > 0.9 else 0.0, None)]
+    panels = [chart(c, *sp) for c, sp in zip(cells, specs)]
+    return slide('예시', '예시 · 흰 카드 여섯 장', '다시 학습하지 않고 sample 분포를 바꾸는 여섯 가지 변환', panels,
+                 '같은 base model에서 <b>sampling</b>만 바꿔 여섯 target', CITE + ' · 곡선은 예시 분포에서 계산', notes('작은 차트 여러 개만 흰 카드에 하나씩 담습니다. 큰 그림 하나는 카드에 넣지 않습니다.'))
+
+
 if __name__ == '__main__':
     init(sys.argv[1])
-    write_deck([g() for g in (g1_cover, g2_two_chains, g3_table, g4_hero, g5_mechanism, g6_bars, g7_lines, g8_closing, g9_causal, g10_matrix, g11_rank, g12_tiers, g13_boxes)])
+    write_deck([g() for g in (g1_cover, g2_two_chains, g3_table, g4_hero, g5_mechanism, g6_bars, g7_lines, g8_closing, g9_causal, g10_matrix, g11_rank, g12_tiers, g13_boxes, g14_cards)])

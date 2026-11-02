@@ -1,15 +1,18 @@
 /* Research theme for the HTML deck engine (loads after css/deck.css).
    Fixed per-slide grid, 1920×1080 stage:
-     title block  kicker y=50 · h2 y=92 (51 px) → ends at y≈152
-     panels       top 176 … bottom 898 (height 722 when one row); every gutter 24 px; inner padding 20 px
-     closing line white panel, bottom 80 → spans y 922–1000 (one line of 30 px)
-     cite         bottom 30, 17 px · slide number bottom right (engine)
-   Figures sit on white panels; the stage stays the warm off-white. No coloured bars, gradients or tracking. */
+     title block  kicker y=50 · h2 y=92 (51 px) → ends at y≈152; left edge x=130, the same edge as what the panels hold
+     panels       top 176 … bottom 898 (height 722 when one row); every gutter 24 px; inner padding 20 px; transparent
+     closing line white card, x 130–1790, bottom 80 → spans y 922–1000 (one line of 30 px)
+     cite         left 130, bottom 30, 17 px · slide number bottom right (engine)
+   Stage first (user decision 2026-11-02): figures sit directly on the warm stage. White is for a card that holds one thing: one formula, one chart
+   among several (.panel.card), the closing line. No coloured bars, gradients or tracking. */
 
-.slide > .kicker { letter-spacing: .02em; text-transform: none; font-size: 21px; font-weight: 600; }
+.slide > .kicker { left: 130px; letter-spacing: .02em; text-transform: none; font-size: 21px; font-weight: 600; }
+.slide > h2 { margin-left: 20px; max-width: 1660px; }
 
 /* panels */
-.panel { position: absolute; background: #fff; border-radius: 16px; box-shadow: 0 1px 2px rgba(31,41,51,.05), 0 6px 24px rgba(31,41,51,.07); }
+.panel { position: absolute; background: transparent; }
+.panel.card { background: #fff; border-radius: 16px; box-shadow: 0 1px 2px rgba(31,41,51,.05), 0 4px 16px rgba(31,41,51,.06); }
 .panel > svg.sc { left: 20px; top: 20px; }
 .panel > .figwrap { position: absolute; left: 20px; top: 20px; }
 .panel > .cap { position: absolute; left: 20px; right: 20px; bottom: 16px; margin: 0; font-size: 19px; color: var(--muted); line-height: 1.35; }
@@ -17,12 +20,12 @@
 .panel > .lines p { margin: 0 0 22px; }
 .panel > .lines b { color: var(--navy); font-weight: 700; }
 
-/* closing line: a plain white panel, same shadow as the figure panels */
+/* closing line: one white card under the figures */
 .slide > .takeaway, .slide > .takeaway.blue, .slide > .takeaway.teal, .slide > .takeaway.violet, .slide > .takeaway.coral, .slide > .takeaway.navy, .slide > .takeaway.solid {
   background: #fff; border: 0; border-radius: 16px; box-shadow: 0 1px 2px rgba(31,41,51,.05), 0 6px 24px rgba(31,41,51,.07);
-  padding: 18px 30px; left: 110px; right: 110px; bottom: 80px; text-align: center; font-size: 30px; font-weight: 600; color: var(--navy); line-height: 1.4; }
+  padding: 18px 30px; left: 130px; right: 130px; bottom: 80px; text-align: center; font-size: 30px; font-weight: 600; color: var(--navy); line-height: 1.4; }
 .progress { background: #D9DEE3; height: 3px; }
-.cite { font-size: 17px; }
+.cite { left: 130px; font-size: 17px; }
 
 /* title and section slides: no blurred colour wash, no gradient text, no tracking */
 .wash { display: none; }
@@ -45,21 +48,22 @@ svg.sc .x { stroke: #D1495B; stroke-width: 4; stroke-linecap: round; }
 /* raster render with leader labels drawn on top */
 .figwrap img { display: block; }
 .figwrap svg { position: absolute; left: 0; top: 0; overflow: visible; }
-.figwrap svg text { font-family: var(--sans); font-size: 20px; font-weight: 600; fill: var(--ink); paint-order: stroke; stroke: #fff; stroke-width: 5px; stroke-linejoin: round; }
+.figwrap svg text { font-family: var(--sans); font-size: 20px; font-weight: 600; fill: var(--ink); paint-order: stroke; stroke: var(--bg); stroke-width: 5px; stroke-linejoin: round; }
 .figwrap svg line { stroke: #1F2933; stroke-width: 1.5; }
 .figwrap svg circle { fill: #1F2933; }
 
 /* formulas and math labels: KaTeX in HTML blocks positioned in panel coordinates (scene x + 20, scene y + 20).
    .fx        = a bare math/Korean label (nowrap, no background), anchored by its left edge unless transformed
-   .fx.box    = a formula strip: one or more <p> lines centred in a light rounded box; a line wider than the box is an
+   .fx.box    = a formula card: one or more <p> lines centred in a small white rounded card on the stage; a line wider than the box is an
                 html-overflow error in check_layout.py (overflow hidden keeps clientWidth = box width)
    .fx.blue   = navy text on the pale blue fill used for the deck's key equation
    .fx .k     = a Korean caption line inside a strip (24 px, regular, ink-soft) */
 .panel > .fx { position: absolute; margin: 0; white-space: nowrap; line-height: 1.25; font-size: 24px; font-weight: 600; color: var(--ink); }
 .panel > .fx.box { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; box-sizing: border-box;
-  padding: 8px 18px; border-radius: 12px; background: #F4F6F8; font-size: 26px; overflow: hidden; }
+  padding: 8px 18px; border-radius: 12px; background: #fff; box-shadow: 0 1px 2px rgba(31,41,51,.05), 0 4px 16px rgba(31,41,51,.06); font-size: 26px; overflow: hidden; }
+.panel.card > .fx.box { background: #F4F6F8; box-shadow: none; }
 .panel > .fx.box.left { align-items: flex-start; }
-.panel > .fx.blue { background: #DCE6F5; color: var(--navy); }
+.panel > .fx.blue, .panel.card > .fx.blue { background: #DCE6F5; box-shadow: none; color: var(--navy); }
 .panel > .fx p { margin: 0; }
 .panel > .fx .k { font-size: 24px; font-weight: 500; color: var(--ink-soft); }
 .panel > .fx .katex { font-size: 1.12em; }

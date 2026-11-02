@@ -135,9 +135,10 @@ MEASURE = r'''
     const cs = getComputedStyle(el); const fo = parseFloat(cs.fillOpacity); const l = LUM(cs.fill); if (l === null) return null;
     return isNaN(fo) || fo >= 1 ? l : fo * l + (1 - fo);
   };
-  const bgOf = el => {  // nearest painted background behind an HTML block inside a panel (a card, a formula strip), else the white panel
+  const panelLum = el => { const p = el.closest && el.closest('.panel'); const l = p ? LUM(getComputedStyle(p).backgroundColor) : null; return l === null ? STAGE_LUM : l; };  // a transparent panel shows the stage (stage first, 2026-11-02)
+  const bgOf = el => {  // nearest painted background behind an HTML block inside a panel (a card, a formula strip), else what the panel shows
     for (let e = el; e && !(e.classList && e.classList.contains('panel')); e = e.parentElement) { const l = LUM(getComputedStyle(e).backgroundColor); if (l !== null) return l; }
-    return 1;
+    return null;
   };
   const NEED = t => (t.fw >= 600 && t.fs >= 22) ? 3 : 4.5;  // WCAG: 3:1 for large bold text, 4.5:1 otherwise
   for (let i = 0; i < slides.length; i++) {
@@ -211,9 +212,9 @@ MEASURE = r'''
         else if (!contains(inner, t.b, 0.5)) S.findings.push({ kind: 'text-in-padding', panel: pi + 1, text: t.t, box: t.b, fs: t.fs });
         if (!contains(STAGE, t.b, 0)) S.findings.push({ kind: 'text-outside-stage', panel: pi + 1, text: t.t, box: t.b });
       });
-      texts.forEach(t => {  // contrast against what the text actually sits on: a painted HTML ancestor, else the smallest solid shape holding it, else the white panel
-        let bgL = (t.kind === 'html' && t.bgL !== 1) ? t.bgL : null;
-        if (bgL === null) { const e = em(t); const holder = shapes.filter(sh => sh.lum !== null && sh.lum !== undefined && holds(sh, e, 1.5)).sort((p, q) => p.b.w * p.b.h - q.b.w * q.b.h)[0]; bgL = holder ? holder.lum : 1; }
+      texts.forEach(t => {  // contrast against what the text actually sits on: a painted HTML ancestor, else the smallest solid shape holding it, else what the panel shows
+        let bgL = t.kind === 'html' ? t.bgL : null;
+        if (bgL === null) { const e = em(t); const holder = shapes.filter(sh => sh.lum !== null && sh.lum !== undefined && holds(sh, e, 1.5)).sort((p, q) => p.b.w * p.b.h - q.b.w * q.b.h)[0]; bgL = holder ? holder.lum : panelLum(p); }
         const cr = CONTRAST(t.fill, bgL);
         if (cr !== null && cr < NEED(t)) S.findings.push({ kind: 'low-contrast', panel: pi + 1, text: t.t, box: t.b, fs: t.fs, fw: t.fw, color: t.fill, ratio: R(cr * 100) / 100, need: NEED(t) });
       });

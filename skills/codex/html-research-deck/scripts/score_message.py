@@ -25,8 +25,8 @@ DESIGN_WATCHED = [SKILL / 'references' / 'rubric.md', SKILL / 'references' / 'ju
 BAN = re.compile(r'\b(CR[123]|ED1|RQ1|DU1)\b|§|\bTable\s*\d|\bFig\.?\s*\d|\bAppendix\b|\bObservation\s*\d')
 SECTION_PREFIX = re.compile(r'^\s*(결과|배경|방법|분석|사례|발견|정리|프로토콜|평가|게임 설정|실험 설정|요약|한 장 요약)\s*\d*\s*[:：]')
 NUM = re.compile(r'\d[\d,.]*')
-JARGON = ['SCM', 'DEF', 'HP', 'EMI', 'ICC', 'Spearman', 'Agentic', 'Prompting', 'ReAct', 'OpenCode', 'openapi', 'hardened', 'SMC', 'Pareto', 'pp',
-          '루브릭', '스캐폴딩', '베이스라인', '문턱', '궤적', '세션', '가족', '탐색 격차', '균형 표본', '반사실']
+# a deck without a glossary: names private to one setup and Korean renderings of academic terms. Academic terms themselves (SCM, ICC, Spearman, Pareto …) stay in English (2026-11-02)
+JARGON = ['DEF', 'HP', 'EMI', 'openapi', 'hardened', 'pp', '루브릭', '스캐폴딩', '베이스라인', '문턱', '궤적', '세션', '가족', '탐색 격차', '균형 표본', '반사실']
 HOOK = ['우리', '연구실', '신약', '스크리닝', '실험 데이터', '구조 데이터', '여러분', '우리 데이터']
 HONEST_NOTE = re.compile(r'모식|좌표에서|발표자\s*(해석|가설|번역|프레이밍|의견)')
 HONEST_MARK = re.compile(r'모식|좌표|발표자')
@@ -34,6 +34,12 @@ HONEST_MARK = re.compile(r'모식|좌표|발표자')
 
 def sha(p):
     return hashlib.sha256(Path(p).read_bytes()).hexdigest()
+
+
+def width(s):
+    """Length in Hangul widths: at the same size a Latin letter or digit is about 0.6 of a Hangul glyph, and TeX counts as what it renders to (2026-11-02, academic terms stay in English)."""
+    s = re.sub(r'\$([^$]*)\$', lambda m: re.sub(r'\\[A-Za-z]+', 'x', m.group(1)).replace('{', '').replace('}', '').replace('_', '').replace('^', ''), s or '')
+    return round(sum(0.6 if c.isascii() and c.isalnum() else 1 for c in s), 1)
 
 
 def toks(s):
@@ -89,7 +95,7 @@ def main():
         t = s['h2'] or s['title']; why = []
         if SECTION_PREFIX.search(t): why.append('절 이름 접두사')
         if len(NUM.findall(t)) >= 3 or t.count('×') >= 2: why.append('변수 나열')
-        if len(t) > 34: why.append(f'{len(t)}자 > 34')
+        if width(t) > 34: why.append(f'폭 {width(t)}자 > 34')
         if BAN.search(t): why.append('금지 토큰')
         D['title'][s['n']] = why or 'ok'
         ok += not why
@@ -97,7 +103,8 @@ def main():
     # M2 kickers
     ok = 0; sections = set()
     for s in content:
-        k = s['kicker']; m = re.match(r'^(.{1,14}) · (.{1,24})$', k)
+        k = s['kicker']; m = re.match(r'^(.+?) · (.+)$', k)
+        m = m if m and width(m.group(1)) <= 14 and width(m.group(2)) <= 24 and ' · ' not in m.group(2) else None
         D['kicker'][s['n']] = 'ok' if m else f'형식 아님: {k!r}'
         if m: sections.add(m.group(1).strip())
         ok += bool(m)
@@ -110,7 +117,7 @@ def main():
         c = s['closing']; why = []
         if not c: why.append('없음')
         else:
-            if not (12 <= len(c) <= 48): why.append(f'{len(c)}자')
+            if not (12 <= width(c) <= 48): why.append(f'폭 {width(c)}자')
             if len(NUM.findall(c)) > 2: why.append('숫자 > 2')
             if BAN.search(c): why.append('금지 토큰')
             j = jaccard(s['h2'], c)

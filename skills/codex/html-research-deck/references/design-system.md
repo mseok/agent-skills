@@ -6,22 +6,26 @@ Everything below was fixed on 2026-10-30 against the accepted three-slide sample
 
 | element | position | note |
 |---|---|---|
-| kicker | left 110, top 50, 21 px, weight 600, no tracking | section · subtopic |
-| h2 | left 110, top 92, 51 px navy | topic/method noun phrase; findings go to the closing line |
-| panels | top 176, bottom 898, x 110–1810 | gutters 24 px; padding 20 px inside |
-| closing line | white panel, x 110–1810, y 922–1000 | 30 px navy, weight 600, centred, one line (≤ ~70 characters) |
-| cite | left 110, bottom 30, 17 px muted | `[1] Author Year · [2] …` |
+| kicker | left 130, top 50, 21 px, weight 600, no tracking | section · subtopic |
+| h2 | left 130, top 92, 51 px navy | topic/method noun phrase; findings go to the closing line |
+| panels | top 176, bottom 898, x 110–1810 | transparent; gutters 24 px; padding 20 px inside, so what they hold starts at x 130, under the title |
+| closing line | white card, x 130–1790, y 922–1000 | 30 px navy, weight 600, centred, one line (≤ ~70 characters) |
+| cite | left 130, bottom 30, 17 px muted | `[1] Author Year · [2] …` |
 | slide number | bottom right (engine) | |
 
 Rows of panels: equal heights inside a row; widths sum to 1700 with 24 px between. Standard splits: 1700 · 838+838 · 1012+664 (scene + render) · 1236+440 (scene + small render) · two rows 388 + 310. Templates in `assets/deck/templates/` carry these coordinates; `scripts/check_deck.py` rejects any other gutter.
 
 Inside a panel the drawing is centred: pick the `viewBox` so the content has equal top/bottom margins (slide 1 of the sample uses `viewBox="20 21 1660 682"` for a 540 px tall drawing). Keep inner margins between 20 and ~80 px; if the drawing cannot fill a 722 px panel, split the slide or add the consequence panel rather than leaving a half-empty card. Measured rule (`scripts/check_layout.py`): with the lane header baseline at scene y 28 the top gap is ≈27 px, so the lowest glyph or shape must reach scene y ≈ 650–665 in a 682 px scene (bottom gap within 24 px of the top gap, never above 80 px); text inside a box sits centred (gap above the first glyph within 10 px of the gap below the last). Fill by enlarging the figure (taller bars, wider node spacing, a DAG spread across the panel's width, bigger boxes) and the type, not by adding lines. Type scale (user decision 2026-10-31): the 24 px bold claim is the base — lane headers 24, body lines and figure labels 22–24, emphasis 26–28, chart value labels 24–26; anything under 22 only for reference-style notes (muted citations, "값은 Fig. 10") or a dense 30-row chart (19 px). Two or three lines of commentary per panel at most; a detail that does not fit at that size goes to the speaker notes. No translucent band over bars or labels: a range marker sits beside the data on the axis, and values go in one column when a reference line would otherwise cross them.
 
+## Stage first (user decision 2026-11-02, replaces the white figure panels of 2026-10-30)
+
+Figures sit directly on the warm stage. White is a card that holds one thing: one formula (`.fx.box`), one chart among several (`.panel.card`), one statement, the closing line. No white rectangle takes more than about a fifth of the panel band: measured over content slides, the reference deck's largest white box is 6 % and its white area 14 %, against 29 % and 52 % with white figure panels, and that difference is what makes it look clean. Anything that used a white halo or disc to interrupt a line now uses the stage colour (`STAGE` in `scene_kit.py`). Several small charts of one kind may each take a card, as the reference does on its steering slide; a mechanism or a single hero never does.
+
 ## Typography
 
-Pretendard Variable everywhere (Korean and Latin), KaTeX for formulas. Scene classes: `.n` 26/700 names, `.s` 21 body labels (ink-soft), `.m` 19 muted, `.in` 24/700 centred in-shape label, `.lane` 21/650 lane header. In-shape names may go to 30 px (KRAS); badge digits 16 px and capsule labels 15 px are the only runs below 19 px. Panel captions 19 px muted; render labels 20 px semibold with a white halo (`paint-order: stroke`).
+Pretendard Variable everywhere (Korean and Latin), KaTeX for formulas. Scene classes: `.n` 26/700 names, `.s` 21 body labels (ink-soft), `.m` 19 muted, `.in` 24/700 centred in-shape label, `.lane` 21/650 lane header. In-shape names may go to 30 px (KRAS); badge digits 16 px and capsule labels 15 px are the only runs below 19 px. Panel captions 19 px muted; render labels 20 px semibold with a stage-coloured halo (`paint-order: stroke`).
 
-Korean slide copy is noun phrases (`research-talk/references/korean-slide-copy.md`); `check_deck.py` flags `~한다/된다/있다/이다/습니다` endings in visible text. Latin author names stay Latin (`Krönke 2014`).
+Context-dependent academic terms stay in English in Latin script, labels on the drawings included (`message-style.md` rule 4, user decision 2026-11-02). Korean slide copy is noun phrases (`research-talk/references/korean-slide-copy.md`); `check_deck.py` flags `~한다/된다/있다/이다/습니다` endings in visible text. Latin author names stay Latin (`Krönke 2014`).
 
 ## Colour (one meaning per hue, whole deck)
 
@@ -52,14 +56,14 @@ At most two hue families besides gray on a slide. Nucleotides are dark capsules 
 | cell | `cellBody` (cell 348×224 + nucleus; nucleus centre at x−34, y−4), `dna` 120 px double wave, transcription arrow `M x y L x y−26 L x+36 y−26` with `marker-end="url(#ahd)"` | |
 | step numbers | navy badge r 13 with a white 16 px digit, plus a 21 px label | |
 | arrows | `class="ar"` gray / `arb` blue, `marker-end="url(#ah|ahd|ahb|ahc|ahl)"`; one smooth curve (quadratic) when returning, never a cubic that hooks at the end | |
-| blocked | white halo circle r 19 then red × (`class="x"`) on the arrow | |
+| blocked | stage-coloured circle r 19 then red × (`class="x"`) on the arrow | |
 | absent state | same shape, `fill="none"` dashed stroke, muted label | |
 
 Rules that made the sample work: the same actor keeps shape and colour across every state and panel; label the change at each arrow (binding, recognition, Ub transfer, degradation, exchange); shapes are explanatory, not geometry; what is measured (PDB render) sits in its own panel with leader labels and a caption `method · resolution · PDB id [n]`; a mechanism slide ends in the consequence the message claims (a cell panel: factor on DNA → genes → growth/arrest; the rescue experiment as the third cell). Shapes not in the sprite are drawn inline in the deck with the same conventions; promote them to the sprite when a second deck needs them.
 
 ## Anti-patterns (each was rejected by the user)
 
-Coloured quote bars and callout boxes; blurred colour washes and gradient text; uppercase letter-spaced labels; progress bars in colour; auto-generated flow charts of boxes and gray arrows; animated canvases; dense bullet text; one closing sentence floating without a panel; mismatched gutters or a half-empty panel; figure text under 19 px; a mechanism that stops at "degradation" without showing the biological effect; the same label crossing a shape's rim.
+Coloured quote bars and callout boxes; blurred colour washes and gradient text; uppercase letter-spaced labels; progress bars in colour; auto-generated flow charts of boxes and gray arrows; animated canvases; dense bullet text; one closing sentence floating without a card; mismatched gutters or a half-empty panel; a big white box around a figure or a title; figure text under 19 px; a mechanism that stops at "degradation" without showing the biological effect; the same label crossing a shape's rim.
 
 ## Per-slide procedure
 

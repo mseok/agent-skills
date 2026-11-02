@@ -12,17 +12,18 @@ keep its sizes and positions, and change the content. Scene coordinates are loca
 same coordinates and add the padding themselves.
 
     cover()            title slide: the title sits on the warm stage, never in a white box; optional figure panel on the right
-    slide(), panel(), notes(), lane()      a content slide; layout presets FULL, L2/R2, LW/RN, P3A/P3B/P3C pass check_deck.py's grid
+    slide(), panel(), notes(), lane()      a content slide; layout presets FULL, L2/R2, LW/RN, P3A/P3B/P3C pass check_deck.py's grid. Stage first: a panel is transparent and the
+                       figure sits on the warm stage; panel(..., cls='panel card') is a white card for one thing among several, such as one small chart of six
     hero_bridge()      the big picture of a transport between two distributions: density field, sample paths, a filled profile at each end
     field(), strands(), vprof()            its parts, for a smaller or partial version; Field is the density of x_t between the ends
     dens()             a 2-D distribution: density raster plus real samples (density.cloud); no outline around it
     chain()            a left-to-right row of actors joined by arrows, sized to fill the given width
     enc(), dec(), model_box(), grid(), photo(), picture()   one actor, one drawing on every slide
     bars(), legend(), big()                charts from numbers, with bold value labels and the key number large
-    T(), lines(), tex(), fx()              text, several lines, a label with KaTeX, a KaTeX strip (cls 'box' grey, 'box blue' the deck's key equation)
+    T(), lines(), tex(), fx()              text, several lines, a label with KaTeX, a KaTeX card (cls 'box' white, 'box blue' the deck's key equation)
     node(), edge()     a causal graph: circles and arrows trimmed to their rims
     plot_axes(), dots(), fit_line(), swarm(), box_stat()   small plots: scatter with a fit, dots on a number line, box plots
-    arrow(), qarrow(), curve(), arr(), line(), rect(), circle(), strand(), badge(), check_mark(), lock(), cross()
+    arrow(), qarrow(), curve(), arr(), line(), rect(), card(), circle(), strand(), badge(), check_mark(), lock(), cross()
 No reported number ever comes from these drawings; the cite line says what is schematic.
 """
 import hashlib
@@ -41,6 +42,7 @@ NAVY, INK, SOFT, MUTED = '#1D3A5F', '#1F2933', '#52606D', '#66727F'
 BLUE, BLUED, PALE = '#4C72B0', '#2F4C7D', '#DCE6F5'
 AMBER, AMBERD, STEEL, STEELD = '#D9A552', '#B7793A', '#7FA7C9', '#4F7CA3'
 RED, CORAL, GRAY, GRAYL, GHOST = '#D1495B', '#E76F51', '#8E9AA6', '#CDD3D9', '#AEB7C0'
+STAGE = '#FAF8F3'  # figures sit on the stage, so anything that cuts a line under it (a blocked arrow's ×) is stage-coloured, never white
 BAR_OTHER = '#C5CDD5'
 
 FULL = (110, 176, 1700, 722)
@@ -116,7 +118,7 @@ def big(x, y, s, size=36, fill=BLUE, a='middle'):
 
 
 def fx(x, y, w, h, rows, size=26, cls='box'):
-    """A formula strip (HTML + KaTeX). A row without $ is a Korean caption line. cls: 'box' grey, 'box blue' the deck's key equation."""
+    """A formula card (HTML + KaTeX). A row without $ is a caption line. cls: 'box' white card, 'box blue' the deck's key equation."""
     ps = ''.join(f'<p>{r}</p>' if '$' in r else f'<p class="k">{r}</p>' for r in rows)
     return f'<div class="fx {cls}" style="left:{x + 20:g}px;top:{y + 20:g}px;width:{w:g}px;height:{h:g}px;font-size:{size}px">{ps}</div>'
 
@@ -193,17 +195,17 @@ def _trap(cx, cy, w, hl, hr, lab, size, ghost):
     return shape + (inlabel(cx, cy, lab, size, 700, MUTED if ghost else None) if lab else '')
 
 
-def enc(cx, cy, w=130, h=100, narrow=0.5, lab='인코더', size=24, ghost=False):
+def enc(cx, cy, w=130, h=100, narrow=0.5, lab='encoder', size=24, ghost=False):
     """Encoder: wide on the left, narrow on the right."""
     return _trap(cx, cy, w, h, h * narrow, lab, size, ghost)
 
 
-def dec(cx, cy, w=130, h=100, narrow=0.5, lab='디코더', size=24, ghost=False):
+def dec(cx, cy, w=130, h=100, narrow=0.5, lab='decoder', size=24, ghost=False):
     """Decoder: narrow on the left, wide on the right."""
     return _trap(cx, cy, w, h * narrow, h, lab, size, ghost)
 
 
-def model_box(cx, cy, w=240, h=84, lab='모델', size=26):
+def model_box(cx, cy, w=240, h=84, lab='model', size=26):
     """The deck's main model: the one solid blue actor, the same box on every slide."""
     return rect(cx - w / 2, cy - h / 2, w, h, 14, BLUE, BLUED, 2.4) + (inlabel(cx, cy, lab, size, 700, '#fff') if lab else '')
 
@@ -231,6 +233,11 @@ def picture(x, y, s):
     return out + circle(x + w * .76, y + h * .3, max(4, s / 12), '#E9B96A')
 
 
+def card(x, y, w, h, rx=14):
+    """A white card on the stage for one statement or one drawing; the same shadow as the formula cards. Never around a whole figure."""
+    return f'<rect x="{x:g}" y="{y:g}" width="{w:g}" height="{h:g}" rx="{rx:g}" fill="#fff" style="filter:drop-shadow(0 1px 1px rgba(31,41,51,.05)) drop-shadow(0 3px 8px rgba(31,41,51,.07))"/>'
+
+
 def lock(cx, cy, s=1.0, color=SOFT):
     r = 7.5 * s
     return (f'<path d="M{cx - r:.1f} {cy:.1f} v{-6 * s:.1f} a{r:.1f} {r:.1f} 0 0 1 {2 * r:.1f} 0 v{6 * s:.1f}" fill="none" stroke="{color}" stroke-width="{3 * s:.1f}"/>'
@@ -238,7 +245,7 @@ def lock(cx, cy, s=1.0, color=SOFT):
 
 
 def cross(cx, cy, r=11):
-    return (circle(cx, cy, r + 7, '#fff') + f'<line class="x" x1="{cx - r}" y1="{cy - r}" x2="{cx + r}" y2="{cy + r}"/>'
+    return (circle(cx, cy, r + 7, STAGE) + f'<line class="x" x1="{cx - r}" y1="{cy - r}" x2="{cx + r}" y2="{cy + r}"/>'
             + f'<line class="x" x1="{cx - r}" y1="{cy + r}" x2="{cx + r}" y2="{cy - r}"/>')
 
 
@@ -434,11 +441,11 @@ def chain(y, parts, x0=0, x1=798, kind='ar', name='chain'):
         elif k == 'picture':
             out += picture(x, y - w / 2, w)
         elif k == 'enc':
-            out += enc(cx, y, w, p[2], lab=p[3] if len(p) > 3 else '인코더')
+            out += enc(cx, y, w, p[2], lab=p[3] if len(p) > 3 else 'encoder')
         elif k == 'dec':
-            out += dec(cx, y, w, p[2], lab=p[3] if len(p) > 3 else '디코더')
+            out += dec(cx, y, w, p[2], lab=p[3] if len(p) > 3 else 'decoder')
         elif k == 'model':
-            out += model_box(cx, y, w, p[2], p[3] if len(p) > 3 else '모델')
+            out += model_box(cx, y, w, p[2], p[3] if len(p) > 3 else 'model')
         elif k == 'grid':
             out += grid(cx, y, w)
         elif k == 'prior':
