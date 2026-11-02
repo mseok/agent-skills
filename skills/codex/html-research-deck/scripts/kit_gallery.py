@@ -436,7 +436,7 @@ def _toy_paper():
 
 
 def g17_paper_figure():
-    """The paper's own figure on the problem slide: two crops joined by the model on the left, the distributions on the right. When the paper draws the thing, crop it; do not redraw it as circles and lines."""
+    """The paper's line drawings of its objects on the problem slide: two crops joined by the model on the left, and on the right the distributions, drawn here in code. Crop only the objects themselves, four slides at most; distributions, paths, charts and mechanisms are always drawn."""
     pdf = _toy_paper()
     l = lane(0, 24, '출발 쌍') + paper_crop('g17a', pdf, 1, (0.08, 0.06, 0.92, 0.31), 49, 40, 700)
     l += arrow(399, 272, 399, 306, 'ar') + model_box(399, 334, 200, 56, '모델') + arrow(399, 362, 399, 398, 'ar')
@@ -451,7 +451,7 @@ def g17_paper_figure():
         r += line(vx, base[2], vx, base[2] + 9, SOFT, 2) + T(vx, base[2] + 40, lab, 24, 600, SOFT, 'middle')
     r += arr(776, base[0] - 90, 776, base[2], BLUE, 4, size=18) + T(776, base[0] - 104, 't', 26, 700, BLUE, 'middle')
     return slide('예시', '예시 · 논문 그림 잘라 쓰기', '짝을 이룬 출발과 도착을 잇는 생성 모델', [panel(*L2, l), panel(*R2, r)],
-                 '출발 분포를 <b>도착 분포로 옮기는</b> 문제', CITE + ' · 왼쪽은 논문 그림을 자르는 경로를 보이려고 만든 가짜 쪽', notes('논문이 그 대상을 그려 놓았으면 그 그림을 paper_crop으로 잘라 씁니다. 흰 박스 없이 무대 위에 놓입니다.'))
+                 '출발 분포를 <b>도착 분포로 옮기는</b> 문제', CITE + ' · 왼쪽은 논문 그림을 자르는 경로를 보이려고 만든 가짜 쪽', notes('논문이 연구 대상 자체를 선으로 그려 놓았으면 그 부분만 paper_crop으로 잘라 씁니다. 캡션과 옆 그림은 빼고, 분포는 옆 패널처럼 코드로 그립니다.'))
 
 
 if __name__ == '__main__':

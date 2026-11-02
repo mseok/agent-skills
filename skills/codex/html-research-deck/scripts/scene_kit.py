@@ -24,7 +24,7 @@ same coordinates and add the padding themselves.
     derive()           a derivation as a table: one row per step, its formula on one line and a phrase of what it gives
     node(), edge()     a causal graph only: variables and directed arrows trimmed to their rims
     ggraph(), ring_pts(), RING_TAIL, pair_line()     a graph as a structure: pale discs, thin lines, red outline on the change (gallery 16)
-    paper_crop()       a figure of the paper itself, cut from the PDF page with no white box (gallery 17); use it when the paper draws the thing
+    paper_crop()       a line drawing of the objects the paper studies, cut from the PDF page with no white box (gallery 17); four slides at most, never a distribution, chart or mechanism
     gap_arrow()        the thin arrow from one whole figure to the next, in the gap between them
     plot_axes(), dots(), fit_line(), swarm(), box_stat()   small plots: scatter with a fit, dots on a number line, box plots
     arrow(), qarrow(), curve(), arr(), line(), rect(), card(), circle(), strand(), badge(), check_mark(), lock(), cross()
@@ -235,9 +235,10 @@ def photo(x, y, s, name):
 
 
 def paper_crop(name, pdf, page, box, x, y, w, h=None, dpi=300):
-    """A figure of the paper itself, cut out of the rendered PDF page: vector drawings come out too (pdfimages finds only bitmaps), and no white box sits on the stage, because its white is multiplied by the
-    stage colour (a CSS blend mode does not survive the PDF export). box = (left, top, right, bottom) as fractions of the page, read off paper/pages/*.png; keep the caption out and white margins are trimmed.
-    h follows the crop's shape when omitted. x, y, w, h are scene coordinates like every other shape; numbers in the crop must still be readable at the size you place it."""
+    """A line drawing of the objects the paper studies, cut out of the rendered PDF page: vector drawings come out too (pdfimages finds only bitmaps), and no white box sits on the stage, because its white is
+    multiplied by the stage colour (a CSS blend mode does not survive the PDF export). At most four slides of a deck, each with a drawing of its own beside the crop. Never a distribution, path, curve, chart, table,
+    mechanism or model diagram: those are drawn with this kit even when the paper has them. box = (left, top, right, bottom) as fractions of the page, read off paper/pages/*.png; leave out the caption, the a./b.
+    letters and neighbouring figures, then open the PNG to check; white margins are trimmed. Width at least 300 px; never the same region twice. h follows the crop's shape when omitted. x, y, w, h are scene coordinates."""
     def make(path):
         from style_gap import read_png
         info = subprocess.run(['pdfinfo', '-f', str(page), '-l', str(page), str(pdf)], capture_output=True, text=True, check=True).stdout
@@ -259,10 +260,11 @@ def paper_crop(name, pdf, page, box, x, y, w, h=None, dpi=300):
                 row += bytes((line_[o] * st[0] // 255, line_[o + 1] * st[1] // 255, line_[o + 2] * st[2] // 255, 255))
             out.append(bytes(row))
         write_png(path, x1 - x0, y1 - y0, out)
-    href = _once(name, ('crop', str(pdf), page, tuple(box), dpi), make)
+    href = _once(f'crop-{name}', ('crop', str(pdf), page, tuple(box), dpi), make)
     iw, ih = struct.unpack('>II', (_S.deck / href).read_bytes()[16:24])
     h = w * ih / iw if h is None else h
-    return f'<image href="{href}" x="{x:g}" y="{y:g}" width="{w:g}" height="{h:g}"/>'
+    src = f'{page}:{box[0]:g},{box[1]:g},{box[2]:g},{box[3]:g}'
+    return f'<image href="{href}" data-crop="{src}" x="{x:g}" y="{y:g}" width="{w:g}" height="{h:g}"/>'
 
 
 def picture(x, y, s):

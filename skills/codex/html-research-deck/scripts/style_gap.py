@@ -13,7 +13,7 @@ anchor 0.9 or above emptyrect 11.7 there, a result slide never below mass 3.8 or
 build before this script had 11.8, 3.2, 11.0. A kit-built deck can also overshoot, with big filled boxes in place of drawings (medians 33-38 on CausalGame), hence the upper limit on mass.
 The Opus 5 and Sonnet 5.5 decks of the DDSBM paper were accepted as they are (user 2026-11-03: '지금 이대로가 좋은거같고') and widened the lower and upper limits: Opus 5's slide 2, a thin graph over a table, has mass 7.5 and emptyrect 13.3, and a stricter limit would tell a builder to inflate exactly what the user liked.
 This measures resemblance, not quality: it has no view on the argument.
-Also flagged: a graph drawn heavier than the accepted decks (user 2026-11-03: lines over 4.6 px or unlabelled discs over 48 px wide; the GPT decks that drew 68-82 px discs and 8 px sticks had passed mass and anchor), a formula row that starts with an operator, which is one relation split over two rows (user 2026-11-02), and a formula card taller than 170 px that holds one row (the judges' empty blue card, 2026-11-02).
+Also flagged: a graph drawn heavier than the accepted decks (user 2026-11-03: lines over 4.6 px or unlabelled discs over 48 px wide; the GPT decks that drew 68-82 px discs and 8 px sticks had passed mass and anchor), paper_crop overuse (more than four slides, narrower than 296 px, the same region twice, or a slide that is only a crop; the first GPT builds with the tool cropped 8 and 11 slides), a formula row that starts with an operator, which is one relation split over two rows (user 2026-11-02), and a formula card taller than 170 px that holds one row (the judges' empty blue card, 2026-11-02).
 The whitebox limit: the Yuanqi Du deck's median is 6, v10 with white figure panels 29, six chart cards on one slide 16 each. Also checked: the cover is the title-slide template with the title on the stage; titles and closing lines against the approved storyline.
 Prints one FIX line per finding and exits 0; the builder fixes them and runs it again.
 """
@@ -193,8 +193,30 @@ def main():
             changed.append(f'{i}장 제목')
         if i > 1 and m_c and plain(m_c.group(1)) != plain(s.get('closing', '')):
             changed.append(f'{i}장 마무리줄')
+    crop_slides, crop_boxes = [], []
     for i, sec in enumerate(secs, 1):
         body = re.sub(r'<aside class="notes">.*?</aside>', '', sec, flags=re.S)
+        crop_tags = re.findall(r'<image\b[^>]*\bdata-crop="[^"]*"[^>]*>', body)
+        if crop_tags:
+            crop_slides.append(i)
+            area = 0.0
+            for t in crop_tags:
+                src = re.search(r'data-crop="(\d+):([\d.,]+)"', t)
+                w_, h_ = float(re.search(r'\bwidth="([\d.]+)"', t).group(1)), float(re.search(r'\bheight="([\d.]+)"', t).group(1))
+                area += w_ * h_
+                if w_ < 296:
+                    fixes.append(f'FIX slide {i}: 자른 그림의 폭이 {w_:g} px다. 300 px 이상으로 놓거나 빼고 직접 그린다')
+                box = [float(v) for v in src.group(2).split(',')]
+                for j, page, other in crop_boxes:
+                    if page == src.group(1):
+                        ow = max(0.0, min(box[2], other[2]) - max(box[0], other[0])); oh = max(0.0, min(box[3], other[3]) - max(box[1], other[1]))
+                        if ow * oh > 0.3 * min((box[2] - box[0]) * (box[3] - box[1]), (other[2] - other[0]) * (other[3] - other[1])):
+                            fixes.append(f'FIX slide {i}: 자른 그림이 {j}장과 같은 부분이다. 같은 부분을 두 번 쓰지 않는다')
+                            break
+                crop_boxes.append((i, src.group(1), box))
+            drawn = len(re.findall(r'<(?:circle|line|path|rect|polygon)\b', body))
+            if area / (1700 * 722) > 0.45 and drawn < 6:
+                fixes.append(f'FIX slide {i}: 자른 그림이 패널의 {100 * area / (1700 * 722):.0f}%이고 직접 그린 도형이 {drawn}개다. 분포, 차트, 표를 직접 그려 함께 둔다')
         gedges, gwide, gr = graph_weight(body)
         if gedges >= 3 and (gwide > 4.6 or gr > 24):
             fixes.append(f'FIX slide {i}: graph가 무겁다(선 {gwide:g} px, 글자 없는 원 지름 {2 * gr:g} px; 받아들여진 덱은 3.4 px, 44 px). 논문 그림이 있으면 paper_crop(), 없으면 ggraph()로 다시 그린다(갤러리 16·17장)')
@@ -204,6 +226,8 @@ def main():
         for m in re.finditer(r'<div class="fx box[^"]*"[^>]*height:([\d.]+)px[^>]*>(.*?)</div>', body, flags=re.S):
             if float(m.group(1)) > 170 and len(re.findall(r'<p[ >]', m.group(2))) == 1:
                 fixes.append(f'FIX slide {i}: 식 한 줄에 높이 {float(m.group(1)):g} px 카드는 휑하다. 카드 높이를 내용에 맞춘다(한 줄이면 130 px 안팎)')
+    if len(crop_slides) > 4:
+        fixes.append(f'FIX deck: paper_crop을 {len(crop_slides)}장에 썼다({crop_slides}). 4장까지다: 연구 대상의 선 그림만 남기고 분포, 경로, 기전, 차트는 kit으로 그린다')
     rows = []
     for p in sorted(glob.glob(str(root / 'deck' / 'qa' / 'shots-full' / 'slide-*.png'))):
         n = int(re.search(r'slide-(\d+)', p).group(1))
