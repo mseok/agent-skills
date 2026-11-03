@@ -234,11 +234,36 @@ def photo(x, y, s, name):
     return f'<image href="assets/figs/{name}.png" x="{x:g}" y="{y:g}" width="{s:g}" height="{s:g}"/>'
 
 
+def _crop_source_px(pdf, page, box, page_w, page_h):
+    """How many pixels of the PDF's own bitmap the crop spans across; None for a vector drawing, which stays sharp at any size. A higher dpi cannot add what the bitmap does not hold."""
+    with tempfile.TemporaryDirectory() as td:
+        svg = Path(td) / 'p.svg'
+        r = subprocess.run(['pdftocairo', '-svg', '-f', str(page), '-l', str(page), str(pdf), str(svg)], capture_output=True)
+        if r.returncode or not svg.exists():
+            return None
+        s = re.sub(r'base64,[^"]*', '', svg.read_text(encoding='utf-8', errors='ignore'))
+    sizes = {m.group(1): (float(m.group(2)), float(m.group(3))) for m in re.finditer(r'<image\b[^>]*?\bid="([^"]+)"[^>]*?\bwidth="([\d.]+)"[^>]*?\bheight="([\d.]+)"', s)}
+    cx0, cy0, cx1, cy1 = box[0] * page_w, box[1] * page_h, box[2] * page_w, box[3] * page_h
+    best = None
+    for m in re.finditer(r'<use\b[^>]*?href="#([^"]+)"[^>]*?\btransform="matrix\(([^)]*)\)"', s):
+        if m.group(1) not in sizes:
+            continue
+        a, _, _, d, e, f = [float(v) for v in re.split(r'[ ,]+', m.group(2).strip())]
+        iw, ih = sizes[m.group(1)]
+        x0, x1 = sorted((e, e + a * iw))
+        y0, y1 = sorted((f, f + d * ih))
+        ow, oh = min(cx1, x1) - max(cx0, x0), min(cy1, y1) - max(cy0, y0)
+        if a and ow > 0 and oh > 0 and ow * oh > 0.2 * (cx1 - cx0) * (cy1 - cy0):
+            px = (cx1 - cx0) / abs(a)
+            best = px if best is None else min(best, px)
+    return best
+
+
 def paper_crop(name, pdf, page, box, x, y, w, h=None, dpi=None):
     """A line drawing of the objects the paper studies, cut out of the rendered PDF page: vector drawings come out too (pdfimages finds only bitmaps), and no white box sits on the stage, because its white is
     multiplied by the stage colour (a CSS blend mode does not survive the PDF export). At most four slides of a deck, each with a drawing of its own beside the crop. Never a distribution, path, curve, chart, table,
     mechanism or model diagram: those are drawn with this kit even when the paper has them. box = (left, top, right, bottom) as fractions of the page, read off paper/pages/*.png; leave out the caption, the a./b.
-    letters and neighbouring figures, then open the PNG to check; white margins are trimmed. Width at least 480 px, 300 px on the cover; never the same region twice. dpi defaults to twice the shown size, so the crop stays sharp. h follows the crop's shape when omitted. x, y, w, h are scene coordinates."""
+    letters and neighbouring figures, then open the PNG to check; white margins are trimmed. Width at least 480 px, 300 px on the cover; never the same region twice. dpi defaults to twice the shown size. A figure stored in the PDF as a bitmap holds only so many pixels: when the crop has fewer than its shown width it is blurred whatever the dpi, so this prints a warning, and style_gap.py flags it; pick a sharper figure (pdfimages -list shows each page's x-ppi) or draw the thing with ggraph(). h follows the crop's shape when omitted. x, y, w, h are scene coordinates."""
     info = subprocess.run(['pdfinfo', '-f', str(page), '-l', str(page), str(pdf)], capture_output=True, text=True, check=True).stdout
     m = re.search(rf'Page\s+{page} size:\s+([\d.]+) x ([\d.]+)', info)
     if dpi is None:
@@ -268,7 +293,14 @@ def paper_crop(name, pdf, page, box, x, y, w, h=None, dpi=None):
     iw, ih = struct.unpack('>II', (_S.deck / href).read_bytes()[16:24])
     h = w * ih / iw if h is None else h
     src = f'{page}:{box[0]:g},{box[1]:g},{box[2]:g},{box[3]:g}'
-    return f'<image href="{href}" data-crop="{src}" x="{x:g}" y="{y:g}" width="{w:g}" height="{h:g}"/>'
+    source_px = _crop_source_px(pdf, page, box, float(m.group(1)), float(m.group(2)))
+    native = ''
+    if source_px is not None:
+        kept = iw / ((box[2] - box[0]) * float(m.group(1)) * dpi / 72)  # the part left after the white margins are trimmed
+        native = f' data-native="{source_px * min(1.0, kept):.0f}"'
+        if source_px * min(1.0, kept) < w:
+            print(f'paper_crop {name}: page {page} is a bitmap; this crop holds {source_px * min(1.0, kept):.0f} source px and is shown at {w:g} px, so it will look blurred', file=sys.stderr)
+    return f'<image href="{href}" data-crop="{src}"{native} x="{x:g}" y="{y:g}" width="{w:g}" height="{h:g}"/>'
 
 
 def picture(x, y, s):

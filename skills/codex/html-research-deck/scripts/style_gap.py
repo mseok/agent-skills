@@ -13,7 +13,7 @@ anchor 0.9 or above emptyrect 11.7 there, a result slide never below mass 3.8 or
 build before this script had 11.8, 3.2, 11.0. A kit-built deck can also overshoot, with big filled boxes in place of drawings (medians 33-38 on CausalGame), hence the upper limit on mass.
 The Opus 5 and Sonnet 5.5 decks of the DDSBM paper were accepted as they are (user 2026-11-03: '지금 이대로가 좋은거같고') and widened the lower and upper limits: Opus 5's slide 2, a thin graph over a table, has mass 7.5 and emptyrect 13.3, and a stricter limit would tell a builder to inflate exactly what the user liked.
 This measures resemblance, not quality: it has no view on the argument.
-Also flagged: a graph drawn heavier than the accepted decks (user 2026-11-03: lines over 4.6 px or unlabelled discs over 48 px wide; the GPT decks that drew 68-82 px discs and 8 px sticks had passed mass and anchor), paper_crop overuse (more than four slides, narrower than 480 px or 296 px on the cover, the same region twice, or a slide that is only a crop; the first GPT builds with the tool cropped 8 and 11 slides), a formula row that starts with an operator, which is one relation split over two rows (user 2026-11-02), and a formula card taller than 170 px that holds one row (the judges' empty blue card, 2026-11-02).
+Also flagged: a crop stretched past its source pixels (data-native, user 2026-11-03: "astra 17페이지의 분자 그림은 매우 해상도가 낮네"), one graph twice on a slide, a slide whose panels are all two far-apart bars, a bar flattened to the axis, a closing slide with a large empty lump, a graph drawn heavier than the accepted decks (user 2026-11-03: lines over 4.6 px or unlabelled discs over 48 px wide; the GPT decks that drew 68-82 px discs and 8 px sticks had passed mass and anchor), paper_crop overuse (more than four slides, narrower than 480 px or 296 px on the cover, the same region twice, or a slide that is only a crop; the first GPT builds with the tool cropped 8 and 11 slides), a formula row that starts with an operator, which is one relation split over two rows (user 2026-11-02), and a formula card taller than 170 px that holds one row (the judges' empty blue card, 2026-11-02).
 The whitebox limit: the Yuanqi Du deck's median is 6, v10 with white figure panels 29, six chart cards on one slide 16 each. Also checked: the cover is the title-slide template with the title on the stage; titles and closing lines against the approved storyline.
 Prints one FIX line per finding and exits 0; the builder fixes them and runs it again.
 """
@@ -38,6 +38,7 @@ WHY = {'mass': '그림이 부족하다: 분포, 막대, 곡선, 논문 그림을
        'emptyrect': '패널에 큰 빈 곳이 있다: 표나 차트를 더하거나 그림을 옮긴다. 원과 선은 키우지 않는다',
        'whitebox': '큰 흰 박스가 있다: 그림은 흰 패널 없이 무대 위에 바로 놓고, 흰색은 수식이나 작은 차트 하나만 담는 카드에만 쓴다'}
 NOT_SCORED = {'title', 'conclusion'}
+CLOSING_EMPTY = 25.0  # the closing slide's largest empty rectangle: accepted decks 7.1-17.0, GPT decks that held only questions 48-70
 SPLIT_ROW = re.compile(r'^\s*\$\s*(?:\\[;,:!]|\\quad|\\qquad|\s)*(?:\+|-|−|=|\\ge\b|\\le\b|\\geq\b|\\leq\b|\\propto\b|\\approx\b)')
 
 
@@ -137,6 +138,57 @@ def features(path, step=3):
     return {'mass': round(sum(map(sum, g)) / n * 100, 1), 'anchor': round(anchor / n * 100, 1), 'emptyrect': round(empty / (cw * ch) * 100, 1), 'whitebox': round(whitebox / n * 100, 1)}
 
 
+def attr(tag, name):
+    m = re.search(rf'\b{name}="([^"]*)"', tag)
+    return m.group(1) if m else None
+
+
+def twin_graphs(body):
+    """Cells of one panel that draw the same graph: same discs, edges and labels at the same relative places. Returns how many extra copies there are."""
+    extra = 0
+    for svg in re.findall(r'<svg\b.*?</svg>', body, flags=re.S):
+        discs = sorted((float(attr(t, 'cx')), float(attr(t, 'cy')), float(attr(t, 'r')), attr(t, 'fill'), attr(t, 'stroke')) for t in re.findall(r'<circle\b[^>]*>', svg) if attr(t, 'r') and attr(t, 'cx') and float(attr(t, 'r')) >= 8)
+        cells, cur = [], []
+        for d in discs:
+            if cur and d[0] - cur[-1][0] > 90:
+                cells.append(cur)
+                cur = []
+            cur.append(d)
+        if cur:
+            cells.append(cur)
+        lines = [tuple(attr(t, a) for a in ('x1', 'y1', 'x2', 'y2')) + (attr(t, 'stroke'),) for t in re.findall(r'<line\b[^>]*>', svg)]
+        lines = [(float(a), float(b), float(c), float(d_), s) for a, b, c, d_, s in lines if None not in (a, b, c, d_)]
+        texts = [(float(m.group(1)), float(m.group(2)), re.sub(r'<[^>]+>', '', m.group(3))) for m in re.finditer(r'<text\b[^>]*?\bx="(-?[\d.]+)"[^>]*?\by="(-?[\d.]+)"[^>]*>(.*?)</text>', svg, flags=re.S)]
+        seen = {}
+        for c in cells:
+            if len(c) < 6:  # a small icon may repeat (the accepted Sonnet 5.5 deck has a 4-node one twice); a figure of its own may not
+                continue
+            x0, x1, y0, y1 = min(d[0] for d in c), max(d[0] for d in c), min(d[1] for d in c), max(d[1] for d in c)
+            nodes = tuple((round(d[0] - x0), round(d[1] - y0), d[3], d[4]) for d in c)
+            edges = tuple(sorted((round(a - x0), round(b - y0), round(p - x0), round(q - y0), s) for a, b, p, q, s in lines if x0 - 5 <= min(a, p) and max(a, p) <= x1 + 5 and y0 - 5 <= min(b, q) and max(b, q) <= y1 + 5))
+            words = tuple(sorted((round(a - x0), round(b - y0), t) for a, b, t in texts if x0 - 30 <= a <= x1 + 30 and y0 - 30 <= b <= y1 + 30))
+            seen[(nodes, edges, words)] = seen.get((nodes, edges, words), 0) + 1
+        extra += sum(k - 1 for k in seen.values())
+    return extra
+
+
+def bar_panels(body):
+    """Bars of each panel, read off the SVG: (panel width, sorted [(x, width, height)]). A bar is a filled rectangle with no outline, 24 to 200 px wide, in a set of equal widths."""
+    out = []
+    for m in re.finditer(r'<div class="panel[^"]*"[^>]*?width:(\d+)px[^>]*>\s*<svg\b(.*?)</svg>', body, flags=re.S):
+        rects = []
+        for t in re.findall(r'<rect\b[^>]*>', m.group(2)):
+            w, h = attr(t, 'width'), attr(t, 'height')
+            if w and h and 24 <= float(w) <= 200 and attr(t, 'stroke') in (None, 'none') and attr(t, 'fill') not in ('#fff', '#FFFFFF', 'none', None):
+                rects.append((float(attr(t, 'x')), float(w), float(h)))
+        widths = {}
+        for r in rects:
+            widths.setdefault(r[1], []).append(r)
+        bars = sorted(max(widths.values(), key=len)) if widths else []
+        out.append((int(m.group(1)), bars if len(bars) >= 2 else []))
+    return out
+
+
 def graph_weight(body):
     """Node-link figures on a slide, panel by panel: (edges, widest edge in px, median radius of discs with no letter in them). An edge is a line with both ends at a disc of r ≥ 8."""
     def num(tag, name):
@@ -217,6 +269,20 @@ def main():
             drawn = len(re.findall(r'<(?:circle|line|path|rect|polygon)\b', body))
             if area / (1700 * 722) > 0.45 and drawn < 6:
                 fixes.append(f'FIX slide {i}: 자른 그림이 패널의 {100 * area / (1700 * 722):.0f}%이고 직접 그린 도형이 {drawn}개다. 분포, 차트, 표를 직접 그려 함께 둔다')
+        for t in crop_tags:
+            w_, native = float(attr(t, 'width')), attr(t, 'data-native')
+            if native and float(native) < w_:
+                fixes.append(f'FIX slide {i}: 자른 그림의 원본이 {float(native):.0f} px인데 {w_:g} px로 늘려 흐리다. PDF 안의 비트맵이라 dpi를 올려도 선명해지지 않는다. pdfimages -list로 더 선명한 그림을 찾거나 ggraph()로 그린다')
+        twins = twin_graphs(body)
+        if twins:
+            fixes.append(f'FIX slide {i}: 한 장의 칸들에 같은 graph가 {twins + 1}번 있다. 칸마다 달라지는 것을 표시하거나 칸을 줄인다')
+        panels_b = bar_panels(body)
+        with_bars = [p for p in panels_b if p[1]]
+        if with_bars and len(with_bars) == len(panels_b) and all(len(b) == 2 and b[1][0] - (b[0][0] + b[0][1]) > 200 for _, b in with_bars):
+            fixes.append(f'FIX slide {i}: 넓은 패널에 막대 두 개뿐이라 가운데가 비었다. 갤러리 18장처럼 좁은 패널 P3A, P3B에 두고 P3C에 그 차이가 어디서 왔는지 그린다')
+        for _, b in with_bars:
+            if len(b) == 2 and max(r[2] for r in b) > 100 and min(r[2] for r in b) < 0.05 * max(r[2] for r in b):
+                fixes.append(f'FIX slide {i}: 막대 하나가 바닥에 붙어 막대 한 개처럼 보인다. 두 값을 big()으로 크게 적거나 다른 그림으로 바꾼다')
         gedges, gwide, gr = graph_weight(body)
         if gedges >= 3 and (gwide > 4.6 or gr > 24):
             fixes.append(f'FIX slide {i}: graph가 무겁다(선 {gwide:g} px, 글자 없는 원 지름 {2 * gr:g} px; 받아들여진 덱은 3.4 px, 44 px). 논문 그림이 있으면 paper_crop(), 없으면 ggraph()로 다시 그린다(갤러리 16·17장)')
@@ -228,6 +294,11 @@ def main():
                 fixes.append(f'FIX slide {i}: 식 한 줄에 높이 {float(m.group(1)):g} px 카드는 휑하다. 카드 높이를 내용에 맞춘다(한 줄이면 130 px 안팎)')
     if len(crop_slides) > 4:
         fixes.append(f'FIX deck: paper_crop을 {len(crop_slides)}장에 썼다({crop_slides}). 4장까지다: 연구 대상의 선 그림만 남기고 분포, 경로, 기전, 차트는 kit으로 그린다')
+    last = root / 'deck' / 'qa' / 'shots-full' / f'slide-{len(secs):02d}.png'
+    if last.exists():
+        fl = features(str(last))
+        if fl['emptyrect'] > CLOSING_EMPTY:
+            fixes.append(f"FIX slide {len(secs)}: 마지막 장의 {fl['emptyrect']:.0f}%가 한 덩어리로 비었다(받아들여진 덱은 7–17%). 갤러리 8장을 복사한다: 왼쪽에 논문이 보여 준 것, 오른쪽 패널에만 질문")
     rows = []
     for p in sorted(glob.glob(str(root / 'deck' / 'qa' / 'shots-full' / 'slide-*.png'))):
         n = int(re.search(r'slide-(\d+)', p).group(1))
