@@ -13,7 +13,7 @@ anchor 0.9 or above emptyrect 11.7 there, a result slide never below mass 3.8 or
 build before this script had 11.8, 3.2, 11.0. A kit-built deck can also overshoot, with big filled boxes in place of drawings (medians 33-38 on CausalGame), hence the upper limit on mass.
 The Opus 5 and Sonnet 5.5 decks of the DDSBM paper were accepted as they are (user 2026-11-03: '지금 이대로가 좋은거같고') and widened the lower and upper limits: Opus 5's slide 2, a thin graph over a table, has mass 7.5 and emptyrect 13.3, and a stricter limit would tell a builder to inflate exactly what the user liked.
 This measures resemblance, not quality: it has no view on the argument.
-Also flagged: a crop stretched past its source pixels (data-native, user 2026-11-03: "astra 17페이지의 분자 그림은 매우 해상도가 낮네"), one graph twice on a slide, a slide whose panels are all two far-apart bars, a bar flattened to the axis, a closing slide with a large empty lump, a graph drawn heavier than the accepted decks (user 2026-11-03: lines over 4.6 px or unlabelled discs over 48 px wide; the GPT decks that drew 68-82 px discs and 8 px sticks had passed mass and anchor), paper_crop overuse (more than four slides, narrower than 480 px or 296 px on the cover, the same region twice, or a slide that is only a crop; the first GPT builds with the tool cropped 8 and 11 slides), a formula row that starts with an operator, which is one relation split over two rows (user 2026-11-02), and a formula card taller than 170 px that holds one row (the judges' empty blue card, 2026-11-02).
+Also flagged: a crop stretched past its source pixels (data-native, user 2026-11-03: "astra 17페이지의 분자 그림은 매우 해상도가 낮네"), one graph twice on a slide, a slide whose panels are all two far-apart bars, two-bar charts over 340 px tall, more than three slides of alike bar panels, a bar flattened to the axis, a closing slide with a large empty lump, a graph drawn heavier than the accepted decks (user 2026-11-03: lines over 4.6 px or unlabelled discs over 48 px wide; the GPT decks that drew 68-82 px discs and 8 px sticks had passed mass and anchor), paper_crop overuse (more than four slides, narrower than 480 px or 296 px on the cover, the same region twice, or a slide that is only a crop; the first GPT builds with the tool cropped 8 and 11 slides), a formula row that starts with an operator, which is one relation split over two rows (user 2026-11-02), and a formula card taller than 170 px that holds one row (the judges' empty blue card, 2026-11-02).
 The whitebox limit: the Yuanqi Du deck's median is 6, v10 with white figure panels 29, six chart cards on one slide 16 each. Also checked: the cover is the title-slide template with the title on the stage; titles and closing lines against the approved storyline.
 Prints one FIX line per finding and exits 0; the builder fixes them and runs it again.
 """
@@ -245,7 +245,7 @@ def main():
             changed.append(f'{i}장 제목')
         if i > 1 and m_c and plain(m_c.group(1)) != plain(s.get('closing', '')):
             changed.append(f'{i}장 마무리줄')
-    crop_slides, crop_boxes = [], []
+    crop_slides, crop_boxes, alike_slides = [], [], []
     for i, sec in enumerate(secs, 1):
         body = re.sub(r'<aside class="notes">.*?</aside>', '', sec, flags=re.S)
         crop_tags = re.findall(r'<image\b[^>]*\bdata-crop="[^"]*"[^>]*>', body)
@@ -280,6 +280,10 @@ def main():
         with_bars = [p for p in panels_b if p[1]]
         if with_bars and len(with_bars) == len(panels_b) and all(len(b) == 2 and b[1][0] - (b[0][0] + b[0][1]) > 200 for _, b in with_bars):
             fixes.append(f'FIX slide {i}: 넓은 패널에 막대 두 개뿐이라 가운데가 비었다. 갤러리 18장처럼 좁은 패널 P3A, P3B에 두고 P3C에 그 차이가 어디서 왔는지 그린다')
+        if with_bars and all(len(b) == 2 for _, b in with_bars) and max(r[2] for _, b in with_bars for r in b) > 340:
+            fixes.append(f'FIX slide {i}: 막대 두 개짜리 차트의 막대가 높이 {max(r[2] for _, b in with_bars for r in b):.0f} px다(받아들여진 덱은 304 px까지). 300 px 아래로 줄이고 남는 자리에 차이 숫자, 설명 그림, 논문 그림을 둔다(갤러리 18, 19장)')
+        if len(with_bars) >= 2 and len({len(b) for _, b in with_bars}) == 1:
+            alike_slides.append(i)
         for _, b in with_bars:
             if len(b) == 2 and max(r[2] for r in b) > 100 and min(r[2] for r in b) < 0.05 * max(r[2] for r in b):
                 fixes.append(f'FIX slide {i}: 막대 하나가 바닥에 붙어 막대 한 개처럼 보인다. 두 값을 big()으로 크게 적거나 다른 그림으로 바꾼다')
@@ -292,6 +296,8 @@ def main():
         for m in re.finditer(r'<div class="fx box[^"]*"[^>]*height:([\d.]+)px[^>]*>(.*?)</div>', body, flags=re.S):
             if float(m.group(1)) > 170 and len(re.findall(r'<p[ >]', m.group(2))) == 1:
                 fixes.append(f'FIX slide {i}: 식 한 줄에 높이 {float(m.group(1)):g} px 카드는 휑하다. 카드 높이를 내용에 맞춘다(한 줄이면 130 px 안팎)')
+    if len(alike_slides) > 3:
+        fixes.append(f'FIX deck: 같은 모양의 막대 패널을 나란히 둔 장이 {len(alike_slides)}장이다({alike_slides}). 받아들여진 덱은 2장까지다. 일부를 선(갤러리 7, 12장), 순위 점(11장), 상자(13장), 작은 카드(14장), 작은 차트와 논문 그림(19장)으로 바꾼다')
     if len(crop_slides) > 4:
         fixes.append(f'FIX deck: paper_crop을 {len(crop_slides)}장에 썼다({crop_slides}). 4장까지다: 연구 대상의 선 그림만 남기고 분포, 경로, 기전, 차트는 kit으로 그린다')
     last = root / 'deck' / 'qa' / 'shots-full' / f'slide-{len(secs):02d}.png'

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""kit_gallery.py — eighteen worked slides drawn with scene_kit.py, with toy content and no paper in them. Copy a slide's code, keep its sizes and positions, change the content.
+"""kit_gallery.py — nineteen worked slides drawn with scene_kit.py, with toy content and no paper in them. Copy a slide's code, keep its sizes and positions, change the content.
 
 usage: kit_gallery.py /abs/deck   (a folder scaffolded by new_deck.py). Renders are kept in assets/kit-gallery/ of this skill.
 Numbers, names and curves here are invented to show the drawing; nothing on these slides is a result.
@@ -455,22 +455,38 @@ def g17_paper_figure():
 
 
 def g18_two_values():
-    """Two values on each of two measures: narrow panels, so that a pair of bars fills its panel, and a third panel that draws where the difference comes from. Never two wide panels with two bars each."""
+    """Two values on each of two measures: narrow panels and bars under 300 px tall, the difference under its own chart (a number the bars do not print), and a third panel that draws where the difference comes from. Never two wide panels with two bars each, never bars filling the panel's height."""
     l = lane(0, 24, '품질, 낮을수록 좋음')
-    b, h = bars(30, 480, 620, 130, [('기준', (4.1,)), ('제안', (3.2,))], 5, colors=(BAR_OTHER,), inks=(INK,), fmt='{:.1f}', hl={(1, 0)})
-    l += b
+    b, h = bars(30, 480, 400, 110, [('기준', (4.1,)), ('제안', (3.2,))], 5, colors=(BAR_OTHER,), inks=(INK,), fmt='{:.1f}', hl={(1, 0)})
+    l += b + line(0, 506, 510, 506, '#E3E7EB', 2) + big(255, 598, '−22%', 56) + T(255, 648, '기준보다 낮은 값', 24, 600, SOFT, 'middle')
     m = lane(0, 24, '한 step 계산량, GFLOPs')
-    b2, h2 = bars(30, 480, 620, 130, [('기준', (320,)), ('제안', (300,))], 390, colors=(BAR_OTHER,), inks=(INK,), hl={(1, 0)})
-    m += b2
-    r = lane(0, 24, '달라진 곳은 encoder 쪽 층 수')
+    b2, h2 = bars(30, 480, 400, 110, [('기준', (320,)), ('제안', (300,))], 390, colors=(BAR_OTHER,), inks=(INK,), hl={(1, 0)})
+    m += b2 + line(0, 506, 510, 506, '#E3E7EB', 2) + big(255, 598, '−6%', 56) + T(255, 648, '한 step당 절감', 24, 600, SOFT, 'middle')
+    r = lane(0, 24, '달라진 곳은 층의 자리')
     c, xs = chain(190, [('enc', 150, 120), ('model', 190, 120, '모델')], 0, 510)
     r += c + T(xs[0], 290, '층 3개 더함', 26, 700, BLUE, 'middle') + T(xs[1], 290, '층 3개 뺌', 26, 700, SOFT, 'middle')
-    r += line(0, 350, 510, 350, '#E3E7EB', 2) + big(255, 440, '−22%', 64) + T(255, 490, '품질 차이', 26, 600, SOFT, 'middle')
-    r += big(255, 590, '−6%', 48) + T(255, 632, '계산량 차이', 26, 600, SOFT, 'middle')
+    r += line(0, 350, 510, 350, '#E3E7EB', 2) + lines(255, 420, ['encoder가 맡는 계산이 늘고', '반복해서 도는 모델은 가벼워짐'], 26, 42, 650, NAVY, 'middle')
+    r += fx(0, 540, 510, 110, [r'$\text{GFLOPs}_{\text{step}} \approx \text{모델 층 수}$'], 28)
     return slide('예시', '예시 · 값 두 개의 비교', '층을 옮겨도 품질은 좋아지고 계산은 줄어든 모델', [panel(*P3A, l, h), panel(*P3B, m, h2), panel(*P3C, r)],
                  '같은 크기에서 품질 차이 <b>22%</b>', CITE, notes('값이 둘뿐이면 넓은 패널 두 개에 나란히 두지 않습니다.'))
 
 
+def g19_small_bars_and_drawing():
+    """Results with the paper's own samples: a row of small charts on top, bars at most 132 px tall, and under it a wide strip cut from the paper, shown no larger than its source pixels. A low-resolution figure of the paper is used whole at its own size; one cell is never stretched."""
+    pdf = _toy_paper()
+    s, h = '', ''
+    for x0, x1, name, rows, vmax, fmt in ((0, 480, '품질, 낮을수록 좋음', (('기준', (4.1,)), ('제안', (3.2,))), 5, '{:.1f}'), (590, 1070, '보존된 부분 구조', (('기준', (61,)), ('제안', (84,))), 100, '{:g}%'), (1180, 1660, '한 step 계산량', (('기준', (320,)), ('제안', (300,))), 390, '{:g}')):
+        b, hh = bars(x0 + 40, x1 - 40, 232, 100, list(rows), vmax, colors=(BAR_OTHER,), inks=(INK,), fmt=fmt, val_size=26, name_size=24, hl={(1, 0)})
+        s += lane(x0, 24, name) + b
+        h += hh
+    s += line(0, 296, 1660, 296, '#E3E7EB', 2) + lane(0, 340, '논문이 보여 준 sample')
+    s += paper_crop('g19', pdf, 1, (0.08, 0.44, 0.92, 0.66), 0, 356, 960)
+    s += lines(1040, 440, ['빨간 표시가', '모델이 바꾼 곳'], 30, 46, 700, NAVY) + line(1040, 520, 1660, 520, '#E3E7EB', 2)
+    s += lines(1040, 572, ['수치가 좋아진 만큼', '보존된 부분도 그림에서 보임'], 26, 40, 500, SOFT)
+    return slide('예시', '예시 · 작은 차트와 논문 그림', '차트로 잰 것을 논문의 sample로 다시 보는 장', [panel(*FULL, s, h)],
+                 '수치의 개선이 <b>그림에서도 보임</b>', CITE + ' · 아래는 논문 그림을 자르는 경로를 보이려고 만든 가짜 쪽', notes('결과 장에 논문의 선 그림을 넣을 때는 차트를 작게 위에 두고, 그림은 원본보다 크게 놓지 않습니다.'))
+
+
 if __name__ == '__main__':
     init(sys.argv[1])
-    write_deck([g() for g in (g1_cover, g2_two_chains, g3_table, g4_hero, g5_mechanism, g6_bars, g7_lines, g8_closing, g9_causal, g10_matrix, g11_rank, g12_tiers, g13_boxes, g14_cards, g15_derivation, g16_graph_cells, g17_paper_figure, g18_two_values)])
+    write_deck([g() for g in (g1_cover, g2_two_chains, g3_table, g4_hero, g5_mechanism, g6_bars, g7_lines, g8_closing, g9_causal, g10_matrix, g11_rank, g12_tiers, g13_boxes, g14_cards, g15_derivation, g16_graph_cells, g17_paper_figure, g18_two_values, g19_small_bars_and_drawing)])
