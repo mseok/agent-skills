@@ -3,6 +3,7 @@ import { spawn } from 'node:child_process';
 import { realpathSync } from 'node:fs';
 import { createInterface } from 'node:readline';
 import { pathToFileURL } from 'node:url';
+import { readGeminiQuota } from './gemini-acp.mjs';
 
 const object = value => value !== null && typeof value === 'object' && !Array.isArray(value);
 const percentage = value => typeof value === 'number' && Number.isFinite(value) && value >= 0 ? value : null;
@@ -69,7 +70,8 @@ const sources = {
   claude: 'native CLI: get_usage (experimental)',
 };
 
-export function readQuota(provider, { spawnChild = spawn, timeoutMs = 25_000 } = {}) {
+export function readQuota(provider, { spawnChild = spawn, timeoutMs = 25_000, gemini = {} } = {}) {
+  if(provider==='gemini')return readGeminiQuota({spawnChild,timeoutMs,...gemini});
   return new Promise(resolve => {
     const args = provider === 'codex' ? ['app-server', '--listen', 'stdio://'] : [
       '--print', '--input-format', 'stream-json', '--output-format', 'stream-json', '--verbose',
@@ -154,15 +156,15 @@ export function readQuota(provider, { spawnChild = spawn, timeoutMs = 25_000 } =
 async function main() {
   const [target = 'all', ...extra] = process.argv.slice(2);
   if (target === '--help' && !extra.length) {
-    console.log('Usage: node quota.mjs [codex|claude|all]\nRead native CLI subscription quotas without model inference.');
+    console.log('Usage: node quota.mjs [codex|claude|gemini|all]\nRead native subscription quotas without model inference.');
     return;
   }
-  if (!['codex', 'claude', 'all'].includes(target) || extra.length) {
-    console.log(JSON.stringify({ status: 'error', reason: 'usage: quota.mjs [codex|claude|all]' }));
+  if (!['codex', 'claude', 'gemini', 'all'].includes(target) || extra.length) {
+    console.log(JSON.stringify({ status: 'error', reason: 'usage: quota.mjs [codex|claude|gemini|all]' }));
     process.exitCode = 2;
     return;
   }
-  const providers = await Promise.all((target === 'all' ? ['codex', 'claude'] : [target]).map(provider => readQuota(provider)));
+  const providers = await Promise.all((target === 'all' ? ['codex', 'claude', 'gemini'] : [target]).map(provider => readQuota(provider)));
   console.log(JSON.stringify({ schemaVersion: 1, accountScope: 'calling environment native CLI login', providers }, null, 2));
   if (providers.some(result => result.status === 'error')) process.exitCode = 1;
 }
