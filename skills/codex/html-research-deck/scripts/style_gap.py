@@ -271,7 +271,7 @@ def main():
                 fixes.append(f'FIX slide {i}: 자른 그림이 패널의 {100 * area / (1700 * 722):.0f}%이고 직접 그린 도형이 {drawn}개다. 분포, 차트, 표를 직접 그려 함께 둔다')
         for t in crop_tags:
             w_, native = float(attr(t, 'width')), attr(t, 'data-native')
-            if native and float(native) < w_:
+            if native and float(native) < 0.98 * w_:
                 fixes.append(f'FIX slide {i}: 자른 그림의 원본이 {float(native):.0f} px인데 {w_:g} px로 늘려 흐리다. PDF 안의 비트맵이라 dpi를 올려도 선명해지지 않는다. pdfimages -list로 더 선명한 그림을 찾거나 ggraph()로 그린다')
         twins = twin_graphs(body)
         if twins:
