@@ -4,6 +4,7 @@ import { realpathSync } from 'node:fs';
 import { createInterface } from 'node:readline';
 import { pathToFileURL } from 'node:url';
 import { readGeminiQuota } from './gemini-acp.mjs';
+import { readClaudeApiUsage } from './claude-api-usage.mjs';
 
 const object = value => value !== null && typeof value === 'object' && !Array.isArray(value);
 const percentage = value => typeof value === 'number' && Number.isFinite(value) && value >= 0 ? value : null;
@@ -70,7 +71,8 @@ const sources = {
   claude: 'native CLI: get_usage (experimental)',
 };
 
-export function readQuota(provider, { spawnChild = spawn, timeoutMs = 25_000, gemini = {} } = {}) {
+export function readQuota(provider, { spawnChild = spawn, timeoutMs = 25_000, gemini = {}, claudeApi = {} } = {}) {
+  if(provider==='claude-api')return Promise.resolve(readClaudeApiUsage(claudeApi));
   if(provider==='gemini')return readGeminiQuota({spawnChild,timeoutMs,...gemini});
   return new Promise(resolve => {
     const args = provider === 'codex' ? ['app-server', '--listen', 'stdio://'] : [
@@ -156,15 +158,15 @@ export function readQuota(provider, { spawnChild = spawn, timeoutMs = 25_000, ge
 async function main() {
   const [target = 'all', ...extra] = process.argv.slice(2);
   if (target === '--help' && !extra.length) {
-    console.log('Usage: node quota.mjs [codex|claude|gemini|all]\nRead native subscription quotas without model inference.');
+    console.log('Usage: node quota.mjs [codex|claude|gemini|claude-api|all]\nRead native subscription quotas and local API cost estimates without model inference.');
     return;
   }
-  if (!['codex', 'claude', 'gemini', 'all'].includes(target) || extra.length) {
-    console.log(JSON.stringify({ status: 'error', reason: 'usage: quota.mjs [codex|claude|gemini|all]' }));
+  if (!['codex', 'claude', 'gemini', 'claude-api', 'all'].includes(target) || extra.length) {
+    console.log(JSON.stringify({ status: 'error', reason: 'usage: quota.mjs [codex|claude|gemini|claude-api|all]' }));
     process.exitCode = 2;
     return;
   }
-  const providers = await Promise.all((target === 'all' ? ['codex', 'claude', 'gemini'] : [target]).map(provider => readQuota(provider)));
+  const providers = await Promise.all((target === 'all' ? ['codex', 'claude', 'gemini', 'claude-api'] : [target]).map(provider => readQuota(provider)));
   console.log(JSON.stringify({ schemaVersion: 1, accountScope: 'calling environment native CLI login', providers }, null, 2));
   if (providers.some(result => result.status === 'error')) process.exitCode = 1;
 }

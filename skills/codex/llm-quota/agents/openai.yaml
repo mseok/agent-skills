@@ -1,4 +1,4 @@
 interface:
   display_name: "LLM Quota"
-  short_description: "Read Codex, Claude, and Gemini subscription limits"
+  short_description: "Read subscription limits and Claude API bridge spend"
   default_prompt: "Use $llm-quota to check all my providers' remaining subscription allowances and reset times."

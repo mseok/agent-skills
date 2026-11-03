@@ -1,6 +1,6 @@
 ---
 name: llm-quota
-description: Check live subscription quotas for Codex, Claude, and Gemini through the official Antigravity ACP profile, without model inference. Use for remaining allowance, usage percentages, reset times, 내 사용량, 남은 한도, or when planning sustained work depends on subscription capacity. Not for context-window usage, token accounting, or API cost estimates.
+description: Check live subscription quotas for Codex, Claude, and Gemini, plus recorded Claude API bridge cost estimates, without model inference. Use for remaining allowance, usage percentages, reset times, 내 사용량, 남은 한도, or recorded bridge API spend. Not for context-window usage, general API billing, or price estimates.
 ---
 
 # LLM quota
@@ -12,6 +12,7 @@ Read subscription limits through the provider's official runtime. Codex and Clau
 - 2026-10-18: "Ai quota mcp 그냥 그러면 기능 이해힌다음에 스킬로만들면안되나?"
 - 2026-11-02: "quota skill 도 맞춰서 업데이트해주고." This accompanies the approved Mac mini Gemini ACP bridge deployment.
 - 2026-11-03: "chatgpt 만 llm quota 를 하면 thinking 을 많이 하고 뭔가 chatgpt 내용만 반환하는거같은데, 이것도 다른 모델과 동일하게 모든 모델 결과 보여주고, context 오염도 안 시키게 해줄 수 있나?"
+- 2026-11-03: "그럼 실행환경 분리해서 실제로 새로운 claude (api) 경로를 만들어줄래? 그리고 quota 도 업데이트해야할듯"
 
 ## Query
 
@@ -21,24 +22,27 @@ Run the helper relative to this skill's directory:
 node scripts/quota.mjs codex
 node scripts/quota.mjs claude
 node scripts/quota.mjs gemini
+node scripts/quota.mjs claude-api
 node scripts/quota.mjs all
 ```
 
-- For an unqualified quota request, use `all`, regardless of the model running this chat. Select `codex`, `claude`, or `gemini` only when the user explicitly asks for that provider alone.
+- For an unqualified quota request, use `all`, regardless of the model running this chat. Select `codex`, `claude`, `gemini`, or `claude-api` only when the user explicitly asks for that provider alone.
 - In a ChatGPT bridge with the local quota handler installed, a standalone skill selection, `!quota`, `$llm-quota`, or `llm quota` is answered locally with all providers. The visible quota exchange is excluded from later model requests. A request that also asks for analysis or planning still goes to the model. Installing this skill alone does not add that bridge handler or remove model context; that integration is verified on the Mac mini, not on the other hosts.
 - A CLI must already be installed and logged in. Preserve the calling environment, including `CODEX_HOME` and `CLAUDE_CONFIG_DIR`. The result is for that local CLI account.
 - Codex and Claude use initialization and quota control requests only. Gemini opens a fresh ACP session with no MCP servers and invokes exactly `/usage` only after the official runtime advertises it. This is a native local command, not a natural-language model prompt. Never fall back to asking a model about its quota. Authentication stays inside the official runtime; do not read credential files or Keychain, extract tokens, or replace this helper with `npx ai-quota`.
 - Gemini uses the bridge's dedicated ACP profile, not the ordinary `agy` CLI login. Defaults are its `acp/runtime/agy_acp_server.par` and `acp/profile`. `GEMINI_ACP_BIN` and `GEMINI_ACP_PROFILE` select another already configured runtime/profile; `BRIDGE_STATE_DIR` selects the bridge directory. Do not copy credentials or sign in merely to repair a quota query. The official ACP runtime may retain native quota-session history.
 - Codex uses `account/rateLimits/read` over app-server stdio. Claude uses its experimental `get_usage` control request over stream-json. Protocol details and sources are in [references/native-protocols.md](references/native-protocols.md); read that reference when diagnosing a protocol failure.
+- `claude-api` reads only local cost snapshots under the selected bridge's `claude-api/usage` directory. It never reads the API key or calls an inference or billing endpoint. `BRIDGE_STATE_DIR` selects the bridge. A host without that API route returns `api_not_configured`.
 
 ## Interpret
 
 - Report provider, used/remaining percentage, reset time in the user's timezone, and `checkedAt`. Keep different quota buckets and model-scoped limits separate. These are shared subscription windows, not this conversation's token usage.
 - For Gemini, retain the separate Gemini Models, Gemini 4 Argon, and Google-provided Claude/GPT groups when returned. The last group is not the user's separate Anthropic or OpenAI subscription. ACP `usage_update.used` and context size are token/context counters, not subscription utilization.
+- Show Claude API separately as **this host bridge's recorded cost estimate**, with its recording period and any `unknownRuns`. It is not subscription utilization, final billing, account-wide spend, or remaining credit. Snapshots are cumulative per CLI process, so the helper replaces each process's total instead of adding successive turns. Active calls after the latest result, crashed calls without a result, and API use outside this bridge are not fully covered. No records means unknown, not zero spend. Remaining credit and account spend limits remain unavailable; ordinary API keys do not authorize the Admin Usage/Cost APIs.
 - Identify windows by their reported duration. A Codex `primary` window can be weekly; never assume that `primary` means five hours.
 - Missing windows, percentages, or reset times stay unavailable. Do not replace them with zero, infer a reset from the window duration, or infer quota from token logs or estimated cost. A reported zero is a measured zero.
 - If a reset time is already in the past, identify that window as stale. Do not infer that its remaining allowance has reset to 100%.
-- `ok` means at least one reported utilization is available. `unavailable` means the CLI supplied no usable subscription percentage. `error` means the query failed; use its sanitized reason. The process exits nonzero on an error, while retaining successful results from the other provider.
+- For subscription providers, `ok` means at least one reported utilization is available, and `unavailable` means no usable percentage was supplied. For `claude-api`, `ok` means the configured route's snapshot directory was readable; inspect the estimate and coverage fields, which may still be unknown. `error` means the query failed; use its sanitized reason. The process exits nonzero on an error while retaining successful providers.
 
 ## Use during work
 

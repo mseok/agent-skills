@@ -33,3 +33,9 @@ Verified on 2026-11-02 with ACP 1.4.5 and the dedicated bridge profile. Send `in
 The live probe returned a local Session Usage / Quota Limits response with no model session tokens available, `usage_update.used = 0`, and zero tool calls. Gemini Models, Google-provided Claude and GPT models, and Gemini 4 Argon were distinct groups. Parse only explicit remaining percentages and reset timestamps; keep unknown formats unavailable. Native credential ownership and profile identity are preserved. The helper aborts on any tool call or positive context-token activity.
 
 The dedicated ACP profile is distinct from the ordinary agy CLI profile. Never substitute the latter's quota on an ACP query failure. Overrides are `GEMINI_ACP_BIN` and `GEMINI_ACP_PROFILE`; default paths follow the local bridge. A missing runtime/profile is an explicit error, not a reason to install, log in, or read tokens.
+
+## Claude API bridge estimates
+
+The separate API route uses official Claude Code `--bare`, an explicit API key, and its own HOME/config directory. Installed CLI help confirms that bare mode never reads OAuth or the keychain. Subscription execution receives neither that key nor the API profile. There is no automatic switch to API billing.
+
+The bridge stores one atomically replaced cost snapshot per CLI process from `total_cost_usd`. This is a cumulative client-side estimate, not authoritative billing; see [official cost tracking](https://code.claude.com/docs/en/agent-sdk/cost-tracking). The quota helper sums the latest snapshots and reports unknown records separately. It does not read credentials or make model requests. Actual account-wide usage/cost and spend-limit endpoints require an [Admin API key](https://platform.claude.com/docs/en/manage-claude/admin-api-keys); an ordinary inference key does not provide that access.
