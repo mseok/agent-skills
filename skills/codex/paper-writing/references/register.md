@@ -70,13 +70,15 @@ Read these contrasts before drafting and compare your draft's choices with them 
 | Vague magnitude: "much better", "a lot", "huge" | The number. |
 | Hedge stacks: "may possibly suggest", "could potentially" | One calibrated verb (below). |
 | Report formatting: bold run-in labels in nature-family Results, bullet lists in Results or Discussion, arrows in prose, emoji | Prose paragraphs. Only an ml-conference contributions list may be bulleted, and only ml-conference Experiments may use short bold paragraph labels. |
-| First-person singular, chatty asides, rhetorical questions | "We" for the authors; declarative sentences. A question that frames an experiment ("We first ask whether …") is fine. |
+| First-person singular, chatty asides, rhetorical questions | "We" for the authors; declarative sentences. A Results subsection opens by motivating its question in a declarative (`results.md`). |
 
 ## Words that depend on context
 
 "currently", "to date", "so far", "at present", "at this stage", "ongoing" and "note that" are report register when they describe the state of the authors' own work ("we have so far tested two datasets"). They are fine in other roles: the time scope of prior literature ("to date, no decoder meets …"), a physical condition ("ongoing thermal fluctuations"), mathematical exposition ("note that $f$ is convex"). Rewrite the first kind; keep the others.
 
 "Significant" and "significantly" mean statistical significance to most readers. Use them only for an inferential claim with its named test and result; otherwise give the magnitude ("substantially", or better, the number).
+
+Give the effect size with its uncertainty beside any test result: a small p-value is not a large effect.
 
 "Sometimes", "often" and "in many cases" weaken an opening sentence without adding information. State the fact and the condition under which it holds instead; deleting the hedge without the condition would claim universality.
 
@@ -88,6 +90,8 @@ One verb per claim, matched to the evidence:
 - a test designed to establish exactly the claim, whose outcome does: "establishes", "confirms", "validates";
 - consistent indirect evidence: "indicates", "is consistent with", "supports";
 - interpretation from an analysis: "suggests", once per point and never stacked with "may".
+
+An exploratory finding (a pattern found after seeing the data or in a search over variants) is stated as observed in that analysis; validation verbs need an independent test, such as held-out data, a separate cohort or a replication. Predictive accuracy is not a causal effect: a model that predicts an outcome does not show that its inputs cause it.
 
 Universal words ("every", "each", "always", "unchanged", "any") need evidence of universality; otherwise say "can" or give the tested range.
 

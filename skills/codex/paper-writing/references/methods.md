@@ -39,6 +39,7 @@ When results are read against a control, floor or reference (a trivial baseline,
 - State the number of independent runs, what varies between them (seed, data split, sample), how results are aggregated and exactly what each error bar or interval represents. Report single runs as single runs.
 - Where a statistical test is used, name it and say whether observations are paired. Never add runs, intervals or tests the inputs do not report.
 - Wherever methods are compared, state what was matched (data, compute, tuning budget, inference access) and disclose any material mismatch beside the comparison it affects. Matching one factor rules out a difference in that factor; it does not isolate a mechanism.
+- Compare with the strongest prior method and with the simple baseline a reader would expect (a trivial predictor, a standard method or the method without its key idea) wherever the inputs have them; a missing one goes to the plan or Notes to author, never implied.
 
 ## Experimental setup tables
 
