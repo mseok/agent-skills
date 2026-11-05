@@ -1,0 +1,4 @@
+interface:
+  display_name: "Obsidian Writing Note"
+  short_description: "Write concise personal notes in Writing/ for review on Obsidian HOME"
+  default_prompt: "Use $obsidian-writing-note to draft a concise, review-ready note in Writing/ for this topic."

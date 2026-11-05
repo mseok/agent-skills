@@ -1,9 +1,11 @@
 ---
 name: obsidian-main-note
-description: Save a reusable project outcome or an explicitly requested note through the canonical Obsidian gateway. For ongoing research milestones use research-workflow to update the question report; use this skill for independently reusable records and authorized existing-note revisions.
+description: Save a reusable project outcome or authorized existing-note revision through the canonical Obsidian gateway. For ongoing research milestones use research-workflow to update the question report; when the user explicitly asks to write or make a personal note for their own reading and review, use obsidian-writing-note instead.
 ---
 
 # Save a useful outcome
+
+When the user explicitly asks to write or make a personal note for themselves ("노트 만들어줘", "노트로 정리해줘", "Writing에 적어줘"), use [obsidian-writing-note](../obsidian-writing-note/SKILL.md) so it lands in `Writing/` for review on `HOME.md` rather than `Inbox/Agents/`.
 
 Read the [shared recording policy](../research-workflow/references/research-recording.md) once
 per task before using this workflow; reuse it if already loaded. Detailed
