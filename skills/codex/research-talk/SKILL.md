@@ -47,6 +47,8 @@ Use the latest user-edited deck as the source, not the original builder or an ol
 
 Update the same presentation note with exact output paths, version, approved slide mapping and remaining needs. If recording fails, keep local work and the bridge outbox, report pending status, and never write Vault files directly.
 
+When saving slides and scripts in Obsidian, follow `references/workflow.md` → “Archive slides and scripts in Obsidian”: PDF and Markdown under `Slides/` using date and title, no version/hash suffix, existing script length preserved, and reciprocal note links. Internal build versions remain in preparation history.
+
 ## Example invocation
 
 “K-Fold의 최근 실험 기록을 바탕으로 20분 연구 발표 흐름부터 같이 정하자. 핵심은 prior가 언제 도움이 되는지야.”

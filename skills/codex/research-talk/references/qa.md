@@ -20,6 +20,8 @@ Record structural checks, render review and native-app checks separately. A PDF 
 
 For revisions compare untouched slides against the latest input. Deliver a new version. Confirm Obsidian recording from its bridge receipt.
 
+For Obsidian archiving, check that the PDF is in `Slides/` under the agreed date/title without an added version or hash suffix. Verify its saved bytes against the source PDF. The script must be Markdown with its existing spoken content preserved; compare its body with the original script or extracted HTML notes. Confirm the preparation note links to both files and the script links to the PDF. Internal build-version names do not override this archive naming rule.
+
 ## Native compatibility observed on 2026-09-14
 
 PowerPoint v4 PDFs were checked across all 20 pages. Keynote import retained editable chart/table/text/shape objects, but omitted table cell borders, altered chart axis formatting/spacing, and rendered the Unicode subscript j at a different height from i in the example equation. PPTX + PowerPoint-exported PDF are authoritative. For Keynote delivery, replace Unicode subscript notation with explicitly positioned editable indices or a checked native equation and recheck. Do not call the current text equation Office Math.
