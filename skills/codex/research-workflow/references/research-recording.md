@@ -41,13 +41,16 @@ recorded separately. Never write vault files, publish branches, use `un note`,
 or synchronize vault Git. Mac mini Git remains backup-only. Attachments use
 raw-byte uploads from approved files.
 
-Pass the hook context's session and turn IDs as `session_id` and `turn_id` in
-every `research_capture`. When the Stop hook asks for the end-of-turn check and
+The trusted PreToolUse handler supplies each invocation's session and turn IDs
+in `research_capture`. Explicit IDs must match the current hook context; never
+infer a binding from a source task or another session. A saved but unassigned
+capture remains a saved report, but cannot satisfy the turn check. When the Stop hook asks for the end-of-turn check and
 no milestone was captured, mark `no-material-change` with the host-local MCP
 `research_disposition` tool and those IDs; the hook asks only for turns long
 enough for research work and at most once per interval per session. This check
 needs no vault note or shell write approval. Failed delivery stays
 in the host-local outbox outside the vault. On resume, inspect/replay pending
-requests; a SHA conflict needs a fresh read and a new request, never a forced
+requests using `replay --session-id SESSION --dry-run` before the scoped replay;
+a SHA conflict needs a fresh read and a new request, never a forced
 overwrite. Recording failures must not block a scientific job.
 <!-- END obsidian-research -->

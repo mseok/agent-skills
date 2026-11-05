@@ -26,11 +26,22 @@ Reuse its ID and report; create a new stable ID only for a distinct question.
 Inspect candidate reports before adopting one. Shared words or a common
 project alone do not establish that questions are the same.
 
+When initializing an approved research project, register its directory with
+`obsidian-research register --root /absolute/project --project CanonicalProject
+--investigation-id existing-question-id`; omit the last option only for a new
+question. This preserves other host settings and makes the question available
+in startup context. A research tool call activates only the invoking session
+when working in an inbox; do not register the whole inbox as research.
+
 At a meaningful milestone, call `research_capture` with the investigation ID,
 canonical project, source references, when it happened, a stable event ID and
-operation ID. Always pass the hook context's `session_id` and `turn_id`; the
-receipt is then tied to this turn and the end-of-turn check sees the capture,
-while a capture without them is stored unassigned and the check cannot see it.
+operation ID. The trusted PreToolUse handler supplies the invoking session and
+turn IDs. If supplying IDs yourself, use only those from the current hook
+context; conflicting IDs are rejected. Never infer them from another source
+task or the most recently active session. `recording_context.status=unassigned`
+means the report was saved but the turn check cannot see it. Restore invocation
+binding before the next capture; do not resend a saved milestone under a new
+operation ID merely to attach it to the current turn.
 For `expected_sha256` use the `sha256` from the latest capture
 receipt in this session, or from `investigation_context` when there is none.
 Do not re-read the report before every capture; re-read only after a
@@ -99,6 +110,13 @@ no disposition. The check never justifies creating a routine note. In Plan
 mode, keep any recording as a proposed action.
 
 The bridge retains failed deliveries outside the vault. `obsidian-research
-status` lists pending IDs; `obsidian-research replay` retries the exact payload.
+status --session-id SESSION` lists pending IDs. Preview with `obsidian-research
+replay --session-id SESSION --dry-run`, then remove `--dry-run` to retry only
+that session's exact payloads. Unassigned requests require provenance recovery;
+never guess their session or turn. Replay stops at a conflict or delivery error.
 Resolve semantic/SHA conflicts in context. Never report a queued request as
 saved, and never use a direct vault file or Git fallback.
+
+## User decisions
+
+- 2026-11-05: "ㅇㅇ 그럼 1~3번부터 적용하고 검증까지 ㄱㄱ." Apply project/question linking, invocation-bound recording and session-filtered replay on Mac mini and messi. Server-context execution gates are outside this change.
