@@ -19,8 +19,8 @@ once per task and reuse it.
   backup job that only commits and pushes. `un note`, `un push`,
   `codex_note_commit`, `obsidian_branch_publish.py` and remote vault checkouts
   are retired.
-- The authenticated token fixes the host (`local` is the Mac mini; `messi`,
-  `gpu22` and `grok-bot` are remote). Never pass or infer a host.
+- The authenticated token fixes the host (`local` is the Mac mini; `messi` and
+  `grok-bot` are remote; gpu22 was retired on 2026-11-06). Never pass or infer a host.
 
 ## 2. Permissions (enforced by the gateway)
 
@@ -57,7 +57,7 @@ once per task and reuse it.
 
 | Place | Holds | Written by |
 |---|---|---|
-| root | `HOME.md`, `AGENTS.md`, `People.md` and project hubs (`K-Fold.md`, `RDBDock.md`) | the user; agents on request |
+| root | `HOME.md`, `AGENTS.md`, `People.md` (the project hub notes were deleted on 2026-11-06; links to them stay unresolved) | the user; agents on request |
 | `Writing/` | the user's own essays, reflections, meeting records and personal synthesis | `note_draft_create` on explicit request |
 | `Concepts/` | reusable definitions, mechanisms and background explanations | `knowledge_revise(create)` on explicit request |
 | `People/` | one note per person (`kind/person`), indexed by `People.md` | on explicit request |
