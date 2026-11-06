@@ -5,9 +5,9 @@ description: Maintain a cumulative Obsidian research report across tasks and hos
 
 # Keep the research question continuous
 
-Read the [shared recording policy](references/research-recording.md) once
-per task before using this workflow; reuse it if already loaded. Detailed
-recording rules live there rather than in every project's AGENTS.md.
+Read the [Obsidian vault policy](../obsidian-main-note/references/obsidian-policy.md) once
+per task before using this workflow; reuse it if already loaded. All vault and
+recording rules live there; this skill holds the procedure.
 
 Use `obsidian_main` throughout. When a task starts or resumes, read the
 question once. If the `investigation_id` is already known (the hook context
@@ -96,7 +96,7 @@ pass those `evidence_paths` to the question report.
 
 On SHA conflict, re-read current context, incorporate the concurrent material
 and send a new operation ID with the current SHA. Do not replay stale
-replacement prose with a new SHA. Use `knowledge_revise` only within its ownership/maintenance scope; history
+replacement prose with a new SHA. Use `knowledge_revise` only within the permissions in the policy; history
 and restore retain original identity and the exact prior content.
 
 At turn end, the successful capture receipt satisfies the omission check. When

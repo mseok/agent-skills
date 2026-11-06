@@ -1,16 +1,22 @@
 ---
-author:
-venue:
+title: "{{title}}"
+created: {{date}}
+tags:
+  - kind/paper-review
+project:
+aliases: []
+author: []
 year:
-url:
+venue:
 doi:
 arxiv:
+url:
 code:
-keywords:
-categories:
-  - "[[Papers]]"
-aliases:
+citekey:
+keywords: []
+related: []
 ---
+
 
 ## TL;DR
 [2-5문장. 무엇이 문제였는지, 어떤 메커니즘/설계로 풀었는지, headline result가 무엇인지, 무엇을 기억해야 하는지 적는다. 지면이 짧으면 background보다 method novelty를 우선 쓴다.]

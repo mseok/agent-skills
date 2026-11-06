@@ -8,7 +8,7 @@ description: "Maintain the agent harness itself across hosts: the shared AGENTS.
 ## Where things live
 
 - Shared guidance: `~/dot/ai/codex/AGENTS.md` (every host links `~/.codex/AGENTS.md` and `~/.claude/CLAUDE.md` to it). The research block at its top is managed by `obsidian-main/scripts/deploy-research.py` from `policies/research-router.md`; edit both the router source and AGENTS.md identically, or redeploy, never one alone.
-- Shared skills: `~/agent-skills/skills/codex` (both harnesses) and `~/agent-skills/skills/claude` (Claude only); `~/dot/bin/install_codex.sh` and `~/dot/bin/install_claude.sh` link them into `~/.codex/skills` and `~/.claude/skills`. The research skills (`research-workflow` with its recording policy under `references/`, `experiment-ledger`, `obsidian-main-note`) live here too; the obsidian-main deployer manages only the research block and hooks. Host-local skill directories are never edited by hand.
+- Shared skills: `~/agent-skills/skills/codex` (both harnesses) and `~/agent-skills/skills/claude` (Claude only); `~/dot/bin/install_codex.sh` and `~/dot/bin/install_claude.sh` link them into `~/.codex/skills` and `~/.claude/skills`. The research skills (`research-workflow`, `experiment-ledger`, `obsidian-main-note`, `obsidian-writing-note`) live here too, and every Obsidian vault rule lives only in `obsidian-main-note/references/obsidian-policy.md`; the obsidian-main deployer manages only the research block and hooks. Host-local skill directories are never edited by hand.
 - Host facts: `~/.codex/host-context.md` on each host. Hooks and settings: `~/.claude/settings.json`, `~/.codex/hooks.json`, host-local.
 - Memory: Claude auto-memory under `~/.claude/projects/<cwd-key>/memory/`, Codex memory under `~/.codex/memories/`. Mandatory behavior never lives only in memory; promote it to AGENTS.md, a skill or host-context, then delete the memory note.
 
@@ -38,7 +38,7 @@ At session start on any host, `~/.codex/AGENTS.md` and `~/.claude/CLAUDE.md` mus
 
 ## Health checks (model-free first)
 
-- Obsidian gateway: `tailscale serve status` and `tailscale funnel status` on the home hub must show the Funnel binding recorded in host-context (443 to the gateway port); then one `investigation_context` read from each host; then `obsidian-research status` for a pending outbox. Replay only with a session filter.
+- Obsidian gateway: `tailscale serve status` and `tailscale funnel status` on the home hub must show the Funnel binding recorded in host-context (Funnel 10000 to the gateway port 39123); then one `investigation_context` read from each host; then `obsidian-research status` for a pending outbox. Replay only with a session filter.
 - Tunnels and services: Zotero MCP, html-preview relay, KVPN monitor status (KAIST VPN Monitor app, `tools/kaist-vpn-monitor`). Record outages and root causes in host-context, not only in memory.
 - Memory hygiene: delete notes that are wrong or superseded, keep one fact per note, and keep the index line consistent with the note.
 

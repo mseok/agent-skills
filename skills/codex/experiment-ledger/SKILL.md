@@ -5,9 +5,9 @@ description: Preserve a separately comparable terminal research result and conne
 
 # Retain the experiment and its meaning
 
-Read the [shared recording policy](../research-workflow/references/research-recording.md) once
-per task before using this workflow; reuse it if already loaded. Detailed
-recording rules live there rather than in every project's AGENTS.md.
+Read the [Obsidian vault policy](../obsidian-main-note/references/obsidian-policy.md) once
+per task before using this workflow; reuse it if already loaded. All vault and
+recording rules live there; this skill holds the procedure.
 
 Keep hypotheses and consequential choices in the question report using
 `research-workflow`. Planned/running job state stays in the execution system;
@@ -34,6 +34,13 @@ run/artifact identity for an existing result. `record_create` accepts a stable
 `evidence_key` (run/artifact plus comparison/analysis scope), `investigation_id`
 and exact `source_refs`. Reuse the same key across servers/tasks; a new run or
 independently comparable analysis gets a distinct key.
+
+A screening, sweep or batch over many items, candidates or seeds is one
+comparable result: write one record per batch (or per screening round) with a
+table, or an attached file from `attachment_upload`, and one `evidence_key` for
+that batch. Never write one record per item. When the result is a key
+experiment behind a note the user writes in `Writing/` or `Notes/`, link that
+note from the record.
 
 For `kind/experiment`, supply canonical project/tags and four flat fields:
 

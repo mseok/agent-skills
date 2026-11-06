@@ -39,7 +39,7 @@ description: >
 3. frontmatter는 최소하지만 정확하게 채운다.
    - `author`, `venue`, `year`, `url`은 기본으로 넣는다.
    - 가능하면 `doi`, `arxiv`, `code`, `aliases`를 함께 채운다.
-   - 사용자가 달리 요청하지 않으면 `categories: [[Papers]]`를 유지한다.
+   - frontmatter 필드와 순서는 Obsidian vault policy(`obsidian-main-note/references/obsidian-policy.md`)의 Paper 템플릿을 따른다: `kind/paper-review` 태그, 정식 `project`, 모르는 필드는 비워 두지 않고 지운다. 은퇴한 `categories`, `projects`는 쓰지 않는다.
    - note 본문은 한국어로 쓰되, frontmatter key는 English를 유지한다.
 
 4. 논문 요약은 "정리" 관점으로 쓴다.
