@@ -61,6 +61,7 @@ once per task and reuse it.
 | `Writing/` | the user's own essays, reflections, meeting records and personal synthesis | `note_draft_create` on explicit request |
 | `Concepts/` | reusable definitions, mechanisms and background explanations | `knowledge_revise(create)` on explicit request |
 | `People/` | one note per person (`kind/person`), indexed by `People.md` | on explicit request |
+| `Study/` | study notes for a book or course: one subfolder per source holding a hub note named after the source and one note per chapter or section (`kind/study`) | on explicit request, from the Study template; no `writer` or `reviewed` |
 | `Slides/` | `YYYY-MM-DD Title.pdf` and its spoken script `YYYY-MM-DD Title.md` | `research-talk` on request |
 | `Inbox/Agents/<host>/` | agent records and question reports; later agents search and fetch them, the user does not read every one | the gateway chooses the path |
 | `Notes/` | the user's older research notes | the user; agents revise only on request |
@@ -71,8 +72,7 @@ once per task and reuse it.
 | `Excalidraw/` | drawings | the user |
 
 Folders separate purpose and lifecycle, never topic; topics live in tags and
-links. A new top-level folder (for example `Study/`) is created when the user
-asks for it. Large data, checkpoints, logs, environments and caches never go
+links. A new top-level folder is created only when the user asks for it. Large data, checkpoints, logs, environments and caches never go
 into the vault. Do not create an empty note just to resolve a link.
 
 ## 4. Which note, if any
@@ -83,6 +83,7 @@ into the vault. Do not create an empty note just to resolve a link.
 | separately comparable terminal result | `experiment-ledger`: one evidence record per run, batch, sweep or screening round |
 | other reusable agent outcome | `obsidian-main-note`: `record_create` |
 | the user explicitly asks for a note | `obsidian-writing-note`: `Concepts/` for reusable explanation, `Writing/` for the user's own prose, both linked for a mixed request; an explicit destination wins |
+| the user asks for study material on a book or course | `Study/<source>/`: a hub note plus one note per chapter or section, written from the Study template |
 | a talk | `research-talk`: its preparation note and `Slides/` |
 | ordinary chat explanation, routine checks, polling, tooling, layout-only edits, prose draft versions, administrative and personal tasks | no note |
 
@@ -93,7 +94,7 @@ asks about a turn without a milestone, answer with `research_disposition`
 ## 5. Metadata
 
 - One template per note type lives in `Templates/`, kepano style: `Person`,
-  `Writing`, `Meeting`, `Concept`, `Experiment`, `Paper`, `Slides` and
+  `Writing`, `Meeting`, `Concept`, `Experiment`, `Paper`, `Slides`, `Study` and
   `Weekly Note` (Periodic Notes is off; weekly notes are not created); `Single
   Paper Review Template` belongs to its skill and uses the Paper fields with
   `kind/paper-review`. The
@@ -104,7 +105,8 @@ asks about a turn without a milestone, answer with `research_disposition`
 - Field order everywhere: `title`, `created`, `updated`, `date`,
   `presentation_date`, `writer`, `reviewed`, `tags`, `project`, `branch`, `aliases`, then
   the type's own fields (person: `name` ... `education`; meeting: `people`,
-  `org`, `loc`; paper: `author` ... `keywords`; research: `investigation_id`,
+  `org`, `loc`; paper: `author` ... `keywords`; study: `book`, `chapter`, `part`,
+  `pages`, `prev`, `next` (a hub: `author`, `publisher`, `doi`); research: `investigation_id`,
   `investigation_report`, `record_role`, `evidence_key`, the four experiment
   fields, `superseded_by`), `related`, any other field, and last the gateway's
   `record_id`, `operation_id`, `host`, `agent`.
@@ -119,7 +121,8 @@ asks about a turn without a milestone, answer with `research_disposition`
   `implementation`, `person`, `audit`, `session`, `lecture`, `decision`,
   `project-hub`, `log`, `presentation-preparation`, `presentation-script`,
   `idea`, `source-audit`, `paper-review`, `manuscript`, `overview`,
-  `style-guide`, `weekly`, `stub`.
+  `style-guide`, `weekly`, `stub`, `study`. A source series is grouped by its
+  folder and the `book` link to its hub, not by a `book/*` tag.
 - `project` is the canonical project name and matches its tag exactly
   (`project: K-Fold` with `project/K-Fold`). Reuse the spelling already in the
   vault: `K-Fold` (not `KFold`, `kfold`), `rdbdock` (not `RDBDock` in metadata);
