@@ -5,6 +5,7 @@ delete process.env.DEBUG;
 delete process.env.PWDEBUG;
 const fs = require('node:fs/promises');
 const net = require('node:net');
+const http = require('node:http');
 const os = require('node:os');
 const path = require('node:path');
 const {execFile, spawn} = require('node:child_process');
@@ -101,6 +102,63 @@ async function waitConnectorOtp(scope) {
     await removePrivatePath(requestPath);
   }
 }
+// SMS OTP fallback (added 2026-11-06 after KVPN stopped delivering OTP mail). The user's phone
+// forwards only the six-digit KVPN SMS code and its receive time to this host over Tailscale.
+// The listener exists only during one OTP wait (150 s), accepts only the configured phone address,
+// ignores codes received before the SMS was requested, and never logs or stores a code.
+// BEGIN openSmsOtp
+function openSmsOtp(config, requestedAtMs, timeoutMs = 90000) {
+  const failure = reason => {const error = new Error(reason);error.safeReason = reason;return error;};
+  let server, timer, finish, settled = false, seen = '';
+  const code = new Promise((resolve, reject) => {
+    finish = (error, value) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      server.close(() => {});
+      server.closeAllConnections();
+      error ? reject(error) : resolve(value);
+    };
+  });
+  code.catch(() => {});
+  server = http.createServer((request, response) => {
+    const reply = status => {response.writeHead(status, {'Content-Type':'text/plain', Connection:'close'});response.end();};
+    if (String(request.socket.remoteAddress).replace(/^::ffff:/, '') !== config.phone) {reply(403);return;}
+    if (request.method !== 'POST' || request.url !== '/kvpn-otp') {reply(404);return;}
+    let body = '';
+    request.setEncoding('utf8');
+    request.on('data', chunk => {
+      body += chunk;
+      if (body.length > 1024) {reply(413);request.destroy();}
+    });
+    request.on('end', () => {
+      if (body.length > 1024) return;
+      let value;
+      try {value = JSON.parse(body);} catch {value = null;}
+      const received = value?.receivedStamp;
+      if (typeof value?.code !== 'string' || !/^\d{6}$/.test(value.code) || !Number.isSafeInteger(received)) {
+        seen = 'sms_otp_malformed';reply(400);return;
+      }
+      // Accept so the phone stops retrying; a code received before this request is stale.
+      reply(200);
+      if (received < requestedAtMs - 20000 || received > Date.now() + 20000) {seen = 'sms_otp_stale';return;}
+      finish(null, value.code);
+    });
+  });
+  server.headersTimeout = 5000;
+  server.requestTimeout = 5000;
+  server.maxConnections = 8;
+  const ready = new Promise((resolve, reject) => {
+    server.once('error', () => reject(failure('sms_listener_unavailable')));
+    server.listen({host:config.listen, port:config.port, exclusive:true}, () => {
+      server.on('error', () => {});
+      timer = setTimeout(() => finish(failure(seen || 'sms_otp_timeout')), timeoutMs);
+      resolve();
+    });
+  });
+  return {ready, code, close:() => finish(failure('sms_otp_closed'))};
+}
+// END openSmsOtp
 async function nativeState(preflight) {return JSON.parse((await run(preflight, [], {timeout:10000})).stdout);}
 async function launchIvanti(launcher) {
   try {
@@ -203,6 +261,8 @@ async function acknowledgeSignInNotice(page) {
   if (!originIs(page.url(), ORIGIN)) stop('unexpected_login_origin');
 }
 async function authenticate(page) {
+  const {smsOtp} = loadSettings();
+  let method = 'email';
   for (const wait of [0,10000,30000]) {
     if (wait) await delay(wait);
     await page.goto(ORIGIN + '/', {waitUntil:'domcontentloaded'});
@@ -227,18 +287,36 @@ async function authenticate(page) {
       attempts++;
       await login.click();
       const frame = await emailFrame(page);
-      const emailMethod = frame.locator('.email .title');
-      if (await emailMethod.count() !== 1) stop('email_method_unavailable');
+      const sms = method === 'sms';
+      const option = frame.locator(sms ? '.sms .title' : '.email .title');
+      if (await option.count() !== 1) stop(sms ? 'sms_method_unavailable' : 'email_method_unavailable');
       if (!originIs(page.url(), ORIGIN) || !originIs(frame.url(), OTP_ORIGIN)) stop('unexpected_otp_origin');
-      const scope = {capturedAtMs:Date.now(), otpSender:loadSettings().otpSender};
-      await emailMethod.click();
-      emit({status:'authenticating',stage:'email',attempts});
-      try {
-        receipt = {status:'received',code:await waitConnectorOtp(scope)};
-      } catch (error) {
-        const timedOut = error.safeReason === 'connector_email_timeout';
-        if (timedOut && attempts < 3) continue;
-        stop(timedOut ? 'connector_email_timeout' : 'connector_email_unavailable');
+      if (sms) {
+        // The portal says an SMS can take about a minute to arrive.
+        const listener = openSmsOtp(smsOtp, Date.now(), 150000);
+        try {
+          await listener.ready;
+          await option.click();
+          emit({status:'authenticating',stage:'sms',attempts});
+          receipt = {status:'received',code:await listener.code};
+        } catch (error) {
+          const timedOut = ['sms_otp_timeout','sms_otp_stale'].includes(error.safeReason);
+          if (timedOut && attempts < 3) continue;
+          stop(error.safeReason || 'sms_otp_unavailable');
+        } finally {listener.close();}
+      } else {
+        const scope = {capturedAtMs:Date.now(), otpSender:loadSettings().otpSender};
+        await option.click();
+        emit({status:'authenticating',stage:'email',attempts});
+        try {
+          receipt = {status:'received',code:await waitConnectorOtp(scope)};
+        } catch (error) {
+          const timedOut = error.safeReason === 'connector_email_timeout';
+          // After an OTP mail timeout, later logins in this run ask for the code by SMS.
+          if (timedOut && smsOtp) method = 'sms';
+          if (timedOut && attempts < 3) continue;
+          stop(timedOut ? 'connector_email_timeout' : 'connector_email_unavailable');
+        }
       }
       if (receipt.status !== 'received') stop('fresh_email_unavailable');
       if (!originIs(page.url(), ORIGIN) || frame.isDetached() || !originIs(frame.url(), OTP_ORIGIN)) stop('unexpected_otp_origin');
@@ -296,14 +374,22 @@ async function handoff(page, launcher) {
     if (await awaitDelivery(30)) return;
     stop(deliveryFailed ? 'launcher_delivery_failed' : 'launcher_portal_load_failed');
   }
-  await step('client_section', () => page.locator('[id="1-header"]').waitFor({state:'visible',timeout:15000}));
-  if (new URL(page.url()).origin !== ORIGIN) stop('unexpected_portal_origin');
-  await step('client_section_validate', () => page.locator('[id="1-header"]').evaluate(h => {
-    if (!/Client Application Sessions|클라이언트 응용프로그램 세션/.test(h.textContent)) throw new Error('Unexpected client section');
-    if (h.nextElementSibling.classList.contains('collapsed')) h.click();
-  }));
-  await step('start_control', () => page.locator('#client_card_start_button').waitFor({state:'visible'}));
-  await step('start_click', () => page.locator('#client_card_start_button').evaluate(e => e.click()));
+  // About a second after /dana/user/ loads, the portal moves itself to /download/ and
+  // launches the client. When that lands during the DOM steps below they fail
+  // (launcher_start_click_failed on 2026-11-03 and 2026-11-06); accept that launch instead.
+  try {
+    await step('client_section', () => page.locator('[id="1-header"]').waitFor({state:'visible',timeout:15000}));
+    if (new URL(page.url()).origin !== ORIGIN) stop('unexpected_portal_origin');
+    await step('client_section_validate', () => page.locator('[id="1-header"]').evaluate(h => {
+      if (!/Client Application Sessions|클라이언트 응용프로그램 세션/.test(h.textContent)) throw new Error('Unexpected client section');
+      if (h.nextElementSibling.classList.contains('collapsed')) h.click();
+    }));
+    await step('start_control', () => page.locator('#client_card_start_button').waitFor({state:'visible'}));
+    await step('start_click', () => page.locator('#client_card_start_button').evaluate(e => e.click()));
+  } catch (error) {
+    if (!error.safeReason?.startsWith('launcher_') || !await awaitDelivery(30)) throw error;
+    return;
+  }
   await awaitDelivery(30);
   if (!delivered) stop(deliveryFailed ? 'launcher_delivery_failed' : 'launcher_request_missing');
 }

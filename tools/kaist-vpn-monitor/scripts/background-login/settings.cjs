@@ -15,7 +15,19 @@ function validateSettings(value) {
   if (typeof value.otpSender !== 'string' || !/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9.-]*[a-zA-Z0-9])?\.[a-zA-Z]{2,}$/.test(value.otpSender)) {
     throw new Error('OTP sender must be the exact mailbox from a user-verified legitimate KVPN email.');
   }
-  return {sshTarget:value.sshTarget, codexBinary:value.codexBinary, otpSender:value.otpSender.toLowerCase()};
+  // Optional SMS OTP fallback: the phone forwards the KVPN SMS code to this host over Tailscale.
+  let smsOtp = null;
+  if (value.smsOtp !== undefined) {
+    const {listen, port, phone} = value.smsOtp || {};
+    const tailnet = address => typeof address === 'string' &&
+      /^100\.(6[4-9]|[7-9]\d|1[01]\d|12[0-7])\.\d{1,3}\.\d{1,3}$/.test(address) &&
+      address.split('.').every(part => Number(part) <= 255);
+    if (!tailnet(listen) || !tailnet(phone) || !Number.isInteger(port) || port < 1024 || port > 65535) {
+      throw new Error('SMS OTP needs Tailscale listen and phone addresses and a port from 1024 to 65535.');
+    }
+    smsOtp = {listen, port, phone};
+  }
+  return {sshTarget:value.sshTarget, codexBinary:value.codexBinary, otpSender:value.otpSender.toLowerCase(), smsOtp};
 }
 function loadSettings() {
   try {return validateSettings(JSON.parse(fs.readFileSync(settingsPath, 'utf8')));}
