@@ -100,10 +100,10 @@ Methods/Results에서 핵심적으로 쓰인 metric마다 다음 세 가지를 �
 - **Visual**: [[#Figure X]] (focus: panels [letter])
 
 ## 본문 그림 모음
-[이 섹션만 보면 main paper body의 Figure 1..N을 순서대로 모두 훑을 수 있어야 한다. note가 하위 폴더에 있으면 attachment 경로를 relative path에 맞게 조정한다. supplementary/appendix figure는 필요할 때만 별도 표기한다.]
+[이 섹션만 보면 main paper body의 Figure 1..N을 순서대로 모두 훑을 수 있어야 한다. 각 figure PNG는 `attachment_upload`로 올리고 (파일 이름 `<paper-slug>-fig-N.png`), 돌려받은 wikilink를 그대로 embed한다. 경로를 미리 지어 쓰지 않는다. supplementary/appendix figure는 필요할 때만 별도 표기한다.]
 
 ### Figure 1
-![Figure 1](Attachments/[paper-slug]/fig-1.png)
+[`attachment_upload`가 돌려준 wikilink를 그대로 넣는다. 예: `![[Attachments/<paper-slug>-fig-1--<sha12>.png]]`]
 - **출처**: Paper Figure 1 (page Y)
 - **Panel map**:
   - a) [무엇을 보여 주는가]
@@ -114,7 +114,7 @@ Methods/Results에서 핵심적으로 쓰인 metric마다 다음 세 가지를 �
 - **본문 연결**: [어느 방법/실험 섹션의 첫 inline 언급과 직접 연결되는가]
 
 ### Figure 2
-![Figure 2](Attachments/[paper-slug]/fig-2.png)
+[`attachment_upload`가 돌려준 wikilink를 그대로 넣는다. 예: `![[Attachments/<paper-slug>-fig-2--<sha12>.png]]`]
 - **출처**: Paper Figure 2 (page Y)
 - **Panel map**:
   - a) [무엇을 보여 주는가]
@@ -130,7 +130,7 @@ Methods/Results에서 핵심적으로 쓰인 metric마다 다음 세 가지를 �
 `본문 그림 모음`은 exhaustive section이다. 여기서는 다른 note에서 특히 다시 인용할 핵심 figure/table만 추려서 anchor를 남긴다.
 
 ### 그림
-![Fig. X: Caption](Attachments/[paper-slug]/fig-x.png)
+[`attachment_upload`가 돌려준 wikilink를 그대로 넣는다. 예: `![[Attachments/<paper-slug>-fig-X--<sha12>.png]]`]
 - **출처**: Paper Figure X (page Y)
 - **Panel map**:
   - a) [무엇을 보여 주는가]
@@ -150,7 +150,7 @@ Methods/Results에서 핵심적으로 쓰인 metric마다 다음 세 가지를 �
 | ... | ... | ... |
 
 옵션 B: 복잡한 표라면 이미지로 붙인다.
-![Table X](Attachments/[paper-slug]/table-x.png)
+[`attachment_upload`가 돌려준 wikilink를 그대로 넣는다. 예: `![[Attachments/<paper-slug>-table-X--<sha12>.png]]`]
 
 ## 한계와 해석상 주의점
 - [논문이 직접 인정하는 한계]
@@ -175,6 +175,6 @@ Methods/Results에서 핵심적으로 쓰인 metric마다 다음 세 가지를 �
 - [ ] 핵심 metric에 수식과 해석이 들어가 있다
 - [ ] 주요 claim이 specific figure/table에 연결되어 있다
 - [ ] claim 바로 아래에 same-note visual pointer가 있고, panel-level focus가 적혀 있다
-- [ ] main paper body의 Figure 1..N이 `Attachments/[paper-slug]/`에 저장되어 note에 모두 embed되어 있다
+- [ ] main paper body의 Figure 1..N이 업로드되어 반환된 wikilink로 note에 모두 embed되어 있고, 모든 embed가 `attachment_preview`로 열린다
 - [ ] 누락된 body figure가 있으면 번호와 이유가 적혀 있다
 - [ ] 재사용 가능한 figure/table anchor가 남아 있다

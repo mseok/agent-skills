@@ -2,7 +2,7 @@
 name: single-paper-review
 description: >
   Use when "논문 리뷰", "논문 정리", single-paper deep summary 요청에서
-  본문 figure를 `Attachments/`에 저장하고 한 note 안에 모두 embed한
+  본문 figure를 `attachment_upload`로 올리고 한 note 안에 모두 embed한
   Obsidian 친화적 한국어 단일 논문 정리 노트가 필요할 때. 방법을
   우선적으로 강조하면서 결과/지표 정의와 재사용 가능한 figure/table
   anchor를 포함한 문서를 만든다.
@@ -32,14 +32,14 @@ description: >
 2. 본문 figure inventory를 먼저 확정한다.
    - 최소 집합은 main paper body에서 번호가 붙은 모든 Figure다. 즉, 본문에 등장하는 Figure 1..N은 빠짐없이 다룬다.
    - Supplementary/Appendix figure는 사용자가 요청하거나 method/result 이해에 꼭 필요할 때만 추가한다.
-   - 각 figure는 원 figure 단위의 PNG로 캡처해 `Attachments/<paper-slug>/`에 저장한다.
+   - 각 figure는 원 figure 단위의 PNG로 캡처해 로컬 작업 폴더에 `<paper-slug>-fig-N.png`로 저장하고, `obsidian_main`의 `attachment_upload`로 올린다. note에는 업로드 응답의 `wikilink`(경로 `Attachments/<paper-slug>-fig-N--<sha12>.png`)를 그대로 넣는다. `Attachments/<paper-slug>/fig-N.png` 같은 경로를 미리 지어 쓰지 않는다: 게이트웨이는 하위 폴더를 만들지 않으므로 그 링크는 깨진다.
    - 패널별 crop은 가독성 보조용으로만 추가할 수 있고, 원 figure embed를 대체하면 안 된다.
    - note에는 figure를 논문 순서대로 모두 모아 보는 전용 섹션을 반드시 둔다.
 
 3. frontmatter는 최소하지만 정확하게 채운다.
    - `author`, `venue`, `year`, `url`은 기본으로 넣는다.
    - 가능하면 `doi`, `arxiv`, `code`, `aliases`를 함께 채운다.
-   - frontmatter 필드와 순서는 Obsidian vault policy(`obsidian-main-note/references/obsidian-policy.md`)의 Paper 템플릿을 따른다: `kind/paper-review` 태그, 정식 `project`, 모르는 필드는 비워 두지 않고 지운다. 은퇴한 `categories`, `projects`는 쓰지 않는다.
+   - frontmatter 필드와 순서는 Obsidian vault policy(`obsidian-agent-record/references/obsidian-policy.md`)의 Paper 템플릿을 따른다: `kind/paper-review` 태그, 정식 `project`, 모르는 필드는 비워 두지 않고 지운다. 은퇴한 `categories`, `projects`는 쓰지 않는다.
    - note 본문은 한국어로 쓰되, frontmatter key는 English를 유지한다.
 
 4. 논문 요약은 "정리" 관점으로 쓴다.
@@ -74,10 +74,9 @@ description: >
    - 다만 별도의 `본문 그림 모음` 섹션에서는 중요도와 무관하게 main paper body figure 전부를 논문 순서대로 embed한다.
 
 8. 결과는 재사용 가능하게 남긴다.
-   - attachment folder는 `Attachments/<paper-slug>/`를 기본으로 한다.
-   - 본문 Figure는 `fig-1.png`, `fig-2.png`처럼 Figure 번호를 보존하는 파일명으로 저장한다.
+   - 업로드할 파일 이름은 `<paper-slug>-fig-1.png`, `<paper-slug>-table-2.png`처럼 paper slug와 논문의 Figure/Table 번호를 보존한다. embed는 게이트웨이가 `--<sha12>`를 붙여 돌려준 경로로 한다.
    - `본문 그림 모음` 섹션은 필수다. 이 섹션만 보면 본문 Figure를 전부 훑을 수 있어야 한다.
-   - figure: 본문에 등장하는 모든 Figure의 PNG를 저장하고 note에 embed한다.
+   - figure: 본문에 등장하는 모든 Figure의 PNG를 업로드하고 반환된 wikilink로 note에 embed한다.
    - table: 단순하면 Markdown table로 옮기고, 복잡하면 이미지로 embed한다.
    - `재사용 가능한 그림 / 표` 섹션은 exhaustive atlas가 아니라, 특히 다시 인용할 가치가 큰 anchor만 추려서 적는다.
    - 각 figure/table에는 항상 다음을 적는다.
@@ -108,3 +107,11 @@ description: >
 
 - Attachments and notes go through `obsidian_main` (`attachment_upload`, `record_create`); never write into the vault's `Attachments/` or `Notes/` folders directly. When `obsidian_main` is not connected, deliver the note as a local file and say so.
 - Every number in the note is spot-checked against the extracted text by a second pass before delivery; first-pass notes have carried 2 to 10 wrong numeric claims each.
+
+## Attachment check (2026-11-07)
+
+- Embed only the path that `attachment_upload` returned for that file. Before delivery, open every image embed in the note with `attachment_preview` (`path`); one `attachment_not_found` means the note is not finished. Evidence: 34 `Sources/` notes written with this skill from 2026-10-07 linked 214 figures as `Attachments/<paper-slug>/fig-N.png` without uploading them, so every figure was broken until the 2026-11-07 repair.
+
+## User decisions
+
+- 2026-11-07: Question "Should I also fix the paper-review skill and template, so figures are uploaded and linked by the path the upload returns?" User: "ㅇㅇ", then "진행해줘."
