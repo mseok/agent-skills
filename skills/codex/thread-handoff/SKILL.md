@@ -22,7 +22,7 @@ description: Hand work between threads, sessions, harnesses (Codex, Claude Code)
 ## Cross-harness
 
 - Codex → Claude: write the handoff file, then start the new thread with its path; do not paste the Codex transcript.
-- Claude → Codex: same file; Codex worker threads created through an API lack browser context, so browser work stays in the GUI thread.
+- Claude → Codex: same file; a missing browser association follows `~/dot/ai/codex/references/codex-browser.md`.
 - Links to another harness's thread cannot be opened; say so immediately instead of trying.
 
 ## Subagent fan-out preflight
