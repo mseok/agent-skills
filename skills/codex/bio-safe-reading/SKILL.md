@@ -9,8 +9,7 @@ This is a model-specific reading preference, not a universal requirement to dele
 
 ## User decisions
 
-- 2026-10-18: "Opus 5 도 좋은데 Astra, sol 도 괜찮으니까 앞으로느 반드시 5로 할 필요는 없어. claude fable, opus 5.5 쓸 때만 opus 사용해야한다는거였어."
-- 2026-11-10 (ChatGPT app, Claude chat 01a1c3bb-3572-7cd3-990c-7dccc5a119e4): asked whether to add Sonnet 5.5 to the reader models after 33 Sonnet 5.5 medium reader runs over the chat stores finished without a block, the user answered: "sonnet 5.5 를 default 로 하자. 요청없으면 high 를 default 로." The default reader for Claude Fable and Opus 5.5 parents is therefore Claude Sonnet 5.5 at effort high; Opus 5 stays an allowed reader.
+The dated decisions behind these rules, in the user's own words, are in [references/user-decisions.md](references/user-decisions.md). Read it before editing this skill or when a rule's origin or scope is in doubt; record a new decision there and state the resulting rule in plain words in this file.
 
 ## When the parent is Claude Fable or Opus 5.5
 

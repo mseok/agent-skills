@@ -114,4 +114,4 @@ description: >
 
 ## User decisions
 
-- 2026-11-07: Question "Should I also fix the paper-review skill and template, so figures are uploaded and linked by the path the upload returns?" User: "ㅇㅇ", then "진행해줘."
+The dated decisions behind these rules, in the user's own words, are in [references/user-decisions.md](references/user-decisions.md). Read it before editing this skill or when a rule's origin or scope is in doubt; record a new decision there and state the resulting rule in plain words in this file.

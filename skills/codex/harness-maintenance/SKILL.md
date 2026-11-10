@@ -20,10 +20,11 @@ description: "Maintain the agent harness itself across hosts: the shared AGENTS.
 4. Edit the source checkout, not a linked copy. `git status` first; preserve other uncommitted work. Commit only when the user asks; never push without a request.
 5. Propagate: fetch and fast-forward each host's `~/dot` and `~/agent-skills`, run the guidance-only installer, then grep skills, automations and per-project instruction files on every host for the old path or rule. A running session does not reload guidance; say that a new session is needed.
 6. Verify on each host: the links resolve, the skill list loads (`ls ~/.claude/skills`, `ls ~/.codex/skills`), no `AGENTS.override.md` shadows the common file, and host-context has the facts the change relies on.
+7. Make no sidecar backups of a harness change: files under Git (`~/dot`, `~/agent-skills`) roll back through Git, and a change to a host-local file (hook settings, host-context) is described in the task's change record instead of being copied beside the file.
 
 ## Skills that encode user decisions
 
-When the user adopts a rule for a skill or automation, record it verbatim with its date in the skill's `User decisions` section, read that section before editing or running the skill, and never drop or narrow an entry without asking. Edit skills in place (no delete-and-recreate), make automation prompts point to the skill instead of copying its rules, and before moving, renaming or deleting a skill or helper, search live automations and other skills for its path and update them in the same change.
+When the user adopts a rule for a skill or automation, record the decision verbatim with its date in the skill's `references/user-decisions.md`, state the resulting rule in plain words in the skill's SKILL.md, read that file before editing the skill, and never drop or narrow an entry without asking. Edit skills in place (no delete-and-recreate), make automation prompts point to the skill instead of copying its rules, and before moving, renaming or deleting a skill or helper, search live automations and other skills for its path and update them in the same change.
 
 ## Evaluate an instruction or skill change
 
@@ -54,6 +55,4 @@ After any skill change, list `~/.claude/skills` and `~/.codex/skills` on every h
 
 ## User decisions
 
-- 2026-11-10 (ChatGPT app, Claude chat 01a1c3bb-3572-7cd3-990c-7dccc5a119e4): one skill scope. User's words: "codex/, claude/ skill 을 굳이 나누지말고 한 쪽을 다른쪽의 shallow link 로 대체하는게 좋을 것 같은데." It followed the finding that a skill kept in the Claude-only scope was invisible to Claude models running in the ChatGPT app.
-- 2026-11-10 (same chat): unused skills are deleted. User's words: "skill 중에 안 쓰는건 지워도될거같고". Applied to the retired skills under `archive/`; every installed skill had been opened at least once since 2026-10-17 and stayed.
-- 2026-11-10 (same chat): no sidecar backups for harness changes. User's words: "백업 굳이 안해도될듯. 기존에 많이 있던 백업도 다 없애주라 이거관련된거만". Files under Git (dot, agent-skills) roll back through Git; a change to a host-local file (hook settings, host-context) is described in the task's change record instead of being copied beside the file.
+The dated decisions behind these rules, in the user's own words, are in [references/user-decisions.md](references/user-decisions.md). Read it before editing this skill or when a rule's origin or scope is in doubt; record a new decision there and state the resulting rule in plain words in this file.

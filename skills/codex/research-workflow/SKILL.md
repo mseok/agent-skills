@@ -119,4 +119,4 @@ saved, and never use a direct vault file or Git fallback.
 
 ## User decisions
 
-- 2026-11-05: "ㅇㅇ 그럼 1~3번부터 적용하고 검증까지 ㄱㄱ." Apply project/question linking, invocation-bound recording and session-filtered replay on Mac mini and messi. Server-context execution gates are outside this change.
+The dated decisions behind these rules, in the user's own words, are in [references/user-decisions.md](references/user-decisions.md). Read it before editing this skill or when a rule's origin or scope is in doubt; record a new decision there and state the resulting rule in plain words in this file.
