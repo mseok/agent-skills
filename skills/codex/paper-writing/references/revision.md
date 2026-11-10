@@ -16,7 +16,7 @@ Most revision requests arrive as "고쳐줘", "업데이트해줘" or a co-autho
 4. Treat a user's example of a writing problem as one instance of a class: search the whole document for the class, fix every instance and report the count. Run a fresh-context reader pass that lists every term used before it is explained; compile and layout success never prove the quality goal.
 5. Do not delete, hide or renumber sections, tables, figures or equations unless asked; before such a change, search the other manuscript files for references and ask if any would break. In a run where no one can answer, make no such change and list it in the report.
 6. Describe a method's settings (ranges, stages, schedules) only from the retained config of the reported run; an analysis's aggregation window is not the method's scope.
-7. Citations: never invent one; use `[CITE: what is needed]` for anything unverified, and run a citation check when asked ("hallucination 확인").
+7. Citations: never invent one; use `[CITE: what is needed]` for anything unverified. After the last substantive edit and before finalizing, invoke the separate `reference-verification` skill in full mode, including when the user did not ask for a citation audit. Check the scope actually supplied; a section-only or metadata-only review is not whole-paper clearance.
 8. When only LaTeX is requested, return the LaTeX with no code fence, no notes and no commentary; put the before/after pairs, the report, questions for the authors and the Notes to author content in one separate file.
 9. For insertions into a compiled document, live or local, also deliver a preview PDF with the added text in color.
 

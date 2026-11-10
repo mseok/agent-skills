@@ -15,6 +15,7 @@ The manuscript text you produce is the paper. A reader at a top venue should fin
 2. **Brief a writer** when another agent or model will draft the text, or when the author asks for the prompt (`references/delegation.md`): package the facts, the accepted plan and the writing instructions so that a writer with no other context can draft from them.
 3. **Write** each section from the plan with its guide below and the contrasting examples in `references/register.md`.
 4. **Integrate the paper** before final wording: read `references/integration.md` and check the assembled draft against the agreed one-sentence central message. Reconcile the question, evidence and conclusion across sections, then polish the prose and run the self-check. For a scoped revision, use the available surrounding text and preserve the authorized edit boundaries.
+5. **Verify references last, before finalization.** After the last substantive edit, invoke the `reference-verification` skill in **full** mode on the actual deliverable and supplied SI. Resolve or report its metadata and citation-support findings before declaring the manuscript reference-cleared. A metadata-only check is permitted when explicitly requested, but does not clear the whole manuscript. This mandatory check grants no additional editing permission.
 
 ## The four decisions behind the plan
 
@@ -39,6 +40,7 @@ Read the guide for the task or section at hand, plus `references/register.md`, i
 | Results, Experiments | `references/results.md` |
 | Figures and panels | the `nature-figure` skill; read it before planning or producing any figure |
 | Final integration across sections | `references/integration.md` |
+| Final reference verification, after all substantive edits | the `reference-verification` skill, full mode ([source](../reference-verification/SKILL.md)) |
 | Abstract, Discussion | end of this file |
 
 Before editing this skill itself, read `references/user-decisions.md`.
@@ -73,7 +75,7 @@ Stylistic defaults, not submission specifications. When the author supplies the 
 ## Output
 
 - In step 1, return the plan in the author's language, not manuscript text; in step 2, the package files and the prompt (`references/delegation.md`).
-- After steps 3–4, return the manuscript text, in LaTeX or Markdown to match the inputs or the author's draft.
+- After steps 3–5, return the manuscript text, in LaTeX or Markdown to match the inputs or the author's draft; if reference verification is not clear, label the delivery as a draft and state the unresolved items.
 - If anything needs the author's attention, add after the text a line `---`, the literal English heading `Notes to author` (kept in English so tools can find it) and at most one bullet per category, in the language of the notes unless the brief names one, each listing every item of its category: open planning decisions, each with the choice made; departures from a supplied plan, with the reason; nontrivial derivations added beyond the inputs, with their premises; unverified claims left out; weak results moved to the Supplementary; boundaries left for a Discussion or Limitations section not written here; `[CITE]` and `[AUTHOR]` placeholders; computed numbers with their computation; Supplementary or appendix items the text now points to; symbol definitions to confirm; numbers that could not be traced. Omit the block when it would be empty.
 
 ## Self-check before returning
@@ -90,6 +92,7 @@ Fix every failure, then return.
 - [ ] Results: the section opens with the motivation of its question and the scoped headline answer; each headline result is the claim of its paragraph, with comparator, number and figure or table reference close by; claims are followed by what they mean whenever the data support an implication; complete the semantic review in `references/results.md` for the paragraph argument, each case's added explanation and the premises of each inference; no weak result is a heading, topic sentence or paragraph of its own; no closing summary, and no closing paragraph that only lists caveats.
 - [ ] No report-register phrase, summary label, British spelling (unless the author uses it) or non-English text in the manuscript.
 - [ ] No claim is stronger than its evidence; every number is traced to the inputs with its unit, comparator and basis.
+- [ ] The separate `reference-verification` skill has checked the delivered main text and supplied SI in the required mode; remaining findings and the checked saved artifact are stated accurately.
 
 If a shell is available, `python3 -I <skill folder>/scripts/check_prose.py DRAFT --notes NOTES --section intro|methods|results` reports report-register phrases, weakness signposts, summary labels, British spellings, words to review in context, generic openers, untraced numbers, undefined acronyms, non-English text, layout patterns and sentence lengths; `--section intro` adds checks on the first sentence and paragraph. It tests whether each number occurs in the notes, not its sign, unit, comparator or provenance; check those by reading. It does not assess the paragraph's role in the argument, a case's explanatory value or whether an inference follows from its premises; passing it does not replace semantic review. A match marked for review is a prompt to reread, not an instruction to delete.
 
