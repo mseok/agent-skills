@@ -5,7 +5,7 @@ description: Maintain a cumulative Obsidian research report across tasks and hos
 
 # Keep the research question continuous
 
-Read the [Obsidian vault policy](../obsidian-main-note/references/obsidian-policy.md) once
+Read the [Obsidian vault policy](../obsidian-agent-record/references/obsidian-policy.md) once
 per task before using this workflow; reuse it if already loaded. All vault and
 recording rules live there; this skill holds the procedure.
 

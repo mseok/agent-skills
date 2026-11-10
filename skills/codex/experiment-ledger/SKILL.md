@@ -5,7 +5,7 @@ description: Preserve a separately comparable terminal research result and conne
 
 # Retain the experiment and its meaning
 
-Read the [Obsidian vault policy](../obsidian-main-note/references/obsidian-policy.md) once
+Read the [Obsidian vault policy](../obsidian-agent-record/references/obsidian-policy.md) once
 per task before using this workflow; reuse it if already loaded. All vault and
 recording rules live there; this skill holds the procedure.
 

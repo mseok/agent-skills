@@ -1,4 +1,0 @@
-interface:
-  display_name: "Obsidian Notes"
-  short_description: "Route concept references and personal writing to their folders"
-  default_prompt: "Use $obsidian-writing-note to save this note in Concepts/ if it is a reusable explanation or Writing/ if it is my own prose, with source-backed content and academic wikilinks."

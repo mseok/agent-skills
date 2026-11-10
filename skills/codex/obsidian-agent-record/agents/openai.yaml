@@ -1,0 +1,3 @@
+interface:
+  display_name: "Obsidian 에이전트 기록"
+  short_description: "후속 에이전트가 검색·재사용할 작업 결과를 Inbox/Agents에 기록"

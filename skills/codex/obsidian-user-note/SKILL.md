@@ -1,16 +1,18 @@
 ---
-name: obsidian-writing-note
-description: Write or revise explicitly requested Obsidian notes through obsidian_main, routing reusable concept explanations to Concepts and the user's own prose to Writing. Preserve detailed context, research necessary gaps, and add academic wikilinks even when targets do not exist. Do not save ordinary chat explanations or research milestones automatically; use the established research skills for milestones and experiments.
+name: obsidian-user-note
+description: Write or revise Obsidian notes the user explicitly requests to read and edit, including concept explanations in Concepts and their own prose or meeting notes in Writing. Preserve detailed context, research necessary gaps and add academic wikilinks. Agent work records belong to obsidian-agent-record; research question reports and comparable experiments use their dedicated skills. Ordinary chat explanations do not trigger a save.
 ---
 
-# Write Obsidian notes in Concepts/ or Writing/
+# Obsidian user notes: Concepts and Writing
 
-Read the [Obsidian vault policy](../obsidian-main-note/references/obsidian-policy.md) once per task; it holds the vault rules (permissions, folders, metadata, writing). This skill adds the note-writing procedure and its detailed guidance.
+Use this skill for the user's readable notes. For example, “turn this meeting into a note I can review” or “write a concept note explaining this mechanism” belongs here. The distinction is the requested artifact's purpose, not whether the request comes from Chat, Codex or Claude; this is not a Chat-plugin-only skill.
+
+Read the [Obsidian vault policy](../obsidian-agent-record/references/obsidian-policy.md) once per task; it holds the vault rules (permissions, folders, metadata, writing). This skill adds the note-writing procedure and its detailed guidance.
 
 ## Trigger boundary
 
-- Use this skill **only** when the user explicitly asks to create, draft, revise, organize, or add concept links to an Obsidian note. An ordinary explanation in chat does not authorize saving a note.
-- Keep all ongoing research continuity unchanged: automatic milestone updates still use `research-workflow` (question reports under `Inbox/Agents/<host>/`), comparable terminal runs still use `experiment-ledger`, and autonomous agent outcome records still use `obsidian-main-note` (`Inbox/Agents/`).
+- Use this skill **only** when the user explicitly asks to create, draft, revise, organize, or add concept links to a user-facing concept note or personal note. An explicit request for an agent record still uses `obsidian-agent-record`; an ordinary explanation in chat does not authorize saving a note.
+- Keep all ongoing research continuity unchanged: automatic milestone updates still use `research-workflow` (question reports under `Inbox/Agents/<host>/`), comparable terminal runs still use `experiment-ledger`, and autonomous agent outcome records still use `obsidian-agent-record` (`Inbox/Agents/`).
 - Do not quiz or interrogate the user before writing. Unless the requested topic itself is genuinely ambiguous, gather context and write a complete, readable draft so the user can review and edit it in Obsidian.
 
 ## Choose the destination by the purpose of the text
@@ -51,7 +53,7 @@ This adopts the first-mention and unresolved-link practice from [Kepano's Links 
 1. **Check vault context first (`obsidian_main`):**
    - Run bounded `knowledge_search` queries (and `knowledge_read` when relevant) across `Concepts/`, `Writing/`, `Notes/`, and `Inbox/Agents/` so terminology, equations, and `[[wikilinks]]` align with existing concept titles, unresolved links and project hubs (such as `[[K-Fold]]` or `[[RDBDock]]`). A missing concept note still receives an unresolved link.
 2. **Draft detailed, high-signal prose at the depth the user needs:**
-   - Do not impose a short line or paragraph target. Respect the chosen tool's transport limit; use meaningfully linked topical notes if needed without discarding the user's content.
+   - Do not impose a character, line or paragraph limit on the finished note. Keep one coherent requested narrative in one note; split only when the topics serve genuinely separate reading purposes or the user asks. A tool request-size limit is not a reason to shorten or split the note.
    - Open immediately with a 2–3 sentence core definition or takeaway in clear Korean with standard English technical terms. Skip empty template banners or decorative emoji headings.
    - Include an equation, mechanism block or comparison only when it helps explain the requested facts; do not force a template onto a meeting record.
    - End when the requested content is covered. Apply the academic concept-link pass above and retain links to relevant topical notes. Check concept coverage and target consistency before saving; a link is navigation, not supporting evidence for a claim.
@@ -59,7 +61,7 @@ This adopts the first-mention and unresolved-link practice from [Kepano's Links 
 3. **Save using the selected branch:**
    - **Concepts:** use `knowledge_revise(action: "create", path: "Concepts/<title>.md")` with complete Markdown in `content`, including YAML `title`, `created`, `tags: [kind/concept, ...]` and useful aliases. Use the canonical English concept title so existing wikilinks resolve. Include the required `reason`, journal `source_refs` and a stable `operation_id`; do not copy the journal into the note body. Read the saved note back to verify it.
    - Creating or revising a Concepts note, and revising a Writing note this host did not create, runs on the Mac mini, whose gateway permits it without any scope file (policy section 2). A remote session hands the change to a Mac mini session; it never substitutes Writing, impersonates a host or edits vault files directly. Never overwrite a collision or create a duplicate to avoid the revision path.
-   - **Writing:** create the personal draft via `note_draft_create`; it generates the personal `writer` metadata automatically.
+   - **Writing:** create the personal draft via `note_draft_create`; it generates the personal `writer` metadata automatically. If the complete body exceeds that tool's current input limit, create the same titled note with its opening passage, read its SHA, then immediately use `knowledge_revise(action: "revise")` to save the complete prepared note at the same path while preserving gateway-generated metadata. Do not report completion at the intermediate step. Verify the final saved body against the full prepared text; if a request ceiling prevents completion, report the transport blocker instead of silently splitting or truncating the writing.
    - **For Writing only**, call `obsidian_main` tool `note_draft_create` with:
      - `title`: exact user-chosen title when the user provides one, or a concise natural concept/topic title when omitted. Do not prepend dates or append `--hash` suffixes (`note_draft_create` saves directly to `Writing/<title>.md` and records `created: YYYY-MM-DD` in YAML frontmatter).
      - `body`: Markdown body prose without frontmatter.
@@ -74,8 +76,11 @@ This adopts the first-mention and unresolved-link practice from [Kepano's Links 
 
 ## User decisions
 
+- 2026-11-09: `"그리고 내가 12000자 제한? 이런거 둬가지고 writign 을 분리해서 했다고 이전에 얘기하던데, 이거 제한 skill 에서 없애주고, 이전에 작성해야했던것도 writing  을 합칠 수 있는건 합쳐주라."` Finished Writing notes have no skill-imposed length cap. Preserve coherent narratives with the same-note create-then-revise route when a creation tool has a smaller input limit; consolidate the existing split writing under the user's requested scope.
+- 2026-11-06: `"호출 이름도 obsidian-user-note랑 obsidian-agent-record로 바꾸자. 참조하는 곳도 같이 맞추고 다른 호스트에도 동기화해줘."`
+- 2026-11-06: `"음 이거 확실히 구분할 수 잇으면 좋겠는데"` The user wants the user-note and agent-record skills to be clearly distinguishable.
 - 2026-11-04: `"굳이 질문을 하기보다는, 내가 어떤 내용을 적어달라고 요청하면 그걸 잘 writing 해주고, 내가 그걸 검수하는게 나을거같은데? 구조만 잘 설계하면 좋을거같음."` (Do not gate note creation on Socratic questioning; write a clean, structured draft when requested so the user can review it.)
-- 2026-11-04: `"그리고 기본적인 연구 진행 상황들은 여전히 기존 workflow 그대로하고, 내가 note 만들어달라고 직접 요청할 때만 새로 만드는 스킬로 새로운 장소에 잘 보관하고, 그 노트들이 그냥 언제나 obsidian 바로들어가자마자 쉽게 볼 수 있게 해줘"` (Preserve `research-workflow`, `experiment-ledger`, and `obsidian-main-note` unchanged; trigger this skill only on explicit note requests, store in the dedicated personal folder, and surface immediately on `HOME.md` startup Base.)
+- 2026-11-04: `"그리고 기본적인 연구 진행 상황들은 여전히 기존 workflow 그대로하고, 내가 note 만들어달라고 직접 요청할 때만 새로 만드는 스킬로 새로운 장소에 잘 보관하고, 그 노트들이 그냥 언제나 obsidian 바로들어가자마자 쉽게 볼 수 있게 해줘"` (Preserve `research-workflow`, `experiment-ledger`, and `obsidian-agent-record` unchanged; trigger this skill only on explicit note requests, store in the dedicated personal folder, and surface immediately on `HOME.md` startup Base.)
 - 2026-11-04: `"날짜는 메타데이터로 넣고, 제목도 내가 설정보통할테니까 그냥 그렇게해야할듯? 그리고 Wiki 말고 다른 폴더명 추천좀."` / `"Writing 으로 해줘."` (Store personal notes in `Writing/<title>.md` using the user's title without a filename date prefix, keeping `created: YYYY-MM-DD` in YAML frontmatter metadata.)
 - 2026-11-05: After quoting the assistant-added follow-up questions, execution-authorization disclaimer and internal source footer, the user said: `"이런거 내가 쓰는 노트에서는 없으면 좋겠어."` / `"내가 쓰는 노트에는 확실한 사실만 있으면 좋겠고, 앞으로 추가 자료 조사 요청이 있으면 새로운 노트 페이지와 함께 링크를 달아서 만들어주면 좋겠어."` Keep personal notes factual and free of those additions; requested follow-up research gets its own linked note.
 - 2026-11-05: `"그리고 미팅 노트는 왜이렇게 간략해진거지? 내가 다 읽고 정리할 수 있게 최대한 자세하게 하고, 중간중간 빈 부분들은 조사를 하도록 언제나 설정해줘."` This supersedes the short-draft target and the restriction on researching necessary gaps without a separate request. Preserve detailed meeting substance, investigate gaps proactively, and connect substantial researched explanations through separate notes.

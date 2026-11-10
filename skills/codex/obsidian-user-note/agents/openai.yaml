@@ -1,0 +1,4 @@
+interface:
+  display_name: "Obsidian 사용자 노트"
+  short_description: "요청한 개념 설명과 개인 글을 Concepts/Writing에 작성"
+  default_prompt: "Use $obsidian-user-note to save this note in Concepts/ if it is a reusable explanation or Writing/ if it is my own prose, with source-backed content and academic wikilinks."

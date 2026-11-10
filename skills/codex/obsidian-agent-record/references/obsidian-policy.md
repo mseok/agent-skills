@@ -1,8 +1,8 @@
 # Obsidian vault policy
 
 This file is the single source of the rules for the user's Obsidian vault. Skills
-(`research-workflow`, `experiment-ledger`, `obsidian-main-note`,
-`obsidian-writing-note`, `research-talk`, `html-research-deck`,
+(`research-workflow`, `experiment-ledger`, `obsidian-agent-record`,
+`obsidian-user-note`, `research-talk`, `html-research-deck`,
 `single-paper-review`) carry only their procedures and point here. The vault's
 own `AGENTS.md` is a short map that points here. The gateway enforces the
 permissions in section 2. Change a rule here, not in a copy; read this file
@@ -81,8 +81,8 @@ into the vault. Do not create an empty note just to resolve a link.
 |---|---|
 | meaningful hypothesis, implementation, result interpretation, adopted decision or change of direction in research | `research-workflow`: update the question report |
 | separately comparable terminal result | `experiment-ledger`: one evidence record per run, batch, sweep or screening round |
-| other reusable agent outcome | `obsidian-main-note`: `record_create` |
-| the user explicitly asks for a note | `obsidian-writing-note`: `Concepts/` for reusable explanation, `Writing/` for the user's own prose, both linked for a mixed request; an explicit destination wins |
+| other reusable agent outcome or an explicitly requested revision of an agent record | `obsidian-agent-record`: `record_create` or an authorized `knowledge_revise` of the existing record |
+| the user explicitly asks for a concept reference, meeting note or personal prose to read and edit | `obsidian-user-note`: `Concepts/` for reusable explanation, `Writing/` for the user's own prose, both linked for a mixed request; an explicit destination wins |
 | the user asks for study material on a book or course | `Study/<source>/`: a hub note plus one note per chapter or section, written from the Study template |
 | a talk | `research-talk`: its preparation note and `Slides/` |
 | ordinary chat explanation, routine checks, polling, tooling, layout-only edits, prose draft versions, administrative and personal tasks | no note |
