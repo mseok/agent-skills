@@ -8,7 +8,7 @@ description: "Maintain the agent harness itself across hosts: the shared AGENTS.
 ## Where things live
 
 - Shared guidance: `~/dot/ai/codex/AGENTS.md` (every host links `~/.codex/AGENTS.md` and `~/.claude/CLAUDE.md` to it). The research block at its top is managed by `obsidian-main/scripts/deploy-research.py` from `policies/research-router.md`; edit both the router source and AGENTS.md identically, or redeploy, never one alone.
-- Shared skills: `~/agent-skills/skills/codex` (both harnesses) and `~/agent-skills/skills/claude` (Claude only); `~/dot/bin/install_codex.sh` and `~/dot/bin/install_claude.sh` link them into `~/.codex/skills` and `~/.claude/skills`. The research skills (`research-workflow`, `experiment-ledger`, `obsidian-agent-record`, `obsidian-user-note`) live here too, and every Obsidian vault rule lives only in `obsidian-agent-record/references/obsidian-policy.md`; the obsidian-main deployer manages only the research block and hooks. Host-local skill directories are never edited by hand.
+- Shared skills: `~/agent-skills/skills/codex`, one scope for both harnesses (`skills/claude` is a link to it so that older paths resolve; never add a second scope); `~/dot/bin/install_codex.sh` and `~/dot/bin/install_claude.sh` link every skill into `~/.codex/skills` and `~/.claude/skills`. Retired skills are deleted from the repository, not archived; Git history keeps them. The research skills (`research-workflow`, `experiment-ledger`, `obsidian-agent-record`, `obsidian-user-note`) live here too, and every Obsidian vault rule lives only in `obsidian-agent-record/references/obsidian-policy.md`; the obsidian-main deployer manages only the research block and hooks. Host-local skill directories are never edited by hand.
 - Host facts: `~/.codex/host-context.md` on each host. Hooks and settings: `~/.claude/settings.json`, `~/.codex/hooks.json`, host-local.
 - Memory: Claude auto-memory under `~/.claude/projects/<cwd-key>/memory/`, Codex memory under `~/.codex/memories/`. Mandatory behavior never lives only in memory; promote it to AGENTS.md, a skill or host-context, then delete the memory note.
 
@@ -51,3 +51,9 @@ At session start on any host, `~/.codex/AGENTS.md` and `~/.claude/CLAUDE.md` mus
 ## Skill parity across hosts (2026-10-17 audit)
 
 After any skill change, list `~/.claude/skills` and `~/.codex/skills` on every host and diff the names against the shared repository; a host missing a shared skill (manuscript-writing was absent on the lab server for a month) is fixed by the installer, never by an ad-hoc copy or by letting the agent fall back to an archived skill.
+
+## User decisions
+
+- 2026-11-10 (ChatGPT app, Claude chat 01a1c3bb-3572-7cd3-990c-7dccc5a119e4): one skill scope. User's words: "codex/, claude/ skill 을 굳이 나누지말고 한 쪽을 다른쪽의 shallow link 로 대체하는게 좋을 것 같은데." It followed the finding that a skill kept in the Claude-only scope was invisible to Claude models running in the ChatGPT app.
+- 2026-11-10 (same chat): unused skills are deleted. User's words: "skill 중에 안 쓰는건 지워도될거같고". Applied to the retired skills under `archive/`; every installed skill had been opened at least once since 2026-10-17 and stayed.
+- 2026-11-10 (same chat): no sidecar backups for harness changes. User's words: "백업 굳이 안해도될듯. 기존에 많이 있던 백업도 다 없애주라 이거관련된거만". Files under Git (dot, agent-skills) roll back through Git; a change to a host-local file (hook settings, host-context) is described in the task's change record instead of being copied beside the file.

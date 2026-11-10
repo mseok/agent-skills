@@ -7,13 +7,14 @@ For the shareable macOS KAIST VPN automation, see
 [KAIST VPN Monitor Community](tools/kaist-vpn-monitor/README.md)
 for setup, requirements, and validation limits.
 
-- `skills/codex/`: skills installed for both Codex and Claude, including `nature-figure` and `research-talk` (slide decks in the dissertation style; Pretendard font bundled under `assets/fonts`, installed automatically).
-- `skills/claude/`: Claude-only skills (`bio-safe-reading`, `single-paper-review`) and the `usage-progress` Claude Code plugin.
-- `archive/`: retired skills; not installed.
+- `skills/codex/`: every skill, installed for both Codex and Claude, including `nature-figure` and `research-talk` (slide decks in the dissertation style; Pretendard font bundled under `assets/fonts`, installed automatically).
+- `skills/codex/usage-progress/`: a Claude Code plugin, not a skill; it has no `SKILL.md`, so only the link in `~/.claude/skills` loads it.
+- `skills/claude`: a link to `skills/codex`, kept so that older paths resolve. There is one scope; do not add a second directory.
+- Retired skills are deleted, not archived; recover one from the Git history when it is needed again.
 - `skills/codex/verification-before-completion/`: copied unchanged from obra/superpowers at commit `8ca22db` (MIT; its `LICENSE` is kept beside the skill).
 
-Keep the existing agent-specific grouping during migration. Shared capabilities
-can be consolidated later after checking their instructions and callers.
+Skills are not grouped by agent (since 2026-11-10): a skill that only one harness can
+use says so in its own description.
 
 ## Install or migrate
 
@@ -25,8 +26,7 @@ With the companion dot checkout available:
 ```
 
 The installer links individual skills under `~/.codex/skills` and
-`~/.claude/skills` (`skills/claude` only into Claude) and removes links left by
-archived or moved skills. It preserves host-owned `.system` skills and unrelated
+`~/.claude/skills` and removes links left by deleted or moved skills. It preserves host-owned `.system` skills and unrelated
 plugins. `AGENT_SKILLS_HOME` overrides the default source checkout location.
 The normal dot Codex installer invokes the same migration.
 
