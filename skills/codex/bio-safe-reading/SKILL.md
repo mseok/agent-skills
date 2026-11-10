@@ -1,20 +1,21 @@
 ---
 name: bio-safe-reading
-description: Apply the user's model-specific preference for reading biology, chemistry, drug-discovery or medical material. Astra, Sol and Claude Opus 5 may read directly; route Claude Fable or Opus 5.5 reading to Claude Opus 5 before it starts. Use for such material, an explicit reading-model instruction, or safe state preservation after a refusal. Model changes never override a safety refusal.
+description: Apply the user's model-specific preference for reading biology, chemistry, drug-discovery or medical material. Astra, Sol, Claude Sonnet 5.5 and Claude Opus 5 may read directly; route Claude Fable or Opus 5.5 reading to Claude Sonnet 5.5 (effort high by default) before it starts. Use for such material, an explicit reading-model instruction, or safe state preservation after a refusal. Model changes never override a safety refusal.
 ---
 
 # Bio-safe reading
 
-This is a model-specific reading preference, not a universal requirement to delegate biology content. Astra, Sol and Claude Opus 5 may read sources directly. The routing rules below apply only when the parent is Claude Fable or Opus 5.5, or the user explicitly requests that routing.
+This is a model-specific reading preference, not a universal requirement to delegate biology content. Astra, Sol, Claude Sonnet 5.5 and Claude Opus 5 may read sources directly. The routing rules below apply only when the parent is Claude Fable or Opus 5.5, or the user explicitly requests that routing.
 
 ## User decisions
 
 - 2026-10-18: "Opus 5 도 좋은데 Astra, sol 도 괜찮으니까 앞으로느 반드시 5로 할 필요는 없어. claude fable, opus 5.5 쓸 때만 opus 사용해야한다는거였어."
+- 2026-11-10 (ChatGPT app, Claude chat 01a1c3bb-3572-7cd3-990c-7dccc5a119e4): asked whether to add Sonnet 5.5 to the reader models after 33 Sonnet 5.5 medium reader runs over the chat stores finished without a block, the user answered: "sonnet 5.5 를 default 로 하자. 요청없으면 high 를 default 로." The default reader for Claude Fable and Opus 5.5 parents is therefore Claude Sonnet 5.5 at effort high; Opus 5 stays an allowed reader.
 
 ## When the parent is Claude Fable or Opus 5.5
 
 1. Do not open raw bio-adjacent sources yourself: paper PDFs, corpus lists, assay or design notes, sequence files, transcripts of research chats. Work from paths, counts, metadata and behavioral summaries.
-2. Delegate reading to Claude Opus 5 (`claude-opus-5`): in Claude Code use the exact model ID rather than an `opus` alias that may resolve to Opus 5.5. One batch per agent; give it paths, the question and the output file, never pasted content. Astra and Sol parents may instead read directly or use a suitable worker when delegation is useful.
+2. Delegate reading to Claude Sonnet 5.5 (`claude-sonnet-5-5`) at effort high unless the user names another model or effort: in the ChatGPT app pass both to `spawn_agent` (`model`, `reasoning_effort`), in Claude Code give the Agent tool the exact model ID and the effort. Claude Opus 5 (`claude-opus-5`) remains an allowed reader when the user asks for it: in Claude Code use the exact model ID rather than an `opus` alias that may resolve to Opus 5.5, and in the ChatGPT app, where `spawn_agent` does not offer it, run it as the headless `claude -p --model claude-opus-5` worker described in host-context and say so before launching. One batch per agent; give it paths, the question and the output file, never pasted content. Astra and Sol parents may instead read directly or use a suitable worker when delegation is useful.
 3. The subagent writes its findings to a file and replies with a short summary. Tell it to keep its own notes at the level of agent behavior or evidence pointers: no protocols, sequences, structures, targets, compound names, dosing or mechanism details in the report unless the user's deliverable needs them, in which case it writes them to the deliverable file, not to the chat.
 4. The parent reads only the summary and the report. If a report must contain scientific detail, read it with a second allowed-model agent that extracts what the parent needs.
 5. Keep quarantine folders for raw material (`<task>/raw/`) and reports (`<task>/findings/`). Never print corpus lists, abstracts or excerpts into the chat.
@@ -39,5 +40,5 @@ tools only; no network, no connectors, no subagents. Reply with a <=15-line summ
 ## Verified additions (2026-10-17 audit)
 
 - Rule 1 also covers item prompts, answer keys, generated drafts, judged sentences, structure files, database entry pages, and research notes or their title lists derived from such material. When the material's domain does not matter to the task (writing-style corpora, evaluation items, layout tests), choose non-bio sources up front, never a life-science index; after a lockout remove bio-adjacent items from such a corpus instead of adding more. In code-driven analysis of biological structures or benchmarks, scripts print identifiers, counts and metrics only, never database records or page text.
-- When the deliverable itself is bio-adjacent text (slides, manuscript prose) and the active reader is Claude Fable or Opus 5.5, use Opus 5 before reading or ask once for that model switch if delegation is unavailable. Astra and Sol require no switch solely because the topic is biological. Preserve the current task state after an actual turn failure without promising that a fresh session will bypass it.
+- When the deliverable itself is bio-adjacent text (slides, manuscript prose) and the active reader is Claude Fable or Opus 5.5, use the default reader (Sonnet 5.5, effort high) before reading or ask once for a model switch if delegation is unavailable. Astra and Sol require no switch solely because the topic is biological. Preserve the current task state after an actual turn failure without promising that a fresh session will bypass it.
 - The blocked turn's tool calls may have run although they are gone from your context: list files changed in the task folder since the blocked turn and treat them as your own output before redoing work.

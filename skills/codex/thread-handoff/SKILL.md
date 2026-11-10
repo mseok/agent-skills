@@ -11,7 +11,7 @@ description: Hand work between threads, sessions, harnesses (Codex, Claude Code)
 2. Create it at the first compaction or before the first external-account change or bulk write; refresh it at material transitions, after about five compactions (then offer a fresh thread), when the user resets context, and before the thread is archived. A handoff carries decisions, not history: no chat summary, no exploration log.
 3. Keep it current, not cumulative. When the user reverses or replaces a decision, delete the old entry in the same write that adds the new one; drop finished operations, answered questions and sources no longer used. Do this only when the `read` output has a `history` key, which means the tool appends every removed entry verbatim to `<name>.history.jsonl`; an older tool has no history, so keep the old entry there. Never paraphrase, merge or shorten a decision to save space, and ask the user before removing a decision that is still in force.
 4. The tool prefixes each completed check with an ID such as `[k12]`. Append new checks at the end, keep the prefixes when you rewrite the list, and write `[k12]` in a decision, question or next action that rests on that check. Over 12,000 bytes the tool moves the oldest checks to the history, keeping the newest ten and every check those fields cite; a file still over budget is saved with a warning, and you clean it up as in step 3 at the next write. Read the history only when the user disputes a decision or the handoff names a gap.
-5. Name the file in the reply with its absolute path and the SHA from the tool's output.
+5. Name the file with its absolute path and the SHA from the tool's output when you create it, at a handoff, or when the user must act on it. Routine refreshes are silent: no path, hash or moved-check report in the reply.
 
 ## Resume
 
@@ -27,8 +27,8 @@ description: Hand work between threads, sessions, harnesses (Codex, Claude Code)
 
 ## Subagent fan-out preflight
 
-1. Before launching, state in one block: number of agents, model, effort (pass the requested model and effort through the host's own subagent tool: ChatGPT app `spawn_agent` with explicit `model` and `reasoning_effort`, Claude Code Agent `effort`; use `claude -p --effort` only where no native subagent tool exists, such as a plain terminal or Workflow; if no route supports it, say so before launching), expected token cost, search cap per agent, and output files. Check the remaining usage budget first; stop launching when a usage warning appears.
-2. No nested subagents by default. Each prompt carries: the exact question, input paths, the output path, "local tools only", and the identifier restriction (no emails, phone numbers, account IDs in requests or outputs).
+1. Before launching, state in one block: number of agents, model, effort (pass the requested model and effort through the host's own subagent tool: ChatGPT app `spawn_agent` with explicit `model` and `reasoning_effort`, Claude Code Agent `effort`; use `claude -p --effort` only where no native subagent tool exists, such as a plain terminal or Workflow; if no route supports it, say so before launching), expected token cost, search cap per agent, and output files. Check the remaining usage budget first; stop launching when a usage warning appears. When the remaining budget cannot be read, size the first wave to one third of the plan and say so. Subagents used only to read pages or files because no fetch tool exists are a fan-out too.
+2. No nested subagents by default. Each prompt carries: the exact question, input paths, the output path, "local tools only", and the identifier restriction (no emails, phone numbers, account IDs in requests or outputs). The brief quotes the user's scope sentence, lists only the inputs the user named and carries the exclusions; any extra source is shown to the user before launch.
 3. The parent verifies subagent claims (citations, numbers, "done") against sources before relaying them, and never lets an inter-thread status message be the final reply to the user.
 4. Partial results are salvaged into files as agents finish; a crashed workflow must not lose finished work.
 
@@ -50,6 +50,12 @@ Archiving, renaming, restarting or deleting many threads or sessions: produce th
 - Fan-out: each agent gets its own working and download directory (shared folders are read-only to agents) and the host's shell traps from host-context (for example `/bin/ls` instead of `ls`, no GNU `timeout`); read a subagent's output only after its completion notification or wait call returns, since an existing file may still be rewritten; in Workflow scripts treat every agent result as possibly null and filter before reading its fields. Claude Code cannot read plan usage: before a fan-out of more than about five agents ask once for the user's usage figures, and when a reset time is near, launch after it or state the risk in the launch line.
 - To continue in another project folder on the Mac mini, start the session there with the host-context procedure (herdr workspace with `--cwd`, then `claude rc`); `create_session` cannot set the working directory, and a first-run folder-trust prompt needs the user's keypress.
 
+## Verified additions (2026-11-10 audit)
+
+- A mailbox or inter-thread post is not delivery: send direct input to the sibling and confirm from its reply or terminal that the work started before you report a handoff.
+- Have each fan-out agent finish by creating a marker file next to its output and replying with one status line (no findings in the reply). The parent waits on the markers with one shell loop, polled in steps under two minutes, instead of one wait call per agent, and reads outputs only after the marker exists.
+- Give agents categorical side files (verdict tables, one JSON object per case) next to their prose reports, so that the parent can count and pack the next stage with a script instead of reading every report.
+
 ## Bulk operations: what "back" means (2026-10-17 audit)
 
 A restored or replacement thread counts as back only when it is visible where the user looks (sidebar and mobile); threads created through app-server tools are hidden there, so create replacements from the GUI or say that they are hidden. After importing a thread into another harness, compare the imported history with the handoff's completed checks and report any gap before continuing.
@@ -57,3 +63,4 @@ A restored or replacement thread counts as back only when it is visible where th
 ## User decisions
 
 - 2026-10-27 (ChatGPT app, Claude chat 01a17beb-b6e8-7861-8906-b61838d2e8b1, continued in 01a17c0d-815e-76b0-b8aa-0a33e0754199): a fan-out passes model and effort through the host's own subagent tool and uses `claude -p --effort` only where no native subagent tool exists (step 1 above). User's words: "ㅇㅇ 둘다 적용 ㄱㄱ" and "둘 다 적용하면 될 듯?".
+- 2026-11-10 (ChatGPT app, Claude chat 01a1c3bb-3572-7cd3-990c-7dccc5a119e4): the 2026-11-10 audit edits to this skill (silent state refresh in step 5, budget and scope lines in the preflight, the 2026-11-10 additions) were applied on the user's go-ahead for the first wave. User's words: "좋아. 지금 hook 도 불필요하다면 없애고 업데이트해야할듯."
