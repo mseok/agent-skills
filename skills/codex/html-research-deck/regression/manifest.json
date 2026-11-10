@@ -1,0 +1,204 @@
+{
+ "version": 1,
+ "cases": [
+  {
+   "id": "title-wraps",
+   "date": "2026-11-01",
+   "source": "references/qa.md",
+   "quote": "its title wrapped over the subtitle",
+   "defect": "the title takes two lines and runs over what is below it",
+   "tool": "check_layout",
+   "expect": "h2-wraps",
+   "bad": "fixtures/title-wraps.bad.html",
+   "fixed": "fixtures/title-wraps.fixed.html"
+  },
+  {
+   "id": "tex-entity-raw",
+   "date": "2026-11-01",
+   "source": "references/qa.md",
+   "quote": "slide 20 showed `\\beta &gt; 0` in red",
+   "defect": "a formula shows a raw HTML entity because it was escaped twice",
+   "tool": "check_layout",
+   "expect": "tex-unrendered",
+   "bad": "fixtures/tex-entity-raw.bad.html",
+   "fixed": "fixtures/tex-entity-raw.fixed.html"
+  },
+  {
+   "id": "box-text-touches-edges",
+   "date": "2026-11-01",
+   "source": "references/qa.md",
+   "quote": "slide 17's `+ 잡음 0.1` touched both sides of its box",
+   "defect": "text touches both sides of its box",
+   "tool": "check_layout",
+   "expect": "box-tight",
+   "bad": "fixtures/box-text-touches-edges.bad.html",
+   "fixed": "fixtures/box-text-touches-edges.fixed.html"
+  },
+  {
+   "id": "fx-strip-offcentre",
+   "date": "2026-11-01",
+   "source": "references/qa.md",
+   "quote": "slides 8–10 had formula strips 20 px from one panel edge and 60 px from the other",
+   "defect": "a formula strip sits off-centre in its panel",
+   "tool": "check_layout",
+   "expect": "fx-offcentre",
+   "bad": "fixtures/fx-strip-offcentre.bad.html",
+   "fixed": "fixtures/fx-strip-offcentre.fixed.html"
+  },
+  {
+   "id": "label-cut-by-panel-edge",
+   "date": "2026-11-01",
+   "source": "references/qa.md",
+   "quote": "a label was cut by the panel edge",
+   "defect": "a label runs past the panel edge",
+   "tool": "check_layout",
+   "expect": "text-outside-panel",
+   "bad": "fixtures/label-cut-by-panel-edge.bad.html",
+   "fixed": "fixtures/label-cut-by-panel-edge.fixed.html"
+  },
+  {
+   "id": "line-through-value-label",
+   "date": "2026-10-31",
+   "source": "references/user-decisions.md",
+   "quote": "여기도 선이 겹쳐있네",
+   "defect": "a dashed reference line runs through a value label",
+   "tool": "check_layout",
+   "expect": "text-crosses-line",
+   "bad": "fixtures/line-through-value-label.bad.html",
+   "fixed": "fixtures/line-through-value-label.fixed.html"
+  },
+  {
+   "id": "range-band-over-labels",
+   "date": "2026-10-31",
+   "source": "references/user-decisions.md",
+   "quote": "여기도 뭔가 겹친게 일부러 그렇게 되었나?",
+   "defect": "a translucent range band lies over bars and labels",
+   "tool": "check_layout",
+   "expect": "text-crosses-shape",
+   "bad": "fixtures/range-band-over-labels.bad.html",
+   "fixed": "fixtures/range-band-over-labels.fixed.html"
+  },
+  {
+   "id": "empty-band-in-panel",
+   "date": "2026-10-31",
+   "source": "references/user-decisions.md",
+   "quote": "패널들 밑 부분의 여백이 너무 크게 남아있네 지금은?",
+   "defect": "a panel keeps an empty band at its bottom",
+   "tool": "check_layout",
+   "expect": "panel-underfilled",
+   "bad": "fixtures/empty-band-in-panel.bad.html",
+   "fixed": "fixtures/empty-band-in-panel.fixed.html"
+  },
+  {
+   "id": "text-high-in-box",
+   "date": "2026-10-31",
+   "source": "references/user-decisions.md",
+   "quote": "이런 부분도 아래 여백이 생기는지 QA 단계에서 확인하고 고쳐야할거같은데?",
+   "defect": "text sits high inside its box",
+   "tool": "check_layout",
+   "expect": "box-unbalanced",
+   "bad": "fixtures/text-high-in-box.bad.html",
+   "fixed": "fixtures/text-high-in-box.fixed.html"
+  },
+  {
+   "id": "low-contrast-grey-note",
+   "date": "2026-11-01",
+   "source": "references/qa.md",
+   "quote": "the v5 judge called 3.0:1 grey notes unreadable at 2 m",
+   "defect": "grey notes below readable contrast",
+   "tool": "check_layout",
+   "expect": "low-contrast",
+   "bad": "fixtures/low-contrast-grey-note.bad.html",
+   "fixed": "fixtures/low-contrast-grey-note.fixed.html"
+  },
+  {
+   "id": "panel-gutter-mismatch",
+   "date": "2026-10-30",
+   "source": "references/user-decisions.md",
+   "quote": "한 슬라이드 내에서는 일관되어야 하고",
+   "defect": "gutters between panels of one slide differ from the grid",
+   "tool": "check_deck",
+   "expect": "horizontal gap",
+   "bad": "fixtures/panel-gutter-mismatch.bad.html",
+   "fixed": "fixtures/panel-gutter-mismatch.fixed.html"
+  },
+  {
+   "id": "author-slot-header",
+   "date": "2026-11-01",
+   "source": "references/user-decisions.md",
+   "quote": "발표자 생각 이런 멘트가 너무 별로다",
+   "defect": "a presenter-thoughts header in visible copy",
+   "tool": "banned_copy_lint",
+   "expect": "author-token",
+   "bad": "fixtures/author-slot-header.bad.html",
+   "fixed": "fixtures/author-slot-header.fixed.html"
+  },
+  {
+   "id": "colon-title",
+   "date": "2026-10-31",
+   "source": "references/message-style.md",
+   "quote": "A:B 이런 스타일로 왜이렇게 많이 쓰는거지?",
+   "defect": "a title in the \"topic: point\" label form",
+   "tool": "banned_copy_lint",
+   "expect": "colon-label",
+   "bad": "fixtures/colon-title.bad.html",
+   "fixed": "fixtures/colon-title.fixed.html"
+  },
+  {
+   "id": "gloss-parenthesis",
+   "date": "2026-10-31",
+   "source": "references/message-style.md",
+   "quote": "(발표자 비유) (게임 한 판) 이런 의미 없는 괄호도 빼줘",
+   "defect": "a parenthetical gloss after a term",
+   "tool": "banned_copy_lint",
+   "expect": "gloss-paren",
+   "bad": "fixtures/gloss-parenthesis.bad.html",
+   "fixed": "fixtures/gloss-parenthesis.fixed.html"
+  },
+  {
+   "id": "quote-bar-ai-design",
+   "date": "2026-10-30",
+   "source": "references/user-decisions.md",
+   "quote": "되게 ai design 같은데",
+   "defect": "a coloured quote bar or accent beside text",
+   "tool": "manual",
+   "check": "No coloured bar, quote rail or callout accent beside text; compare with the taste sample."
+  },
+  {
+   "id": "arrow-end-unnatural",
+   "date": "2026-10-30",
+   "source": "references/user-decisions.md",
+   "quote": "이거 화살표가 끝부분이 너무 부자연스러운데?",
+   "defect": "an arrow whose end looks unnatural",
+   "tool": "manual",
+   "check": "Every arrowhead sits on the tangent of one smooth curve; no hook or detached head at the end."
+  },
+  {
+   "id": "dots-not-a-distribution",
+   "date": "2026-11-01",
+   "source": "references/user-decisions.md",
+   "quote": "점을 마구마구 찍어놓고 이제 별로 분포처럼 보이지 않는 그냥 그림",
+   "defect": "scattered dots that do not read as a distribution",
+   "tool": "manual",
+   "check": "A density drawing reads as one distribution: samples only inside the visible cloud, no ring around it."
+  },
+  {
+   "id": "white-box-behind-title",
+   "date": "2026-11-02",
+   "source": "references/user-decisions.md",
+   "quote": "무슨 흰색 박스를 쓰네? 너무 별로다.",
+   "defect": "a white box behind the title",
+   "tool": "manual",
+   "check": "No white box behind a title or a figure; run style_gap.py on GPT builds and read its white-area findings."
+  },
+  {
+   "id": "soft-bitmap",
+   "date": "2026-11-02",
+   "source": "references/user-decisions.md",
+   "quote": "astra 17페이지의 분자 그림은 매우 해상도가 낮네.",
+   "defect": "a placed bitmap that looks soft",
+   "tool": "manual",
+   "check": "Open every slide with a placed raster at full size; no raster is shown larger than its source pixels (style_gap data-native)."
+  }
+ ]
+}
