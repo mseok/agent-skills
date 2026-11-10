@@ -72,6 +72,7 @@ Never:
 - **nature-family.** Subsection headings are full-sentence findings within the evidence, with their scope: "Correlation-aware decoding suppresses burst-induced failures", not "Decoder performance". Inside a subsection, paragraphs are continuous prose without bold run-in labels. Figures are cited inline in parentheses, "(Fig. 2a)", never in a heading or label.
 - **ml-conference.** Experiments are organized around the paper's questions. A short bold label naming a question or experiment may open a paragraph ("**Transfer to unseen chips.**").
 - **Both.** No closing summary paragraph or label ("Summary.", "In summary,", "Key findings:", "Takeaways"): the opening already gave the answer, and the Discussion draws the conclusions.
+- **Paragraph and caption endings.** A Results paragraph ends on its finding (or on what the finding means), never on a figure pointer or a layout remark. A figure or table caption says what is shown and how it was measured, with panel letters; it carries no layout remarks (where an element sits, its size or color) beyond what a reader needs to decode the data.
 
 ## Tables
 

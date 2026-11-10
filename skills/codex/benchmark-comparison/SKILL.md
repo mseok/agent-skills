@@ -57,3 +57,7 @@ Draft the table or figure in the working folder with a versioned name; show it i
 ## Found defects (2026-10-17 audit)
 
 When you find a defect in scoring, extraction or aggregation code, write it to the project facts file in the same turn with the affected tables, list the delivered work built on them (manuscript text, figures, handoffs to colleagues) and ask one yes/no question about auditing that work; a "rest not checked" caveat is not a finding.
+
+## Test items before bulk building (2026-11-10)
+
+Before building more than three test items for a skill, prompt or benchmark, write down in the working folder the target skill, what is given, what is withheld, what the outcome stands for and one sample item, and ask the user one yes/no question about that design. Before any run, a second reader checks the items for leaked answers. Read `references/user-decisions.md` before editing this skill.
