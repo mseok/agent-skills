@@ -23,6 +23,14 @@ export function normalizeGemini(text) {
   return windows;
 }
 
+// A sign-in failure of the official ACP runtime: ACP's auth_required error code (-32000) or an
+// authentication message. The quota reports it as `auth_required`; the bridge shows how to sign
+// in again (renew-gemini-login). User decision 2026-11-09: "3번도 넣어주라."
+export function isAcpAuthError(error) {
+  if (!error) return false;
+  return error.code === -32000 || /auth(entication)?[ _-]?required|unauthenticated|not (logged|signed) in|(log|sign)[ -]?in required|invalid_grant|reauth|credentials? (expired|invalid|missing)/i.test(String(error.message ?? ''));
+}
+
 export function readGeminiQuota({spawnChild=spawn,timeoutMs=25000,executable,profileDir}={}) {
   const state=process.env.BRIDGE_STATE_DIR??path.join(os.homedir(),process.platform==='darwin'?'Library/Application Support/chatgpt-claude-bridge':'.codex/claude-bridge/bridge');
   executable??=process.env.GEMINI_ACP_BIN??path.join(state,'acp/runtime/agy_acp_server.par');
@@ -68,7 +76,7 @@ export function readGeminiQuota({spawnChild=spawn,timeoutMs=25000,executable,pro
         if(quotaSent&&u.sessionUpdate==='agent_message_chunk'&&u.content?.type==='text')text+=u.content.text;
         return;
       }
-      if(m.error)return finish({status:'error',reason:'native_request_rejected'});
+      if(m.error)return finish({status:'error',reason:isAcpAuthError(m.error)?'auth_required':'native_request_rejected'});
       if(m.id===1)send({id:2,method:'session/new',params:{cwd,mcpServers:[]}});
       else if(m.id===2){sessionId=m.result?.sessionId;query();}
       else if(m.id===3){

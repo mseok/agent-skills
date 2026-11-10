@@ -28,3 +28,13 @@ for(const [name,options,expected] of [['native local command',{advertise:true},'
   finally{fs.rmSync(profileDir,{recursive:true,force:true});}
  });
 }
+test('Gemini: a sign-in failure is auth_required, other rejections stay native_request_rejected',async()=>{
+ const runtime=(code,message)=>(_exe,_args,opts)=>spawn(process.execPath,['-e',`require('node:readline').createInterface({input:process.stdin}).on('line',l=>{const m=JSON.parse(l);if(m.method==='initialize')console.log(JSON.stringify({jsonrpc:'2.0',id:m.id,result:{}}));else console.log(JSON.stringify({jsonrpc:'2.0',id:m.id,error:{code:${code},message:${JSON.stringify(message)}}}));});`],opts);
+ const profileDir=fs.mkdtempSync(path.join(os.tmpdir(),'quota-acp-'));
+ try{
+  for(const [code,message,reason] of [[-32000,'Authentication required','auth_required'],[-32603,'Unauthenticated: sign in again','auth_required'],[-32603,'internal error','native_request_rejected']]){
+   const r=await readGeminiQuota({executable:process.execPath,profileDir,spawnChild:runtime(code,message),timeoutMs:3000});
+   assert.equal(r.status,'error');assert.equal(r.reason,reason);assert.equal(r.windows.length,0);
+  }
+ }finally{fs.rmSync(profileDir,{recursive:true,force:true});}
+});

@@ -5,6 +5,7 @@ import { createInterface } from 'node:readline';
 import { pathToFileURL } from 'node:url';
 import { readGeminiQuota } from './gemini-acp.mjs';
 import { readClaudeApiUsage } from './claude-api-usage.mjs';
+import { withObservedClaude, withTokenAge } from './claude-observed.mjs';
 
 const object = value => value !== null && typeof value === 'object' && !Array.isArray(value);
 const percentage = value => typeof value === 'number' && Number.isFinite(value) && value >= 0 ? value : null;
@@ -71,7 +72,16 @@ const sources = {
   claude: 'native CLI: get_usage (experimental)',
 };
 
-export function readQuota(provider, { spawnChild = spawn, timeoutMs = 25_000, gemini = {}, claudeApi = {} } = {}) {
+// Claude: the native get_usage reading first; when it fails or has no values (an expired /login
+// sign-in), the values the bridge's subscription turns last reported (claude-observed.mjs).
+// The bridge's one-year token age is attached as `bridgeToken` (file time only, never contents).
+// `claudeObserved: { stateDir: null }` turns both off.
+export function readQuota(provider, options = {}) {
+  const native = readNativeQuota(provider, options);
+  return provider === 'claude' ? native.then(result => withTokenAge(withObservedClaude(result, options.claudeObserved), options.claudeObserved)) : native;
+}
+
+function readNativeQuota(provider, { spawnChild = spawn, timeoutMs = 25_000, gemini = {}, claudeApi = {} } = {}) {
   if(provider==='claude-api')return Promise.resolve(readClaudeApiUsage(claudeApi));
   if(provider==='gemini')return readGeminiQuota({spawnChild,timeoutMs,...gemini});
   return new Promise(resolve => {

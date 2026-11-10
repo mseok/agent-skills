@@ -94,7 +94,7 @@ for (const provider of ['codex', 'claude']) {
   });
 
   test(`${provider}: rejection fails closed without exposing native errors or stderr`, async () => {
-    const result = await readQuota(provider, { spawnChild: fakeCli(provider, { rejected: true }), timeoutMs: 3000 });
+    const result = await readQuota(provider, { spawnChild: fakeCli(provider, { rejected: true }), timeoutMs: 3000, claudeObserved: { stateDir: null } });
     assert.equal(result.status, 'error');
     assert.equal(result.reason, 'native_request_rejected');
     assert.equal(result.phase, 'initialize');
@@ -110,7 +110,7 @@ test('invalid protocol JSON is an explicit error, not an empty successful quota'
 });
 
 test('an unresponsive native CLI stops at the deadline', async () => {
-  const result = await readQuota('claude', { spawnChild: fakeCli('claude', { silent: true }), timeoutMs: 100 });
+  const result = await readQuota('claude', { spawnChild: fakeCli('claude', { silent: true }), timeoutMs: 100, claudeObserved: { stateDir: null } });
   assert.equal(result.reason, 'timeout');
   assert.equal(result.status, 'error');
 });
