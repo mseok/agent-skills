@@ -27,6 +27,7 @@ Live shared manuscripts (Overleaf, shared drives) are read-only by default.
 
 - Apply there only when the user approves the exact change set in the current turn. Then, immediately before applying, re-download or re-export the live files; if they changed since the draft was made, stop and rebase the change on the new text. Otherwise edit the local copy, produce the diff, compile, check the PDF page, and paste the verified text into the target region as a targeted replacement; never upload a source file over the live project (user decision 2026-11-10), never select-all, retype or reformat inside the live editor, and never while another session is editing. Confirm the result with a fresh export. If the browser fails, hand over the diff and the compiled PDF for the user to apply.
 - Apply only the target region of the files the request names; never touch other source files alongside, and show the diff of every file you changed.
+- The export, hash, per-edit replacement list and fresh-export check for this are in `references/shared-doc-export.md`; the local tool `~/dot/bin/shared-doc-apply` runs the checks and has no upload path.
 
 ## Report
 
