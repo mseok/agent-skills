@@ -57,7 +57,7 @@ once per task and reuse it.
 
 | Place | Holds | Written by |
 |---|---|---|
-| root | `HOME.md`, `AGENTS.md`, `People.md` (the project hub notes were deleted on 2026-11-06; links to them stay unresolved) | the user; agents on request |
+| root | `HOME.md`, `AGENTS.md`, `People.md` and one project overview note per project, named after the project (`kind/project-hub`; restored on 2026-11-10 at the user's request after the older hubs were deleted on 2026-11-06). An overview note holds only Bases views that list the project's notes by `project` and `project/*` | the user; agents on request, and the overview-note rule below |
 | `Writing/` | the user's own essays, reflections, meeting records and personal synthesis | `note_draft_create` on explicit request |
 | `Concepts/` | reusable definitions, mechanisms and background explanations | `knowledge_revise(create)` on explicit request |
 | `People/` | one note per person (`kind/person`), indexed by `People.md` | on explicit request |
@@ -74,6 +74,13 @@ once per task and reuse it.
 Folders separate purpose and lifecycle, never topic; topics live in tags and
 links. A new top-level folder is created only when the user asks for it. Large data, checkpoints, logs, environments and caches never go
 into the vault. Do not create an empty note just to resolve a link.
+
+When a note is written with a `project` value that has no overview note in the
+root, create `<project>.md` from `Templates/Project Template.md` in the same
+task (replace `{{title}}` with the project name and `{{date}}` with today) and
+add its link to the project overview line in `HOME.md` (user decision
+2026-11-10). Remote hosts cannot create root notes: they say in the reply that
+the overview note is missing instead.
 
 ## 4. Which note, if any
 
@@ -94,7 +101,7 @@ asks about a turn without a milestone, answer with `research_disposition`
 ## 5. Metadata
 
 - One template per note type lives in `Templates/`, kepano style: `Person`,
-  `Writing`, `Meeting`, `Concept`, `Experiment`, `Paper`, `Slides`, `Study` and
+  `Writing`, `Meeting`, `Concept`, `Experiment`, `Paper`, `Slides`, `Study`, `Project` and
   `Weekly Note` (Periodic Notes is off; weekly notes are not created); `Single
   Paper Review Template` belongs to its skill and uses the Paper fields with
   `kind/paper-review`. The
