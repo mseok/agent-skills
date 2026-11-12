@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Smoke test for assets/style-kit.mjs: syntax check, then build assets/kit-demo.mjs into a temp dir and count slides.
+"""Smoke test for assets/pptx/style-kit.mjs: syntax check, then build assets/pptx/kit-demo.mjs into a temp dir and count slides.
 
 Needs the Codex runtime node (it provides @oai/artifact-tool). Skips when the runtime is absent.
 """
@@ -7,7 +7,7 @@ import os, shutil, subprocess, tempfile, unittest, zipfile
 from pathlib import Path
 
 RUNTIME = Path('/Users/mseok/.cache/codex-runtimes/codex-primary-runtime/dependencies/node')
-ASSETS = Path(__file__).resolve().parent.parent / 'assets'
+ASSETS = Path(__file__).resolve().parent.parent.parent / 'assets' / 'pptx'
 
 
 @unittest.skipUnless((RUNTIME / 'bin/node').exists(), 'Codex runtime node not available')

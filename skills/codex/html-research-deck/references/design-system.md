@@ -25,7 +25,7 @@ Figures sit directly on the warm stage. White is a card that holds one thing: on
 
 Pretendard Variable everywhere (Korean and Latin), KaTeX for formulas. Scene classes: `.n` 26/700 names, `.s` 21 body labels (ink-soft), `.m` 19 muted, `.in` 24/700 centred in-shape label, `.lane` 21/650 lane header. The `.s` and `.lane` defaults are older than the type scale above (user decision 2026-10-31): set body labels to 22–24 px and lane headers to 24 px explicitly. In-shape names may go to 30 px (KRAS); badge digits 16 px and capsule labels 15 px are the only runs below 19 px. Panel captions 19 px muted; render labels 20 px semibold with a stage-coloured halo (`paint-order: stroke`).
 
-Context-dependent academic terms stay in English in Latin script, labels on the drawings included (`message-style.md` rule 4, user decision 2026-11-02). Korean slide copy is noun phrases (`research-talk/references/korean-slide-copy.md`); `check_deck.py` flags `~한다/된다/있다/이다/습니다` endings in visible text. Latin author names stay Latin (`Krönke 2014`).
+Context-dependent academic terms stay in English in Latin script, labels on the drawings included (`message-style.md` rule 4, user decision 2026-11-02). Korean slide copy is noun phrases (`korean-slide-copy.md`); `check_deck.py` flags `~한다/된다/있다/이다/습니다` endings in visible text. Latin author names stay Latin (`Krönke 2014`).
 
 ## Colour (one meaning per hue, whole deck)
 
@@ -61,6 +61,17 @@ At most two hue families besides gray on a slide. Nucleotides are dark capsules 
 
 Rules that made the sample work: the same actor keeps shape and colour across every state and panel; label the change at each arrow (binding, recognition, Ub transfer, degradation, exchange); shapes are explanatory, not geometry; what is measured (PDB render) sits in its own panel with leader labels and a caption `method · resolution · PDB id [n]`; a mechanism slide ends in the consequence the message claims (a cell panel: factor on DNA → genes → growth/arrest; the rescue experiment as the third cell). Shapes not in the sprite are drawn inline in the deck with the same conventions; promote them to the sprite when a second deck needs them.
 
+## Additions of 2026-11-12 (user decision "v18a 는 QR 빼고 다 넣어도 될거같고")
+
+Tried on a copy of the accepted Latent SI deck (v18a) and adopted; the cover QR code of that round was not.
+
+- **Section tracker.** `init(deck, sections=[…])` puts the deck's sections in the kicker row of every `slide()`, right-aligned at x 1790, 17 px, text only; the current section is navy. It is navigation, not decoration: no pills, bars or colour. T hides it during a talk.
+- **Equation numbers.** `fx(..., eq='17')` shows the paper's own equation number small in the corner of a formula card, so a question can be traced to the paper. Check each number against the paper; never number a formula yourself.
+- **Result tiles on the closing slide.** The panel beside the presenter's question slot holds four `tile()`s in two columns (LW panel): each a white card with a one-line title, one small drawing and one number or phrase. The sentences the tiles stand for go to the notes. Every number on a tile is one the deck already showed (gallery 8).
+- **Backup slides and tables.** `slide(..., backup=True)` after the closing slide: numbered B1, B2, …, outside the progress count. The full table behind a chart of the talk goes there as `table()`: three rules, tabular numerals, numbers right-aligned, the values the slide is about marked `'em'` (gallery 20; fragment `slide-backup-table.html`). A table of numbers is never pasted as an image.
+- **Builds.** A dense mechanism may appear in two or three steps in the order the talk tells them: `step(f, svg)` for parts of the scene, `at(f, html)` for `tex()` and `fx()` blocks. The last build is the whole slide, so PNGs, the PDF and every checker see the same slide as before. Not for charts, and not on every slide.
+- **Presenter aids** (`js/aids.js`, listed under ? in the deck): L laser pointer, Z zoom 2× at the cursor (Esc leaves), T tracker on or off. They do not run in `?print`, `?presenter` or `?embed`.
+
 ## Anti-patterns (each was rejected by the user)
 
 Coloured quote bars and callout boxes; blurred colour washes and gradient text; uppercase letter-spaced labels; progress bars in colour; auto-generated flow charts of boxes and gray arrows; animated canvases; dense bullet text; one closing sentence floating without a card; mismatched gutters or a half-empty panel; a big white box around a figure or a title; figure text under 19 px; a mechanism that stops at "degradation" without showing the biological effect; the same label crossing a shape's rim.
@@ -89,4 +100,4 @@ Paths between distributions are smooth curves from `bridge()` or `brownian()` (t
 
 ## Structure renders (PDB, molecules)
 
-Produce the image with research-talk's pipeline — `research-talk/references/molecular-visualization.md` (coordinate-based PyMOL render, white background, ≥ 2400 px on the long side, trimmed margin, residue labels taken from the coordinate records, provenance JSON beside the asset) and `research-talk/scripts/draw_chem.py` for 2-D structures — then place it with the `figure-render` template: `<img>` inside `.figwrap` in its own panel, leader labels beside the image (HTML `.fx` or SVG), never on it, a `.cap` with method · resolution · PDB id, full provenance in the notes. `check_layout.py` treats `<img>`/`<image>` as rasters (clipping, labels on top). No generated-image stand-ins for structures; a slide without a structure says so instead.
+Produce the image with the PyMOL/RDKit pipeline of `molecular-visualization.md` (coordinate-based PyMOL render, white background, ≥ 2400 px on the long side, trimmed margin, residue labels taken from the coordinate records, provenance JSON beside the asset) and `scripts/draw_chem.py` for 2-D structures — then place it with the `figure-render` template: `<img>` inside `.figwrap` in its own panel, leader labels beside the image (HTML `.fx` or SVG), never on it, a `.cap` with method · resolution · PDB id, full provenance in the notes. `check_layout.py` treats `<img>`/`<image>` as rasters (clipping, labels on top). No generated-image stand-ins for structures; a slide without a structure says so instead.

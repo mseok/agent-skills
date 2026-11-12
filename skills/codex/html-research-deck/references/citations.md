@@ -12,7 +12,7 @@ Retain an auditable local citation map with slide ID, supported object/claim, vi
 
 Before delivery, inspect the rendered slide and verify both directions: every marker resolves to a reference, and every displayed reference has identifiable supported content. For compounds, independently check the name/chemical identifier and the paper’s role. This is a semantic check, not just counting reference text boxes.
 
-Name footer text objects with the `reference-footer:` prefix (the style-kit `reference()` helper does this). Run `scripts/check_slide_conventions.py` on the exported PPTX. It verifies introduction of contiguous reference numbers from 1, ascending footer order and body/footer correspondence. It does not establish whether a source supports a claim; inspect the citation map and reading order separately.
+Name footer text objects with the `reference-footer:` prefix (the style-kit `reference()` helper does this). Run `scripts/pptx/check_slide_conventions.py` on the exported PPTX. It verifies introduction of contiguous reference numbers from 1, ascending footer order and body/footer correspondence. It does not establish whether a source supports a claim; inspect the citation map and reading order separately.
 
 ## Provenance details that judges found missing
 

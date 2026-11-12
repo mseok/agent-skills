@@ -13,7 +13,7 @@ export const C = { ink:'#000000', muted:'#666666', light:'#DDDDDD', pale:'#F7F7F
 // Vertical budget in source points (1080 high): header to y≈263, evidence band, closing line, reference footer (≤ 2 rows), page number.
 export const BAND = { x:95, y:285, w:1730, h:555 };   // evidence incl. captions ends at y 840
 export const TAKEAWAY = { x:140, y:872, w:1640, h:90 };   // one centered line; ≥ 40 pt clear below the band
-export let FAMILY = 'Pretendard';   // default for every deck (Hangul + Latin + Greek in one face; installed on Mac, copy on Windows: assets/fonts, scripts/ensure_font.py)
+export let FAMILY = 'Pretendard';   // default for every deck (Hangul + Latin + Greek in one face; installed on Mac, copy on Windows: assets/pptx/fonts, scripts/pptx/ensure_font.py)
 // Vertical optical correction (source pt) for single-family decks whose line box sits low in a middle-anchored shape (measured in Artifact Tool; Pretendard +2 to +4 pt low).
 const FAMILY_OPTICAL={Pretendard:-2};
 export const LINE_SPACING = 1.2;
@@ -62,16 +62,16 @@ export function arrow(slide,x,y,w,h,{geometry='rightArrow',color=C.arrow}={}) {
 export function reference(slide,value,x=650,y=1000,w=1175,h=60,options={}) {
   return text(slide,value,x,y,w,h,REFERENCE_PT,{name:'reference-footer:'+value.slice(0,40),alignment:'right',color:C.muted,...options});
 }
-// Pretendard is not preinstalled on Mac or Windows: createDeck() runs scripts/ensure_font.py once per process, which installs the bundled copy into the user's font folder when it is missing.
+// Pretendard is not preinstalled on Mac or Windows: createDeck() runs scripts/pptx/ensure_font.py once per process, which installs the bundled copy into the user's font folder when it is missing.
 let FONT_CHECKED=false;
 export function ensureFont(){
   if(FONT_CHECKED||FAMILY!=='Pretendard')return;
   FONT_CHECKED=true;
   try{
     const here=path.dirname(fileURLToPath(import.meta.url));
-    const root=[process.env.RESEARCH_TALK_SKILL,path.resolve(here,'..'),'/Users/mseok/.codex/skills/research-talk'].filter(Boolean).find(r=>fs.existsSync(path.join(r,'scripts/ensure_font.py')));
-    if(!root){console.warn('ensureFont(): scripts/ensure_font.py not found; make sure Pretendard is installed');return;}
-    const r=spawnSync('python3',[path.join(root,'scripts/ensure_font.py')],{encoding:'utf8'});
+    const root=[process.env.RESEARCH_DECK_SKILL,process.env.RESEARCH_TALK_SKILL,path.resolve(here,'..','..'),'/Users/mseok/.codex/skills/html-research-deck'].filter(Boolean).find(r=>fs.existsSync(path.join(r,'scripts/pptx/ensure_font.py')));
+    if(!root){console.warn('ensureFont(): scripts/pptx/ensure_font.py not found (set RESEARCH_DECK_SKILL to the html-research-deck skill folder); make sure Pretendard is installed');return;}
+    const r=spawnSync('python3',[path.join(root,'scripts/pptx/ensure_font.py')],{encoding:'utf8'});
     const msg=(r.stdout||'').trim();
     if(r.status!==0)console.warn('ensureFont(): '+(msg||r.stderr||'failed')+' (renders fall back to another font until Pretendard is installed)');
     else if(!/: installed$/.test(msg))console.log('ensureFont(): '+msg);

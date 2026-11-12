@@ -25,7 +25,10 @@ errors   : text-outside-panel, text-outside-stage,
            html-overlap        two slide-level HTML blocks intersect (h1 / subtitle / who / aff on the title slide; h2, kicker,
                                panels, closing line, cite on content slides),
            h2-wraps            the slide title takes two lines,
-           closing-wraps       the closing line takes two lines
+           closing-wraps       the closing line takes two lines,
+           title-too-long      Folio layout only (slides of class fo, references/folio.md): the rail title takes more than four lines. On Folio
+                               slides h2-wraps and closing-wraps do not apply: the title wraps in the rail by design, and a closing line
+                               that does not fit its fixed card is an html-overflow
 warnings : box-unbalanced      text inside a rect sits off-centre vertically by > 10 px,
            fx-offcentre        a near-full-width .fx.box (≥ 60 % of the inner width) whose left and right gaps to the panel differ by > 16 px
                                (Latent SI v5 slides 8–10: 20 vs 60 px while the neighbouring panel's boxes sat at 60/60),
@@ -53,7 +56,7 @@ from pathlib import Path
 CHROME = os.environ.get('CHROME', '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome')
 ERRORS = ('text-outside-panel', 'text-outside-stage', 'text-clipped', 'text-in-padding', 'text-overlap', 'text-crosses-shape',
           'text-crosses-line', 'text-crosses-path', 'text-crosses-image', 'shape-clipped', 'html-overflow', 'html-overlap',
-          'h2-wraps', 'closing-wraps', 'tex-unrendered', 'box-tight')
+          'h2-wraps', 'closing-wraps', 'tex-unrendered', 'box-tight', 'title-too-long')
 
 MEASURE = r'''
 <script id="qa-layout-script">
@@ -270,7 +273,11 @@ MEASURE = r'''
       if (o.w > 1.5 && o.h > 1.5) S.findings.push({ kind: 'html-overlap', a: blocks[a].name, b: blocks[b].name, textA: blocks[a].t, textB: blocks[b].t, overlap: { w: R(o.w), h: R(o.h) }, boxA: blocks[a].b, boxB: blocks[b].b });
     }
     const h2 = s.querySelector(':scope > h2');
-    if (h2 && vis(h2)) { const b = box(h2), cs = getComputedStyle(h2); const lh = parseFloat(cs.lineHeight) || parseFloat(cs.fontSize) * 1.2; if (b.h > lh * 1.6) S.findings.push({ kind: 'h2-wraps', box: b, text: snip(h2) }); }
+    // the Folio layout (references/folio.md): the title wraps in the rail by design (four lines at most) and the closing line sits in a fixed card
+    const folio = s.classList.contains('fo') || s.classList.contains('fo-dark') || s.classList.contains('fo-cover');
+    if (h2 && vis(h2)) { const b = box(h2), cs = getComputedStyle(h2); const lh = parseFloat(cs.lineHeight) || parseFloat(cs.fontSize) * 1.2;
+      if (folio) { if (s.classList.contains('fo') && !s.classList.contains('fo-spread') && b.h > lh * 4 + 6) S.findings.push({ kind: 'title-too-long', box: b, text: snip(h2), lines: Math.round(b.h / lh) }); }
+      else if (b.h > lh * 1.6) S.findings.push({ kind: 'h2-wraps', box: b, text: snip(h2) }); }
     Array.from(s.querySelectorAll('.takeaway, .lines, .cap, h2, .kicker, h1, .fx.box')).forEach(el => {
       if (!vis(el)) return;
       // 4 px slack: multi-line blocks report a scrollHeight one line-height rounding above clientHeight
@@ -283,7 +290,7 @@ MEASURE = r'''
       const lh = parseFloat(cs.lineHeight) || parseFloat(cs.fontSize) * 1.4;
       const padV = (parseFloat(cs.paddingTop) || 0) + (parseFloat(cs.paddingBottom) || 0);
       S.takeaway = b;
-      if (b.h > padV + lh * 1.6) S.findings.push({ kind: 'closing-wraps', box: b, text: snip(tk) });
+      if (!folio && b.h > padV + lh * 1.6) S.findings.push({ kind: 'closing-wraps', box: b, text: snip(tk) });
     }
     report.slides.push(S);
     flush();
@@ -346,6 +353,8 @@ def describe(f):
         return f"{k}: \"{f['text'][:40]}\" {f['fs']:g}px/{f['fw']} {f['color']} {f['ratio']:g}:1 < {f['need']:g}:1{' on the stage' if f.get('on') == 'stage' else ''}"
     if k == 'closing-wraps':
         return f"{k}: closing line is {f['box']['h']:g} px tall: \"{f['text']}\""
+    if k == 'title-too-long':
+        return f"{k}: the rail title takes {f.get('lines', '?')} lines ({f['box']['h']:g} px), four at most: \"{f['text']}\""
     return json.dumps(f, ensure_ascii=False)
 
 

@@ -2,7 +2,7 @@
 
 This file is the single source of the rules for the user's Obsidian vault. Skills
 (`research-workflow`, `experiment-ledger`, `obsidian-agent-record`,
-`obsidian-user-note`, `research-talk`, `html-research-deck`,
+`obsidian-user-note`, `html-research-deck`,
 `single-paper-review`) carry only their procedures and point here. The vault's
 own `AGENTS.md` is a short map that points here. The gateway enforces the
 permissions in section 2. Change a rule here, not in a copy; read this file
@@ -62,7 +62,7 @@ once per task and reuse it.
 | `Concepts/` | reusable definitions, mechanisms and background explanations | `knowledge_revise(create)` on explicit request |
 | `People/` | one note per person (`kind/person`), indexed by `People.md` | on explicit request |
 | `Study/` | study notes for a book or course: one subfolder per source holding a hub note named after the source and one note per chapter or section (`kind/study`) | on explicit request, from the Study template; no `writer` or `reviewed` |
-| `Slides/` | `YYYY-MM-DD Title.pdf` and its spoken script `YYYY-MM-DD Title.md` | `research-talk` on request |
+| `Slides/` | `YYYY-MM-DD Title.pdf` and its spoken script `YYYY-MM-DD Title.md` | `html-research-deck` on request |
 | `Inbox/Agents/<host>/` | agent records and question reports; later agents search and fetch them, the user does not read every one | the gateway chooses the path |
 | `Notes/` | the user's older research notes | the user; agents revise only on request |
 | `Sources/` | papers, clippings and other external material | the user |
@@ -91,7 +91,7 @@ the overview note is missing instead.
 | other reusable agent outcome or an explicitly requested revision of an agent record | `obsidian-agent-record`: `record_create` or an authorized `knowledge_revise` of the existing record |
 | the user explicitly asks for a concept reference, meeting note or personal prose to read and edit | `obsidian-user-note`: `Concepts/` for reusable explanation, `Writing/` for the user's own prose, both linked for a mixed request; an explicit destination wins |
 | the user asks for study material on a book or course | `Study/<source>/`: a hub note plus one note per chapter or section, written from the Study template |
-| a talk | `research-talk`: its preparation note and `Slides/` |
+| a talk | `html-research-deck`: its preparation note and `Slides/` |
 | ordinary chat explanation, routine checks, polling, tooling, layout-only edits, prose draft versions, administrative and personal tasks | no note |
 
 Ordinary research milestones need no new permission. When the turn-end check

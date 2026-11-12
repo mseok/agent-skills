@@ -1,6 +1,6 @@
 ---
 name: nature-figure
-description: Produce or revise any scientific plot, panel, schematic or publication figure (matplotlib, PyMOL, SVG, Figma), from a quick comparison bar chart to Nature-style final artwork. Use for 그림, 플롯, 패널, figure, chart, rebuild, redraw, Figma handoff requests, and whenever numbers from a benchmark are plotted; not ordinary slides (research-talk) or manuscript prose (paper-writing).
+description: Produce or revise any scientific plot, panel, schematic or publication figure (matplotlib, PyMOL, SVG, Figma), from a quick comparison bar chart to Nature-style final artwork. Use for 그림, 플롯, 패널, figure, chart, rebuild, redraw, Figma handoff requests, and whenever numbers from a benchmark are plotted; not ordinary slides (html-research-deck) or manuscript prose (paper-writing).
 ---
 
 # Nature-style scientific figures

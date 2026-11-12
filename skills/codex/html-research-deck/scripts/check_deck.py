@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Static checks for a research-theme HTML deck before rendering.
+"""Static checks for an HTML deck before rendering (research theme, or the Folio layout when the deck links css/theme-folio.css).
 
 usage: check_deck.py /absolute/deck/index.html [--json /absolute/qa/check.json]
 
@@ -7,6 +7,8 @@ Errors (exit 1): panel grid off the 24 px gutter / 176–898 band / 110–1810 w
 a content slide without a closing line, a visible citation marker [n] missing from the cite line, a Korean
 declarative ending in visible copy, a <use href="#..."> without the inlined sprite, scene text below 15 px.
 Warnings: scene text 15–18 px, closing line longer than 70 characters, missing speaker notes, missing cite line.
+Folio decks (references/folio.md) are checked against their own grid instead: a content slide has one plate at x 624, y 72,
+1216 x 928; a spread has one at x 76, y 196, 1784 x 690; a section opener has neither plate nor closing line.
 The checks read the HTML only; rendered overlaps and legibility still need the PNG pass (references/qa.md).
 """
 import argparse
@@ -95,6 +97,22 @@ def check_panels(styles, err, tag):
     return len(boxes)
 
 
+FOLIO_PLATE, FOLIO_SPREAD = (624.0, 72.0, 1216.0, 928.0), (76.0, 196.0, 1784.0, 690.0)
+
+
+def check_panels_folio(styles, classes, err, tag):
+    """The Folio grid: one plate per content slide, at the plate's or the spread's fixed box."""
+    boxes = [(px(st, 'left'), px(st, 'top'), px(st, 'width'), px(st, 'height')) for st in styles]
+    if 'fo-dark' in classes or 'fo-cover' in classes:
+        return len(boxes)
+    want = FOLIO_SPREAD if 'fo-spread' in classes else FOLIO_PLATE
+    if len(boxes) != 1:
+        err.append(f'{tag}: a Folio slide has one plate, found {len(boxes)}')
+    elif boxes[0] != want:
+        err.append(f'{tag}: plate at {boxes[0]}, expected {want}')
+    return len(boxes)
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument('index')
@@ -103,15 +121,16 @@ def main():
     doc = re.sub(r'<!--.*?-->', '', open(a.index, encoding='utf-8').read(), flags=re.S)  # comments are not slides
     err, warn, report = [], [], []
     has_sprite = 'class="sprite"' in doc
+    folio = 'css/theme-folio.css' in doc
     for i, m in enumerate(SEC.finditer(doc), 1):
         classes, body = m.group(1), m.group(3)
         title = re.search(r'data-title="([^"]*)"', m.group(2))
         tag = f'slide {i} ({title.group(1) if title else "untitled"})'
         is_title = 'title-slide' in classes
         vis = NOTES.sub('', body)
-        n_panels = check_panels(PANEL.findall(vis), err, tag)
+        n_panels = check_panels_folio(PANEL.findall(vis), classes, err, tag) if folio else check_panels(PANEL.findall(vis), err, tag)
         take = TAKE.search(vis)
-        if not is_title and not take:
+        if not is_title and not take and 'fo-dark' not in classes:
             err.append(f'{tag}: no closing line (.takeaway)')
         if take:
             t = ' '.join(units(take.group(0)))
@@ -124,7 +143,7 @@ def main():
             err.append(f'{tag}: citation markers {sorted(used)} but no cite line')
         elif used - cited:
             err.append(f'{tag}: markers {sorted(used - cited)} are used but absent from the cite line')
-        if not cite and not is_title:
+        if not cite and not is_title and 'fo-dark' not in classes:
             warn.append(f'{tag}: no cite line')
         if not NOTES.search(body):
             warn.append(f'{tag}: no speaker notes')

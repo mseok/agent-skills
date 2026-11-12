@@ -2,13 +2,13 @@
 """Make sure the deck font (default Pretendard) is installed; install the bundled copy automatically when it is missing.
 
 usage: ensure_font.py [--family Pretendard] [--check-only]
-Looks in fontconfig (`fc-list`), then the user/system font folders. When the family is missing it copies assets/fonts/<family>-*.otf into the user's
+Looks in fontconfig (`fc-list`), then the user/system font folders. When the family is missing it copies assets/pptx/fonts/<family>-*.otf into the user's
 font folder (user-level, no admin rights; the user approved automatic installation on 2026-10-02):
   macOS   ~/Library/Fonts
   Linux   ~/.local/share/fonts (then `fc-cache -f`)
   Windows %LOCALAPPDATA%\\Microsoft\\Windows\\Fonts plus the per-user registry entries
 Exit 0 when the family is available afterwards, 1 when it is not (message says why). --check-only never installs.
-Other machines that open the deck need the same font: assets/fonts/README.md."""
+Other machines that open the deck need the same font: assets/pptx/fonts/README.md."""
 import argparse, os, shutil, subprocess, sys
 from pathlib import Path
 
@@ -16,7 +16,7 @@ ap = argparse.ArgumentParser()
 ap.add_argument('--family', default='Pretendard'); ap.add_argument('--check-only', action='store_true')
 ap.add_argument('--install', action='store_true', help='kept for old callers; installation is automatic now')
 a = ap.parse_args()
-FONTS = Path(__file__).resolve().parent.parent / 'assets' / 'fonts'
+FONTS = Path(__file__).resolve().parent.parent.parent / 'assets' / 'pptx' / 'fonts'
 
 
 def folders():
@@ -55,7 +55,7 @@ def install(files):
             with winreg.CreateKey(winreg.HKEY_CURRENT_USER, r'Software\Microsoft\Windows NT\CurrentVersion\Fonts') as k:
                 for f in files:
                     winreg.SetValueEx(k, f'{f.stem} (OpenType)', 0, winreg.REG_SZ, str(dest / f.name))
-        except Exception as e:   # the files are in place; the font appears after the next sign-in
+        except OSError as e:   # the files are in place; the font appears after the next sign-in
             print(f'registry entry failed ({e}); sign out and in once')
     return dest
 

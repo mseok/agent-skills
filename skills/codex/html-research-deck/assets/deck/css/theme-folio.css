@@ -1,0 +1,120 @@
+/* Folio: a second layout for the HTML deck engine (loads after css/deck.css, instead of theme-research.css).
+   User decision 2026-11-12: "folio 는 font 만 기존과 동일하게 해서 다른 양식으로 만들어두자" — the same fonts as the research theme
+   (Pretendard everywhere, KaTeX for formulas), a different page. Rules and kit: references/folio.md, scripts/folio_kit.py.
+
+   One slide is one opening of a monograph, on the 1920x1080 stage:
+     rail   x 96-552      what is said: section number, title (wraps, four lines at most), the symbols or metrics this slide uses,
+                          the closing line in a white card (y 832-1000)
+     spine  x 592         a hairline; its segments are the sections, the dark one is the current section, the dot is this slide
+     plate  x 624-1840, y 72-1000 (.panel, 20 px padding, so a drawing has 1176 x 888)   what is shown: one figure on the paper
+     cite   under the plate, x 644, 17 px
+   Slide kinds: .fo (rail + plate) · .fo-cover · .fo-dark (section opener: one question on ink) · .fo-spread (full-width plate, for a table)
+   Colour: ink on paper, indigo for the model or value of interest, ochre for the prior, vermilion only for the section number and one key
+   phrase. No bars, washes, gradient text, letter-spaced labels, icons or animation. */
+
+:root {
+  --bg: #F6F3EB; --paper: #F6F3EB; --ink: #17191C; --ink-soft: #4A4F55; --muted: #666B70; --rule: #CFC9BA; --faint: #E3DED1;
+  --indigo: #27477D; --indigo-mid: #5B7FB8; --indigo-fill: #DDE5F1; --ochre: #B8791F; --ochre-fill: #F1E0BC; --verm: #CF3F2A;
+  --navy: #1E3A66;
+}
+html, body { background: #E7E3D8; }
+.stage { background: var(--paper); }
+.progress { display: none !important; }
+.slide { padding: 0; }
+.slide-num { right: 80px; bottom: 28px; font-size: 18px; color: var(--muted); }
+.wash { display: none; }
+
+/* ---------- rail ---------- */
+.slide > .kicker { left: 96px; top: 62px; display: flex; align-items: baseline; gap: 12px; font-size: 22px; font-weight: 600; letter-spacing: 0; text-transform: none; color: var(--ink-soft); white-space: nowrap; }
+.slide > .kicker .sec { font-size: 26px; font-weight: 800; color: var(--verm); font-variant-numeric: tabular-nums lining-nums; }
+.slide > h2 { position: absolute; left: 96px; top: 124px; width: 456px; max-width: none; margin: 0; font-size: 44px; line-height: 1.3; font-weight: 700; letter-spacing: -0.02em; color: var(--ink); text-wrap: balance; }
+.slide > h2 .katex { font-size: 1em; }
+.slide > .recall-rule { position: absolute; left: 96px; width: 456px; height: 0; border-top: 1.5px solid var(--rule); }
+.slide > p.recall { position: absolute; left: 96px; width: 456px; margin: 0; display: flex; align-items: baseline; gap: 14px; font-size: 22px; line-height: 1.3; color: var(--ink-soft); white-space: nowrap; }
+.slide > p.recall .sym { flex: 0 0 74px; font-size: 23px; color: var(--ink); }
+.slide > p.recall.term .sym { flex-basis: 104px; font-size: 22px; font-weight: 700; }
+.slide > .takeaway { left: 96px; right: auto; width: 456px; bottom: 80px; height: 168px; box-sizing: border-box; padding: 0 28px; display: flex; align-items: center; background: #fff; border: 0; border-radius: 14px;
+  box-shadow: 0 1px 2px rgba(23,25,28,.05), 0 6px 22px rgba(23,25,28,.07); font-size: 27px; line-height: 1.42; font-weight: 600; color: var(--navy); text-align: left; overflow: hidden; }
+.slide > .takeaway > span { display: block; text-wrap: balance; }
+.slide > .takeaway b { color: var(--verm); font-weight: 700; white-space: nowrap; }
+.slide > .takeaway .nb { white-space: nowrap; }
+
+/* ---------- spine ---------- */
+.slide > svg.spine { position: absolute; left: 580px; top: 72px; overflow: visible; }
+
+/* ---------- plate ---------- */
+.panel { position: absolute; background: transparent; }
+.panel > svg.sc { position: absolute; left: 20px; top: 20px; overflow: visible; }
+svg.sc text { font-family: var(--sans); }
+svg.sc text.num { font-variant-numeric: lining-nums tabular-nums; letter-spacing: -0.01em; }
+.panel > .figwrap { position: absolute; left: 20px; top: 20px; }
+.cite { left: 644px; right: 200px; bottom: 28px; font-size: 17px; color: var(--muted); }
+
+/* formulas: KaTeX in HTML blocks placed in panel coordinates (scene x + 20, scene y + 20)
+   .fx            a bare label (math or mixed), anchored by its left edge unless transformed
+   .fx.box        a sized block with its lines centred: a white card that holds one formula
+   .fx.box.plain  the same block without the card: a display equation on the paper, as in a book
+   .fx .eqn       the paper's equation number, flush right, in parentheses
+   .fx .note      what the row gives, flush left: a derivation is a stack of such rows, and the key row is the white card
+   .fx .k         a caption line inside a block */
+.panel > .fx { position: absolute; margin: 0; white-space: nowrap; line-height: 1.25; font-size: 24px; font-weight: 600; color: var(--ink); }
+.panel > .fx.box { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; box-sizing: border-box; padding: 8px 18px; border-radius: 12px; background: #fff;
+  box-shadow: 0 1px 2px rgba(23,25,28,.05), 0 4px 16px rgba(23,25,28,.06); font-size: 26px; overflow: hidden; }
+.panel > .fx.box.plain { background: transparent; box-shadow: none; border-radius: 0; }
+.panel > .fx.box.left { align-items: flex-start; }
+.panel > .fx p { margin: 0; }
+.panel > .fx .k { font-size: 24px; font-weight: 500; color: var(--ink-soft); }
+.panel > .fx .katex { font-size: 1.1em; }
+.panel > .fx .katex .mord.text, .panel > .fx .katex .text { font-family: "Pretendard Variable", Pretendard, sans-serif; }
+.panel > .fx.box:has(.eqn) { padding-right: 84px; }
+.panel > .fx.box:has(.note) { padding-left: 300px; }
+.panel > .fx .note { position: absolute; left: 0; top: 50%; transform: translateY(-50%); font-size: 24px; font-weight: 500; color: var(--ink-soft); }
+.panel > .fx.box:not(.plain) .note { left: 26px; }
+.panel > .fx .eqn { position: absolute; right: 18px; top: 50%; transform: translateY(-50%); font-size: 23px; font-weight: 500; color: var(--muted); font-variant-numeric: lining-nums; }
+
+/* three-rule table (scene_kit.table()): tabular numerals, numbers right-aligned */
+.bt { position: absolute; border-collapse: collapse; font-size: 30px; color: var(--ink); font-variant-numeric: tabular-nums lining-nums; white-space: nowrap; }
+.bt th, .bt td { padding: 0 22px; text-align: right; }
+.bt thead th { font-size: 24px; font-weight: 650; color: var(--ink-soft); height: 66px; vertical-align: middle; }
+.bt thead tr:first-child th { border-top: 2.6px solid var(--ink); }
+.bt thead tr:last-child th, .bt thead th[rowspan] { border-bottom: 1.6px solid var(--ink); }
+.bt thead th.grp { text-align: center; color: var(--ink); font-size: 25px; }
+.bt thead th.grp span { display: block; padding: 0 0 10px; border-bottom: 1.3px solid #A39E90; }
+.bt tbody td { height: var(--row, 96px); vertical-align: middle; }
+.bt tbody tr + tr td { border-top: 1px solid var(--faint); }
+.bt tbody tr:last-child td { border-bottom: 2.6px solid var(--ink); }
+.bt .l { text-align: left; }
+.bt .gap { padding-left: 56px; }
+.bt td.name { font-size: 32px; font-weight: 750; color: var(--ink); }
+.bt td.em { font-weight: 750; color: var(--indigo); }
+.bt td small { display: block; margin-top: 4px; font-size: 23px; font-weight: 500; color: var(--muted); }
+
+/* ---------- cover ---------- */
+.fo-cover > h1 { position: absolute; left: 96px; top: 150px; width: 780px; margin: 0; font-size: 100px; line-height: 1.1; padding-bottom: 14px; font-weight: 800; letter-spacing: -0.035em; color: var(--ink); }
+.fo-cover > h1 em { font-style: normal; background: none; -webkit-background-clip: initial; background-clip: initial; color: var(--indigo); -webkit-text-fill-color: var(--indigo); }
+.fo-cover > h1 small { display: block; font-size: .36em; font-weight: 600; letter-spacing: -0.01em; color: var(--ink-soft); margin-top: .5em; line-height: 1.3; }
+.fo-cover > .subtitle { position: absolute; left: 100px; top: 548px; width: 760px; font-size: 32px; line-height: 1.4; font-weight: 500; color: var(--ink-soft); }
+.fo-cover > .venue { position: absolute; left: 100px; top: 632px; width: 760px; font-size: 24px; line-height: 1.5; color: var(--muted); }
+.fo-cover > .who { position: absolute; left: 100px; top: 908px; font-size: 30px; font-weight: 650; color: var(--ink); }
+.fo-cover > .aff { position: absolute; left: 100px; top: 954px; font-size: 24px; color: var(--ink-soft); }
+.fo-cover > svg.spine { left: 900px; }
+
+/* ---------- section opener: one question on ink ---------- */
+.slide.fo-dark { background: var(--ink); }
+.fo-dark > .sec-big { position: absolute; left: 92px; top: 84px; font-size: 140px; line-height: 1; font-weight: 800; letter-spacing: -0.04em; color: var(--verm); font-variant-numeric: tabular-nums lining-nums; }
+.fo-dark > .sec-name { position: absolute; left: 100px; top: 248px; font-size: 34px; font-weight: 600; color: #CFC9BA; }
+.fo-dark > h2 { left: 644px; top: 0; width: 1150px; height: 1080px; display: flex; align-items: center; font-size: 76px; line-height: 1.28; letter-spacing: -0.03em; color: var(--paper); }
+.fo-dark > h2 > span { display: block; text-wrap: balance; }
+.fo-dark > .slide-num { color: #9A958A; }
+
+/* ---------- spread: a full-width plate under a one-line title ---------- */
+.fo-spread > h2 { top: 112px; width: 1744px; white-space: nowrap; }
+.fo-spread > .takeaway { width: 1728px; height: 96px; justify-content: center; text-align: center; }
+.fo-spread > .cite { left: 96px; }
+
+/* presenter aids (js/aids.js): L laser pointer, Z zoom at the cursor */
+body.laser, body.laser * { cursor: none !important; }
+.laser-dot { position: fixed; left: -9px; top: -9px; width: 18px; height: 18px; border-radius: 50%; background: #CF3F2A; box-shadow: 0 0 0 5px rgba(207,63,42,.22), 0 0 18px 6px rgba(207,63,42,.35); pointer-events: none; z-index: 60; display: none; }
+body.laser .laser-dot { display: block; }
+.viewport.zoomed { transition: transform .22s ease; }
+body.print .laser-dot { display: none; }

@@ -71,3 +71,42 @@ svg.sc .x { stroke: #D1495B; stroke-width: 4; stroke-linecap: round; }
 
 /* title slide: an English sub-line inside the h1 (the paper title under its Korean reading) */
 .title-slide h1 small { display: block; font-size: .6em; font-weight: 600; letter-spacing: 0; color: var(--ink-soft); margin-top: .12em; }
+
+/* ---- additions of 2026-11-12 (user decision "v18a 는 QR 빼고 다 넣어도 될거같고") ----
+   .tracker   the deck's sections in the kicker row, text only; the current one in navy (scene_kit.init(deck, sections=…); T hides it)
+   .fx .eqn   the paper's equation number in the corner of a formula card (fx(..., eq='17'))
+   .bt        a three-rule table for a backup slide: tabular numerals, numbers right-aligned (scene_kit.table())
+   .tile      a result tile of the closing slide: one figure, one number, one phrase (scene_kit.tile())
+   .laser-dot presenter aids in js/aids.js: L laser pointer, Z zoom at the cursor */
+.slide > .tracker { position: absolute; right: 130px; top: 53px; display: flex; gap: 22px; margin: 0; font-size: 17px; font-weight: 500; color: var(--muted); line-height: 1.2; white-space: nowrap; }
+.slide > .tracker .on { color: var(--navy); font-weight: 700; }
+body.no-tracker .slide > .tracker { display: none; }
+
+.panel > .fx .eqn { position: absolute; right: 16px; top: 9px; font-size: 18px; font-weight: 500; color: var(--muted); line-height: 1.2; }
+
+.bt { position: absolute; border-collapse: collapse; font-size: 30px; color: var(--ink); font-variant-numeric: tabular-nums lining-nums; white-space: nowrap; }
+.bt th, .bt td { padding: 0 20px; text-align: right; }
+.bt thead th { font-size: 24px; font-weight: 650; color: var(--ink-soft); height: 68px; vertical-align: middle; }
+.bt thead tr:first-child th { border-top: 2.6px solid var(--ink); }
+.bt thead tr:last-child th, .bt thead th[rowspan] { border-bottom: 1.6px solid var(--ink); }
+.bt thead th.grp { text-align: center; color: var(--ink); font-size: 25px; }
+.bt thead th.grp span { display: block; padding: 0 0 10px; border-bottom: 1.3px solid #9AA5B1; }
+.bt tbody td { height: var(--row, 96px); vertical-align: middle; }
+.bt tbody tr + tr td { border-top: 1px solid #E3E7EB; }
+.bt tbody tr:last-child td { border-bottom: 2.6px solid var(--ink); }
+.bt .l { text-align: left; }
+.bt .gap { padding-left: 54px; }
+.bt td.name { font-weight: 700; color: var(--navy); }
+.bt td.em { font-weight: 750; color: var(--navy); }
+.bt td small { display: block; margin-top: 4px; font-size: 23px; font-weight: 500; color: var(--muted); }
+
+.tile { position: absolute; box-sizing: border-box; border-radius: 14px; background: #fff; box-shadow: 0 1px 2px rgba(31,41,51,.05), 0 4px 16px rgba(31,41,51,.06); }
+.tile > h3 { position: absolute; left: 26px; top: 22px; margin: 0; font-size: 24px; font-weight: 700; color: var(--navy); line-height: 1.25; white-space: nowrap; }
+.tile > svg { position: absolute; left: 0; top: 0; overflow: visible; }
+.tile > svg text { font-family: var(--sans); fill: var(--ink); }
+
+body.laser, body.laser * { cursor: none !important; }
+.laser-dot { position: fixed; left: -9px; top: -9px; width: 18px; height: 18px; border-radius: 50%; background: #D1495B; box-shadow: 0 0 0 5px rgba(209,73,91,.22), 0 0 18px 6px rgba(209,73,91,.35); pointer-events: none; z-index: 60; display: none; }
+body.laser .laser-dot { display: block; }
+.viewport.zoomed { transition: transform .22s ease; }
+body.print .laser-dot { display: none; }

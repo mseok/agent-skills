@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""kit_gallery.py — nineteen worked slides drawn with scene_kit.py, with toy content and no paper in them. Copy a slide's code, keep its sizes and positions, change the content.
+"""kit_gallery.py — twenty worked slides drawn with scene_kit.py, with toy content and no paper in them. Copy a slide's code, keep its sizes and positions, change the content.
 
 usage: kit_gallery.py /abs/deck   (a folder scaffolded by new_deck.py). Renders are kept in assets/kit-gallery/ of this skill.
 Numbers, names and curves here are invented to show the drawing; nothing on these slides is a result.
@@ -12,7 +12,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from scene_kit import *  # noqa: E402,F403
-from scene_kit import AMBER, AMBERD, BAR_OTHER, BIMODAL, BLUE, CORAL, FULL, GHOST, GRAY, GRAYL, INK, L2, MUTED, NAVY, P3A, P3B, P3C, R2, RED, RING_TAIL, SOFT, STEEL, STEELD  # noqa: E402
+from scene_kit import AMBER, AMBERD, BAR_OTHER, BIMODAL, BLUE, CORAL, FULL, GHOST, GRAY, GRAYL, INK, L2, LW, MUTED, NAVY, P3A, P3B, P3C, R2, RED, RING_TAIL, RN, SOFT, STEEL, STEELD  # noqa: E402
 
 CITE = '예시 내용 · 숫자와 이름은 그리는 법을 보이려고 지어낸 것'
 F = Field(0.62, BIMODAL, sig=1.0)
@@ -179,26 +179,27 @@ def g7_lines():
 
 
 def g8_closing():
-    """The closing: four findings, each with a tiny drawing, on the left; the questions on the right are the presenter's slot."""
-    l = lane(0, 24, '논문이 보여 준 것')
-    ys = [50, 204, 358, 512]
-    rows = [('한 loss로 세 모델을 함께', 'encoder, decoder, 생성 모델'), ('비슷한 품질에 더 가벼운 step', '가장 큰 크기에서 65% 절감'), ('joint training이 separate training보다 좋음', '4.5에서 3.7로'), ('prior와 sampler의 자유', '여러 분포, guidance, inversion')]
-    for y, (a, b) in zip(ys, rows):
-        l += card(0, y, 798, 146) + T(216, y + 65, a, 27, 700) + T(216, y + 101, b, 24, None, SOFT)
-    c = ys[0] + 73
-    l += enc(40, c, 56, 62, lab='') + model_box(100, c, 48, 62, '') + dec(160, c, 56, 62, lab='')
-    c = ys[1] + 73
-    l += rect(62, c - 22, 40, 54, 4, BLUE, 'none', 0) + rect(112, c - 48, 40, 80, 4, '#C5CDD5', 'none', 0)
-    c = ys[2] + 73
-    l += strand([(40, c - 22), (84, c + 2), (128, c + 14), (172, c + 18)], BLUE, 4, 1) + strand([(40, c - 28), (172, c - 28)], SOFT, 2.4, 1, '8 6')
-    c = ys[3] + 73
-    l += vprof(gauss1(0, 0.8), -2.4, 2.4, 100, c + 44, c - 44, -44, AMBER, AMBERD)
+    """The closing: four result tiles on the left, each one figure, one number, one phrase (the sentences they stand for are in the notes); the questions on the right are the presenter's slot."""
+    t1 = enc(79, 138, 118, 92, lab='encoder', size=22) + arrow(142, 138, 174, 138) + model_box(237, 138, 118, 84, '모델', 22) + arrow(300, 138, 332, 138) + dec(395, 138, 118, 92, lab='decoder', size=22)
+    t1 += f'<path d="M20 204 V216 H454 V204" fill="none" stroke="{SOFT}" stroke-width="1.8" stroke-linejoin="round"/>' + T(237, 254, 'loss 하나로 joint training', 24, 700, NAVY, 'middle')
+    t2 = T(26, 104, '제안', 22, 700, NAVY) + rect(150, 82, 84, 30, 4, BLUE, 'none', 0) + T(244, 106, '300', 24, 700, NAVY)
+    t2 += T(26, 150, '기준', 22, None, SOFT) + rect(150, 128, 240, 30, 4, BAR_OTHER, 'none', 0) + T(400, 152, '860', 24, 700, SOFT)
+    t2 += T(150, 190, '가장 큰 크기, step마다 계산량', 22, None, SOFT) + T(26, 258, '65%', 58, 800, NAVY) + T(186, 232, 'step마다', 22, 600) + T(186, 260, '계산 절감', 22, 600)
+    t3 = T(26, 170, '4.5', 50, 700, SOFT) + arrow(146, 152, 210, 152) + T(230, 170, '3.7', 78, 800, NAVY)
+    t3 += T(26, 210, 'separate', 22, None, SOFT) + T(230, 210, 'joint training', 22, 700, NAVY) + T(26, 258, '품질 지표, 낮을수록 좋음', 22, None, SOFT)
+    t4 = ''
+    for i, (pdf, name, v) in enumerate(((uniform1(-1.5, 1.5), 'uniform', '4.8'), (laplace1(0, 0.55), 'Laplacian', '4.4'), (gauss1(0, 0.8), 'Gaussian', '3.8'), (mixture1([(1, -1.2, 0.3), (1, 1.2, 0.3)]), 'mixture', '4.3'))):
+        cx, on = 20 + 108.5 * i + 54.25, name == 'Gaussian'
+        t4 += hprof(pdf, -2.8, 2.8, cx - 44, cx + 44, 142, 58, '#F8E3BF', AMBERD) + T(cx, 178, v, 24, 700, NAVY if on else INK, 'middle') + T(cx, 208, name, 22, 700 if on else None, NAVY if on else SOFT, 'middle')
+    t4 += T(26, 258, '네 prior 모두 학습', 22, None, SOFT)
+    tiles = tile(0, 0, '한 loss로 세 모델을 함께', t1) + tile(1, 0, '비슷한 품질에 더 가벼운 step', t2) + tile(0, 1, 'joint training이 더 좋음', t3) + tile(1, 1, 'prior와 sampler의 자유', t4)
     r = lane(0, 24, '우리에게 던지는 질문')
-    for i, q in enumerate((['우리 모델의 representation은', '생성 모델보다 먼저 굳어 있는가'], ['noise와 크기를', '우리는 어떻게 정해 왔는가'], ['prior를 고를 수 있다면', '어떤 선택지가 있는가'])):
+    for i, q in enumerate((['우리 representation은', '생성 모델보다 먼저 굳었는가'], ['noise와 크기를', '우리는 어떻게 정해 왔는가'], ['prior를 고를 수 있다면', '어떤 선택지가 있는가'])):
         cy = 162 + i * 226
         r += circle(44, cy, 26, NAVY) + T(44, cy + 11, str(i + 1), 30, 700, '#fff', 'middle') + lines(96, cy - 8, q, 32, 46, 700, NAVY)
-    return slide('예시', '예시 · 정리와 질문', 'jointly 학습하는 것이 우리에게 주는 뜻', [panel(*L2, l), panel(*R2, r)],
-                 '우리 representation에도 <b>누가 먼저 굳었나</b> 묻기', CITE, notes('오른쪽은 발표자가 발표마다 직접 쓰는 자리입니다.'))
+    return slide('예시', '예시 · 정리와 질문', 'jointly 학습하는 것이 우리에게 주는 뜻', [panel(*LW, lane(0, 24, '논문이 보여 준 것'), tiles), panel(*RN, r)],
+                 '우리 representation에도 <b>누가 먼저 굳었나</b> 묻기', CITE,
+                 notes('왼쪽 타일은 그림 하나, 숫자 하나, 구절 하나입니다. 타일이 줄인 문장은 노트에 둡니다.', '오른쪽은 발표자가 발표마다 직접 쓰는 자리입니다.'))
 
 
 def g9_causal():
@@ -376,7 +377,7 @@ def g15_derivation():
     r, hr = derive(rows, rh=96, size=32, note_size=26)
     r = lane(0, 24, 'linear SDE에서 sample 식까지 네 단계') + r + arrow(120, 446, 120, 510)
     hr += tex(140, 486, r'$\epsilon \sim \mathcal N(0, I)$이면 경로를 풀 필요 없음', 26, 700)
-    hr += fx(0, 524, 972, 136, [r'$z_t = e^{-\theta t} z_0 + \frac{\sigma}{\sqrt{2\theta}}\sqrt{1 - e^{-2\theta t}}\;\epsilon$'], 38, 'box blue')
+    hr += fx(0, 524, 972, 136, [r'$z_t = e^{-\theta t} z_0 + \frac{\sigma}{\sqrt{2\theta}}\sqrt{1 - e^{-2\theta t}}\;\epsilon$'], 38, 'box blue', eq='4')   # eq = the paper's own equation number (invented here)
     return slide('예시', '예시 · 식이 내용인 유도', '식으로 풀리는 transition으로 바로 뽑는 sample', [panel(110, 176, 664, 722, l, h), panel(798, 176, 1012, 722, r, hr)],
                  '경로를 풀지 않아도 <b>어느 $t$든</b> 한 번에 sample', CITE + ' · Ornstein-Uhlenbeck 과정의 교과서 식', notes('유도를 말하는 장은 식이 내용입니다. 단계 이름만 적은 상자로 바꾸지 않습니다. 한 식은 한 줄에 둡니다.'))
 
@@ -487,6 +488,18 @@ def g19_small_bars_and_drawing():
                  '수치의 개선이 <b>그림에서도 보임</b>', CITE + ' · 아래는 논문 그림을 자르는 경로를 보이려고 만든 가짜 쪽', notes('결과 장에 논문의 선 그림을 넣을 때는 차트를 작게 위에 두고, 그림은 원본보다 크게 놓지 않습니다.'))
 
 
+def g20_backup_table():
+    """A backup slide: the full table behind a chart of the talk, three rules and tabular numerals. slide(..., backup=True) numbers it B1 and keeps it out of the progress count; 'em' marks the values the slide is about."""
+    t = table(['크기', '제안', '기준', '제안', '기준', '제안, step마다', '제안 decoder, 한 번', '기준, step마다'],
+              [['작음', '2.6', '2.6', ('390', '5 / 5 / 380'), '400', ('160', '', 'em'), '15', '200'],
+               ['중간', '3.1', '3.5', ('390', '5 / 5 / 380'), '400', ('250', '', 'em'), '60', '470'],
+               ['큼', '3.9', '3.9', ('390', '5 / 5 / 380'), '405', ('300', '', 'em'), '240', '860']],
+              groups=[('품질 지표', 2), ('parameter, M', 2), ('계산량', 3)], row_h=158)
+    return slide('부록', '부록 · 세 크기의 전체 값', '크기가 커질수록 벌어지는 step마다의 계산', [panel(*FULL, lane(0, 24, '세 크기의 제안 모델과 기준 모델'), t)],
+                 '가장 큰 크기에서 step마다 드는 계산은 <b>300 대 860</b>', CITE + ' · parameter 아래 작은 글씨는 encoder / decoder / 모델',
+                 notes('본문의 막대 뒤에 있는 전체 값입니다. 질문이 나오면 이 장으로 옵니다.'), backup=True)
+
+
 if __name__ == '__main__':
     init(sys.argv[1])
-    write_deck([g() for g in (g1_cover, g2_two_chains, g3_table, g4_hero, g5_mechanism, g6_bars, g7_lines, g8_closing, g9_causal, g10_matrix, g11_rank, g12_tiers, g13_boxes, g14_cards, g15_derivation, g16_graph_cells, g17_paper_figure, g18_two_values, g19_small_bars_and_drawing)])
+    write_deck([g() for g in (g1_cover, g2_two_chains, g3_table, g4_hero, g5_mechanism, g6_bars, g7_lines, g8_closing, g9_causal, g10_matrix, g11_rank, g12_tiers, g13_boxes, g14_cards, g15_derivation, g16_graph_cells, g17_paper_figure, g18_two_values, g19_small_bars_and_drawing, g20_backup_table)])

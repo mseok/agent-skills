@@ -7,7 +7,7 @@ For the shareable macOS KAIST VPN automation, see
 [KAIST VPN Monitor Community](tools/kaist-vpn-monitor/README.md)
 for setup, requirements, and validation limits.
 
-- `skills/codex/`: every skill, installed for both Codex and Claude, including `nature-figure` and `research-talk` (slide decks in the dissertation style; Pretendard font bundled under `assets/fonts`, installed automatically).
+- `skills/codex/`: every skill, installed for both Codex and Claude, including `nature-figure` and `html-research-deck` (talk storylines and HTML slide decks; PPTX decks in the dissertation style on request, with the Pretendard font bundled under `assets/pptx/fonts` and installed automatically).
 - `skills/codex/usage-progress/`: a Claude Code plugin, not a skill; it has no `SKILL.md`, so only the link in `~/.claude/skills` loads it.
 - `skills/claude`: a link to `skills/codex`, kept so that older paths resolve. There is one scope; do not add a second directory.
 - Retired skills are deleted, not archived; recover one from the Git history when it is needed again.

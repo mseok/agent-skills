@@ -20,34 +20,34 @@ const families = [a.family && a.family !== true ? a.family : 'Pretendard'];
 if (a['pair-ea'] && a['pair-ea'] !== true) {
   const {execFileSync} = await import('node:child_process');
   draftPath = a.draft.replace(/\.pptx$/, '.paired.pptx');
-  // pair_fonts.py: $RESEARCH_TALK_SKILL, else the skill folder this file was copied from (frozen snapshots), else the installed skill.
+  // pair_fonts.py: $RESEARCH_DECK_SKILL (or the older $RESEARCH_TALK_SKILL), else the skill folder this file sits in (assets/pptx inside html-research-deck), else the installed skill.
   const here = path.dirname(fileURLToPath(import.meta.url));
-  const skillRoot = [process.env.RESEARCH_TALK_SKILL, path.resolve(here, '..'), '/Users/mseok/.codex/skills/research-talk'].filter(Boolean)
-    .find(r => existsSync(path.join(r, 'scripts/pair_fonts.py')));
-  if (!skillRoot) throw new Error('pair_fonts.py not found: set RESEARCH_TALK_SKILL to the skill folder');
-  execFileSync(PY, [path.join(skillRoot, 'scripts/pair_fonts.py'), a.draft, draftPath, families[0], a['pair-ea']], {stdio: 'inherit'});
+  const skillRoot = [process.env.RESEARCH_DECK_SKILL, process.env.RESEARCH_TALK_SKILL, path.resolve(here, '..', '..'), '/Users/mseok/.codex/skills/html-research-deck'].filter(Boolean)
+    .find(r => existsSync(path.join(r, 'scripts/pptx/pair_fonts.py')));
+  if (!skillRoot) throw new Error('pair_fonts.py not found: set RESEARCH_DECK_SKILL to the html-research-deck skill folder');
+  execFileSync(PY, [path.join(skillRoot, 'scripts/pptx/pair_fonts.py'), a.draft, draftPath, families[0], a['pair-ea']], {stdio: 'inherit'});
   families.push(a['pair-ea']);
 }
 // Make sure the deck font is installed (installs the bundled copy automatically when missing).
 if (families[0] === 'Pretendard') {
   const {spawnSync} = await import('node:child_process');
   const hereF = path.dirname(fileURLToPath(import.meta.url));
-  const rootF = [process.env.RESEARCH_TALK_SKILL, path.resolve(hereF, '..'), '/Users/mseok/.codex/skills/research-talk'].filter(Boolean).find(r => existsSync(path.join(r, 'scripts/ensure_font.py')));
-  if (rootF) { const r = spawnSync(PY, [path.join(rootF, 'scripts/ensure_font.py')], {encoding: 'utf8'}); console.log((r.stdout || '').trim() || (r.stderr || '').trim()); }
+  const rootF = [process.env.RESEARCH_DECK_SKILL, process.env.RESEARCH_TALK_SKILL, path.resolve(hereF, '..', '..'), '/Users/mseok/.codex/skills/html-research-deck'].filter(Boolean).find(r => existsSync(path.join(r, 'scripts/pptx/ensure_font.py')));
+  if (rootF) { const r = spawnSync(PY, [path.join(rootF, 'scripts/pptx/ensure_font.py')], {encoding: 'utf8'}); console.log((r.stdout || '').trim() || (r.stderr || '').trim()); }
 }
 // Theme fonts (heading/body) → the deck family, so text typed later in PowerPoint/Keynote matches (Artifact Tool's font scheme is read-only; the theme XML is rewritten).
 {
   const {execFileSync} = await import('node:child_process');
   const here2 = path.dirname(fileURLToPath(import.meta.url));
-  const root2 = [process.env.RESEARCH_TALK_SKILL, path.resolve(here2, '..'), '/Users/mseok/.codex/skills/research-talk'].filter(Boolean).find(r => existsSync(path.join(r, 'scripts/set_theme_fonts.py')));
+  const root2 = [process.env.RESEARCH_DECK_SKILL, process.env.RESEARCH_TALK_SKILL, path.resolve(here2, '..', '..'), '/Users/mseok/.codex/skills/html-research-deck'].filter(Boolean).find(r => existsSync(path.join(r, 'scripts/pptx/set_theme_fonts.py')));
   if (root2) {
     const themed = draftPath.replace(/\.pptx$/, '.themed.pptx');
-    execFileSync(PY, [path.join(root2, 'scripts/set_theme_fonts.py'), draftPath, themed, families[0], families[1] ?? families[0]], {stdio: 'inherit'});
+    execFileSync(PY, [path.join(root2, 'scripts/pptx/set_theme_fonts.py'), draftPath, themed, families[0], families[1] ?? families[0]], {stdio: 'inherit'});
     draftPath = themed;
     // Charts: PowerPoint adds the series name as a title unless <c:autoTitleDeleted val="1"/> is present.
-    if (existsSync(path.join(root2, 'scripts/chart_no_autotitle.py'))) {
+    if (existsSync(path.join(root2, 'scripts/pptx/chart_no_autotitle.py'))) {
       const notitle = draftPath.replace(/\.themed\.pptx$/, '.notitle.pptx');
-      execFileSync(PY, [path.join(root2, 'scripts/chart_no_autotitle.py'), draftPath, notitle], {stdio: 'inherit'});
+      execFileSync(PY, [path.join(root2, 'scripts/pptx/chart_no_autotitle.py'), draftPath, notitle], {stdio: 'inherit'});
       draftPath = notitle;
     }
   }

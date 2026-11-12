@@ -47,3 +47,29 @@ Dated decisions of the user behind this skill's rules, in the user's own words. 
 - "디스트리뷰션 … prior … 양키 두 그 처음 HTML 페이지에서 했던 거랑 비슷하게 … 코드 기반으로" → `scripts/density.py`: density rasters + real samples + 1-D profiles + bridge paths (`design-system.md`, Distributions); blobs and dashed ellipses are out.
 - "분자나 PDB 구조 … 리서치톡에 있는 방식으로 … 파이몰 같은 프로그램으로 … 렌더링 … 한 다음에 넣는 식" → `design-system.md`, Structure renders: research-talk's PyMOL/RDKit pipeline produces the PNG, the `figure-render` template places it; nothing generated stands in for a structure.
 - Second lesson from the same deck (v5, 2026-11-01 noon): the checker passed 0/0 again while the independent design judge saw an unrendered `\beta &gt; 0` in red on slide 20 (a card path html-escapes once, so `&gt;` written in TeX became `&amp;gt;`), `+ 잡음 0.1` touching both sides of its box on slide 17, and formula strips 20/60 px off-centre on slides 8–10. `check_layout.py` now has `tex-unrendered` and `box-tight` as errors and `fx-offcentre` as a warning; write `<`/`>` as `&lt;`/`&gt;` only in `.fx`/`tex()` strings that are not escaped again, and run the checker on the previous version to confirm a new kind fires before trusting it (it reported 5 errors · 6 warnings on v5, 0/0 on v6). The judge also loaded the user's global CLAUDE.md and ran a bio-safe-reading pre-screen on an ML deck ($1.06, non-independent): `judge_deck.py` and `judge_message.py` now pass `--setting-sources ''` and `--strict-mcp-config`.
+
+## User decisions (2026-11-12, merging research-talk into this skill)
+
+- "research-talk, html-research-deck 을 html-research-deck 에 통합하고 싶어." → the former `research-talk` skill (storyline, approval, gates, PPTX production) lives in this skill since 2026-11-12: storyline and gates in SKILL.md, PPTX production in `references/pptx-production.md`, `pptx-design.md` and `pptx-qa.md`, its kit in `assets/pptx/` and `scripts/pptx/`. Read as part of the same request and not yet confirmed in the user's words: an HTML deck is the default product, and PPTX is built only when the user asks for PPTX, PowerPoint or Keynote. (Confirmed the same day, next section.)
+- "지금 디자인들이 꽤 마음에 드는데 너가 생각하기에 html research deck 을 창의적으로 좀 더 예쁘고 학술 발표에서도 부족함 없이 만들 수 있는 게 있으면 한 번 시도해줘봐. Latent SI 논문을 reference 삼아서 계속 iterative 하게 개선해나가도록 해줘." → design experiments run on a copy of the Latent SI deck; the accepted theme and v17 stay as they are until the user gives a verdict on the experiment. First round: `v18a` in Mac mini `inbox/html-research-deck-merge-20261112/design-lab/` (result tiles on the closing slide, paper equation numbers on formula cards, a backup slide with a booktabs table, builds on a dense slide, a section tracker, a QR code on the cover, laser and zoom keys); nothing from it is in the theme yet.
+
+- "그럼 너가 아예 완전히 새로운 템플릿을 만들어봐. 너의 창의성을 보여줄 수 있는 아카데믹 세미나 템플릿." → a separate proposal, Folio, in Mac mini `inbox/html-research-deck-merge-20261112/folio/` (README there): a left rail for the title, the symbols a slide uses and the closing card, a spine that shows the sections, a 1176 x 888 plate for one figure, serif display type, densities as stepped level sets, numbered display equations, a dark question slide per section. Ten sample slides with the accepted v17 content; nothing from it is in this skill's theme, scripts or checks until the user decides. (Decided the same day, next section.)
+
+## User decisions (2026-11-12, after the v18a experiments and the Folio proposal)
+
+One message: "v18a 는 QR 빼고 다 넣어도 될거같고, HTML 기본 PPTX 요청 시가 맞음. 통합을 commit 하고 배포도 하면 좋겠고, folio 는 font 만 기존과 동일하게 해서 다른 양식으로 만들어두자."
+
+- "v18a 는 QR 빼고 다 넣어도 될거같고" → adopted into the research theme and `scene_kit.py`: the section tracker, the paper's equation numbers on formula cards, result tiles on the closing slide, backup slides with a three-rule table, builds on a dense slide, the presenter keys L, Z and T (`design-system.md`, Additions of 2026-11-12; gallery 8, 15 and 20). The cover QR code is not adopted: no QR code on a cover unless the user asks.
+- "HTML 기본 PPTX 요청 시가 맞음" → confirmed: an HTML deck is the default product; PPTX is built only when the user asks for PPTX, PowerPoint or Keynote.
+- "통합을 commit 하고 배포도 하면 좋겠고" → a request to commit the merge of research-talk into this skill and to deploy it to the other hosts (harness-maintenance, Propagate). What reached which host is in that task's report, not in this file.
+- "folio 는 font 만 기존과 동일하게 해서 다른 양식으로 만들어두자" → Folio is a second layout of this skill with the research theme's fonts (Pretendard, KaTeX): `assets/deck/css/theme-folio.css`, `scripts/folio_kit.py`, `scripts/folio_gallery.py`, `new_deck.py --theme folio`, `references/folio.md`. The serif titles of the proposal (MaruBuri, Source Serif 4) and its Roman section numerals are out; sections carry two-digit numbers. The research theme stays the default; Folio is used when the user asks for it by name.
+
+## User decisions carried over from research-talk (verbatim, with their dates)
+
+- 2026-11-10, approving the next-stage skill edits: "인정." Approved here: "HTML 덱" and interactive HTML requests route to html-research-deck, and "same as before" carries the earlier approved flow (SKILL.md, storyline step 4 and the harness-neutral section). Since the merge both rules are in SKILL.md (Routes).
+- The two decisions of 2026-11-05 on archiving slides and scripts in Obsidian are kept in `workflow.md` (User decisions (2026-11-05)).
+
+## User decisions recorded only in SKILL.md until 2026-11-12
+
+- "이건 지금 이번에 한거처럼 규칙을 정해두면 요청하는거 그대로 만들 수 있는거아닌가?" and "좋은거같애. 1 2b 가 좋을듯?" → the rules live in the skill so a request yields the deck directly; the taste benchmark of 2–3 slides stays as the one user checkpoint before the full build.
+- "나는 gpt 모델 (astra or sol high) 도 자주 쓰는데, 각각을 high, xhigh로 했을 때 비슷한 결과가 나오도록 하면 좋겟음" → the equivalence test (`equiv_run.py`, `references/loops-and-builders.md`); "비슷하다" = within ±3 on both design and message.

@@ -20,7 +20,11 @@ same coordinates and add the padding themselves.
     chain()            a left-to-right row of actors joined by arrows, sized to fill the given width
     enc(), dec(), model_box(), grid(), photo(), picture()   one actor, one drawing on every slide
     bars(), legend(), big()                charts from numbers, with bold value labels and the key number large
-    T(), lines(), tex(), fx()              text, several lines, a label with KaTeX, a KaTeX card (cls 'box' white, 'box blue' the deck's key equation)
+    T(), lines(), tex(), fx()              text, several lines, a label with KaTeX, a KaTeX card (cls 'box' white, 'box blue' the deck's key equation; eq= the paper's equation number)
+    tile()             a result tile of the closing slide: one figure, one number, one phrase (gallery 8)
+    table()            a three-rule table for a backup slide (gallery 20); slide(..., backup=True) numbers it B1
+    step(), at()       builds: reveal part of a dense scene at build 1, 2, …; the last build is the whole slide
+    init(deck, sections=[…])               turns on the section tracker in the kicker row
     derive()           a derivation as a table: one row per step, its formula on one line and a phrase of what it gives
     node(), edge()     a causal graph only: variables and directed arrows trimmed to their rims
     ggraph(), ring_pts(), RING_TAIL, pair_line()     a graph as a structure: pale discs, thin lines, red outline on the change (gallery 16)
@@ -62,11 +66,13 @@ BIMODAL = [(0.5, -1.25, 0.32), (0.5, 1.25, 0.32)]
 XR2, YR2 = (-2.3, 2.3), (-2.3, 2.3)
 DOTS = {STEEL: '#3F66A6', AMBER: AMBERD, '#9AA5B1': '#7C8894'}
 
-_S = SimpleNamespace(deck=None, figs=None, cache_file=None, cache={})
+_S = SimpleNamespace(deck=None, figs=None, cache_file=None, cache={}, sections=None)
 
 
-def init(deck_dir):
-    """Set the deck folder (holds index.html and assets/figs); call once at the top of build.py."""
+def init(deck_dir, sections=None):
+    """Set the deck folder (holds index.html and assets/figs); call once at the top of build.py.
+    sections, the deck's section names in order, turns on the section tracker in the kicker row of every slide() whose section is in the list."""
+    _S.sections = list(sections) if sections else None
     _S.deck = Path(deck_dir).resolve()
     _S.figs = _S.deck / 'assets' / 'figs'
     _S.figs.mkdir(parents=True, exist_ok=True)
@@ -125,11 +131,13 @@ def big(x, y, s, size=36, fill=BLUE, a='middle'):
     return T(x, y, s, size, 800, fill, a)
 
 
-def fx(x, y, w, h, rows, size=26, cls='box'):
+def fx(x, y, w, h, rows, size=26, cls='box', eq=None):
     """A formula card (HTML + KaTeX). Each row is one whole relation: never split a formula over two rows, widen the card or lower size to 24 instead.
-    A row without $ is a caption line. cls: 'box' white card, 'box blue' the deck's key equation."""
+    A row without $ is a caption line. cls: 'box' white card, 'box blue' the deck's key equation. eq is the paper's own equation number,
+    shown small in the card's corner so a question can be traced to the paper (check it against the paper, never number a formula yourself)."""
     ps = ''.join(f'<p>{r}</p>' if '$' in r else f'<p class="k">{r}</p>' for r in rows)
-    return f'<div class="fx {cls}" style="left:{x + 20:g}px;top:{y + 20:g}px;width:{w:g}px;height:{h:g}px;font-size:{size}px">{ps}</div>'
+    tag = f'<span class="eqn">eq. {eq}</span>' if eq else ''
+    return f'<div class="fx {cls}" style="left:{x + 20:g}px;top:{y + 20:g}px;width:{w:g}px;height:{h:g}px;font-size:{size}px">{ps}{tag}</div>'
 
 
 def tex(x, y, s, size=24, w=600, color=None, a='start'):
@@ -678,11 +686,70 @@ def notes(*paras):
     return '<aside class="notes">' + ''.join(f'<p>{p}</p>' for p in paras) + '</aside>'
 
 
-def slide(section, kicker, h2, panels, closing, cite, note):
-    """One content slide. h2 is the point of the slide, closing the one line under the panels."""
+def tracker(section):
+    """The section tracker of the kicker row: every section of the deck in muted text, the current one in navy."""
+    return '<div class="tracker">' + ''.join(f'<span class="on">{s}</span>' if s == section else f'<span>{s}</span>' for s in _S.sections) + '</div>'
+
+
+def step(f, svg):
+    """Reveal a part of a scene at build f (1, 2, …): wrap its SVG. The last build shows everything, so PNGs and the PDF do not change.
+    Use it on a dense mechanism (two or three steps in the order the talk tells them), not on every slide."""
+    return f'<g data-f="{f}" class="fade">{svg}</g>'
+
+
+def at(f, html):
+    """The same for HTML blocks (tex(), fx(), tile(), table()): every block in the string appears at build f."""
+    return re.sub(r'<(div|table) class="(fx|tile|bt)', lambda m: f'<{m.group(1)} data-f="{f}" class="fade {m.group(2)}', html)
+
+
+def tile(col, row, title, body, tw=474, th=292, x0=0, y0=52, gap=24):
+    """A result tile for the closing slide (HTML; put it in panel(..., html=)): a white card with a one-line title and one small drawing
+    in tile coordinates (0..tw, 0..th; the title takes the top 60 px): one figure, one number, one phrase. The sentences go to the notes.
+    Four tiles in two columns fill the LW panel under its lane header."""
+    x, y = x0 + 20 + col * (tw + gap), y0 + 20 + row * (th + gap)
+    return (f'<div class="tile" style="left:{x:g}px;top:{y:g}px;width:{tw:g}px;height:{th:g}px"><h3>{title}</h3>'
+            f'<svg width="{tw:g}" height="{th:g}" viewBox="0 0 {tw:g} {th:g}">{body}</svg></div>')
+
+
+def table(cols, rows, groups=None, x=0, y=52, w=1660, row_h=None):
+    """A three-rule table for a backup slide (HTML; put it in panel(..., html=)). cols are the column labels, the first names the rows.
+    rows = [[cell, …]]: a cell is text, (text, small) with a second line in small type, or (text, small, 'em') for the value the slide
+    is about (small may be ''). groups = [(label, n_columns), …] is an optional first header row over the columns after the first.
+    Numbers are right-aligned in tabular numerals; row_h (px) sets the body row height so the table fills its panel."""
+    opens, j = set(), 1
+    for gi, (_, n) in enumerate(groups or ()):
+        if gi:
+            opens.add(j)
+        j += n
+    gap = lambda j: ' gap' if j in opens else ''
+    if groups:
+        j, top = 1, f'<th class="l" rowspan="2">{cols[0]}</th>'
+        for label, n in groups:
+            top += f'<th class="grp{gap(j)}" colspan="{n}"><span>{label}</span></th>'
+            j += n
+        head = f'<tr>{top}</tr><tr>' + ''.join(f'<th class="{gap(j).strip()}">{c}</th>' for j, c in enumerate(cols[1:], 1)) + '</tr>'
+    else:
+        head = '<tr>' + ''.join(f'<th class="{"l" if j == 0 else ""}">{c}</th>' for j, c in enumerate(cols)) + '</tr>'
+    body = ''
+    for r in rows:
+        tds = ''
+        for j, c in enumerate(r):
+            c = tuple(c) if isinstance(c, (tuple, list)) else (c,)
+            small = f'<small>{c[1]}</small>' if len(c) > 1 and c[1] else ''
+            cls = ('l name' if j == 0 else '') + gap(j) + (' em' if len(c) > 2 and c[2] == 'em' else '')
+            tds += f'<td class="{cls.strip()}">{c[0]}{small}</td>'
+        body += f'<tr>{tds}</tr>'
+    var = f';--row:{row_h:g}px' if row_h else ''
+    return f'<table class="bt" style="left:{x + 20:g}px;top:{y + 20:g}px;width:{w:g}px{var}"><thead>{head}</thead><tbody>{body}</tbody></table>'
+
+
+def slide(section, kicker, h2, panels, closing, cite, note, backup=False):
+    """One content slide. h2 is the point of the slide, closing the one line under the panels. backup=True makes it a backup slide:
+    it sits after the closing slide, is numbered B1, B2, … and is left out of the progress count."""
     plain = h2.replace('$', '').replace('\\', '')
-    return (f'<section class="slide" data-title="{plain}" data-section="{section}">\n'
-            f'  <div class="kicker blue">{kicker}</div>\n  <h2>{h2}</h2>\n  ' + '\n  '.join(panels) + '\n'
+    trk = f'\n  {tracker(section)}' if _S.sections and section in _S.sections else ''
+    return (f'<section class="slide" data-title="{plain}" data-section="{section}"{" data-backup" if backup else ""}>\n'
+            f'  <div class="kicker blue">{kicker}</div>{trk}\n  <h2>{h2}</h2>\n  ' + '\n  '.join(panels) + '\n'
             f'  <div class="takeaway">{closing}</div>\n  <div class="cite">{cite}</div>\n  {note}\n</section>')
 
 

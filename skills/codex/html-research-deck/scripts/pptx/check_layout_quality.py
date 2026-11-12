@@ -36,10 +36,10 @@ def label_width(line, size, latin):
         try:
             if 'b' not in _FONT_CACHE:
                 from PIL import ImageFont
-                fd = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'assets', 'fonts')
+                fd = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'assets', 'pptx', 'fonts')
                 _FONT_CACHE['b'] = ImageFont.truetype(os.path.join(fd, 'Pretendard-Bold.otf'), 1000)
             return _FONT_CACHE['b'].getlength(line) / 1000.0 * size
-        except Exception:
+        except (ImportError, OSError, AttributeError):  # noqa: S110 - no Pillow, no bundled font or an old Pillow: use the rough estimate below
             pass
     return sum((1.0 if ord(ch) > 0x2e80 else 0.57) * size for ch in line)
 

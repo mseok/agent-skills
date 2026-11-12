@@ -1,6 +1,6 @@
 ---
 name: korean-proposal-docs
-description: Co-write Korean government or institutional proposals, progress reports, R&D admin forms and budget sheets in HWP, HWPX, DOCX or Google Docs, including multi-institution templates with assigned sections. Use when the user mentions 제안서, 과제, 사업계획서, 보고서, 양식, 연차, 예산, 한글 문서, or asks to fill, revise or check such a document. Not for journal manuscripts (paper-writing) or slide decks (research-talk).
+description: Co-write Korean government or institutional proposals, progress reports, R&D admin forms and budget sheets in HWP, HWPX, DOCX or Google Docs, including multi-institution templates with assigned sections. Use when the user mentions 제안서, 과제, 사업계획서, 보고서, 양식, 연차, 예산, 한글 문서, or asks to fill, revise or check such a document. Not for journal manuscripts (paper-writing) or slide decks (html-research-deck).
 ---
 
 # Korean proposals, reports and forms

@@ -11,10 +11,10 @@ Rewrite the whole phrase while preserving the scientific relation, scope and unc
 | 카보닐 산소는 수소결합 수용체가 될 수 있다 | 카보닐 산소의 수소결합 수용 가능성 |
 | 세포 반응은 아직 검증되지 않았다 | 세포 반응: 미검증 |
 
-After exporting a Korean PPTX, run:
+For an HTML deck `scripts/check_deck.py` flags these endings in visible text. After exporting a Korean PPTX, run:
 
 ```sh
-python3 /Users/mseok/.codex/skills/research-talk/scripts/check_korean_slide_copy.py /absolute/path/deck.pptx --report /absolute/path/qa/korean-copy.json
+python3 /Users/mseok/.codex/skills/html-research-deck/scripts/pptx/check_korean_slide_copy.py /absolute/path/deck.pptx --report /absolute/path/qa/korean-copy.json
 ```
 
 Exit 1 means unresolved findings. The report identifies slide number, XML part, object ID/name, paragraph, text and matched ending. Correct the source copy and re-export, then rerun; do not deliver on the assumption that a visual proofread caught the issue. The checker is read-only and rejoins formatting runs, including table and chart text. It excludes speaker notes, hidden slides, master-only text and raster image labels. Its suffix rules are a useful automatic gate, not a complete Korean grammar analysis. Inspect uncovered text when present, especially text baked into a newly made image.

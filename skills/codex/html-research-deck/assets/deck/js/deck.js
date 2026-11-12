@@ -3,6 +3,7 @@
 
    Keys : → Space PgDn click = next build · ← PgUp Backspace = previous · Home / End
           S presenter window (notes, timer, next) · O overview · F fullscreen · B black screen
+          L laser pointer · Z zoom at the cursor · T section tracker (js/aids.js)
           Shift+P pause canvas animations · 12 ⏎ jump to slide 12 · ? help
    URL  : #/12/3 deep link (slide 12, build 3) · ?short skip data-optional slides · ?export no transitions
           ?print every slide stacked at 1920×1080 for PDF capture · ?embed (used by the presenter window)
@@ -171,6 +172,7 @@
       <tr><td>→ Space PgDn click</td><td>next build / slide</td></tr><tr><td>← PgUp Backspace</td><td>previous</td></tr>
       <tr><td>S</td><td>presenter window: notes, timer, next slide</td></tr><tr><td>O</td><td>overview (Esc closes)</td></tr>
       <tr><td>F</td><td>fullscreen</td></tr><tr><td>B or .</td><td>black screen</td></tr><tr><td>Shift+P</td><td>pause animations</td></tr>
+      <tr><td>L</td><td>laser pointer</td></tr><tr><td>Z</td><td>zoom 2x at the cursor (Esc leaves)</td></tr><tr><td>T</td><td>section tracker on or off</td></tr>
       <tr><td>12 Enter</td><td>jump to slide 12</td></tr><tr><td>?short in URL</td><td>skip optional slides</td></tr>
       <tr><td>?print in URL</td><td>all slides stacked (PDF capture)</td></tr></table></div>`;
     helpEl.addEventListener('click', () => helpEl.classList.remove('open'));
