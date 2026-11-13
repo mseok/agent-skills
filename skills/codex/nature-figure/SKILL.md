@@ -1,6 +1,6 @@
 ---
 name: nature-figure
-description: Produce or revise any scientific plot, panel, schematic or publication figure (matplotlib, PyMOL, SVG, Figma), from a quick comparison bar chart to Nature-style final artwork. Use for 그림, 플롯, 패널, figure, chart, rebuild, redraw, Figma handoff requests, and whenever numbers from a benchmark are plotted; not ordinary slides (html-research-deck) or manuscript prose (paper-writing).
+description: Produce or revise any scientific plot, panel or publication figure (matplotlib, PyMOL, SVG, Figma), from a quick comparison bar chart to Nature-style final artwork. Use for 그림, 플롯, 패널, figure, chart, rebuild, redraw, Figma handoff requests, and whenever numbers from a benchmark are plotted; not a figure that is mainly a concept, overview or model-architecture schematic (concept-figure), ordinary slides (html-research-deck) or manuscript prose (paper-writing).
 ---
 
 # Nature-style scientific figures
@@ -21,7 +21,7 @@ For broad exploratory inputs, briefly state each proposed panel's question, evid
 
 Use [data-and-writing.md](references/data-and-writing.md) when making plots or composing scientific text. Keep data transformations and source-to-panel mapping recoverable. Choose panels to answer a scientific question rather than to fill a preset grid. Use consistent visual encodings across related figures.
 
-For schematic/model diagrams, inspect supplied method evidence before drawing dependencies. For molecular images, render actual provided or retrieved coordinates with scientific software; preserve camera, selections, alignment and structure identifiers. Label illustrative states as such; an interpolation is not an observed prediction or physical trajectory. Do not use generated bitmap artwork as experimental data or as a replacement for a quantitative chart.
+A schematic or model-diagram panel follows `concept-figure`. For molecular images, render actual provided or retrieved coordinates with scientific software; preserve camera, selections, alignment and structure identifiers. Label illustrative states as such; an interpolation is not an observed prediction or physical trajectory. Do not use generated bitmap artwork as experimental data or as a replacement for a quantitative chart.
 
 Use standard plotting tools for scientific charts and vector composition for layout. Use the available visualize skill only when an interactive exploration would help choose variables, subsets or layout; it is optional and does not replace the standalone publication artifact. If Figma or PowerPoint is requested, load its relevant skill and maintain native editable objects where feasible. A local export does not establish that a Figma upload succeeded.
 
@@ -64,20 +64,20 @@ Apply unless the user says otherwise; record any override in the project's `STYL
 
 Pre-flight before editing in Figma: login state in the automation browser, required fonts available in that browser, write access to the file, frame policy (edit in place; no hidden version frames; one live text object per box; native arrows). If a font cannot load, say so in the same turn with the unblock options (desktop app, user applies the exported SVG, font helper) and never change the figure's required font to suit the tool. Do not convert text to outlines. After editing, verify the Figma source itself changed, not only a local export.
 
+- Arrows are single native vectors with stroke end caps; never outline text; edit the node the user points at in place; check every child's bounds against its clipping frame and inspect panel edges at 100% zoom before reporting a composition done; typography recomputed at final size (pt = units × target width mm ÷ frame width units × 72 ÷ 25.4), no text under 5 pt, panel letters 8 pt bold lowercase.
+- Edit through computer use in an in-app browser tab where the user is signed in; the Figma connector is read-only and its plan caps calls, so a cap error means switching to computer use in the same turn, not stopping. Never route a figure file through a browser's native save or file-chooser dialog: export to a new filename, move it with shell tools, upload through the destination's own file-add control; if that needs the native chooser, hand the user the exact local path and destination in one line. The final message lists every repair made to an imported copy (fills, fonts, clipping). (2026-10-17 audit)
+
 ## Provenance, rebuilds and redraws
 
 - Every number in a figure is recomputed from raw outputs listed in a per-panel source manifest, following the benchmark's own evaluation docs or scripts; numbers copied from chat, Slack, slides or older figures appear only in panels labelled provisional, and no off-range point is hidden.
 - Rebuild with new data: keep the established panels, comparisons and overlays; put any new comparison in a separate candidate file and ask before swapping it in. Immutable inputs (reference or input structures) may be reused once their hash matches the run's provenance record; derived numbers and renders are regenerated.
 - Redraw of an existing figure: keep each panel's chart type, layout and zoom structure unless asked; list every panel whose representation changed, with a one-line reason.
 - Binned continuous variables: label groups by definition and cut rule in the legend, and show the continuous relationship or a two- versus three-group sensitivity before interpreting group differences.
-- Architecture schematics keep `CODE_PATHS.md` beside the figure (each arrow as source → consuming module, file:line at the cited commit); derive every arrow from it and re-check borrowed connections when imitating another paper's figure.
 - Toolchain: the interpreter that has cairosvg, reportlab, pymupdf, lxml and fontTools is named in host-context; render structures with the canonical open-source PyMOL environment named there, never a new per-task environment and never the App Store build (evaluation watermark).
-- Figma: arrows are single native vectors with stroke end caps; never outline text; edit the node the user points at in place; check every child's bounds against its clipping frame and inspect panel edges at 100% zoom before reporting a composition done; typography recomputed at final size (pt = units × target width mm ÷ frame width units × 72 ÷ 25.4), no text under 5 pt, panel letters 8 pt bold lowercase.
 
 ## Verified additions (2026-10-17 audit)
 
 - Bar plots by default for comparisons of a few named quantities (methods, conditions, components); no point-and-interval panels unless asked. Captions say what each panel shows and how to read it; setup, definitions and controls go in the main or SI text. Under each inline preview, give one line per panel: axes, marks, and which rule assigned any category labels.
-- Figma: edit through computer use in an in-app browser tab where the user is signed in; the Figma connector is read-only and its plan caps calls, so a cap error means switching to computer use in the same turn, not stopping. Never route a figure file through a browser's native save or file-chooser dialog: export to a new filename, move it with shell tools, upload through the destination's own file-add control; if that needs the native chooser, hand the user the exact local path and destination in one line. The final message lists every repair made to an imported copy (fills, fonts, clipping).
 - When a figure is placed into a manuscript, recompute the text size at the width it actually occupies there (the scaling applied by the document), and place a vector PDF rather than a raster image.
 - Before recommending or publishing a grouped or binned panel, report the grouping variable's rank correlation with the obvious size covariate and say whether the intended claim survives it.
 

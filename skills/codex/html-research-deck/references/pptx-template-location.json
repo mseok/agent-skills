@@ -1,11 +1,11 @@
 {
-  "skill_name": "artifact-template-seokhyun-research",
-  "skill_directory": "/Users/mseok/.codex/skills/artifact-template-seokhyun-research",
-  "clean_template": "/Users/mseok/.codex/skills/artifact-template-seokhyun-research/assets/reference.pptx",
-  "preview": "/Users/mseok/.codex/skills/artifact-template-seokhyun-research/assets/preview.png",
+  "paths_relative_to": "the html-research-deck skill folder; absolute paths exist on the Mac mini only",
+  "clean_template": "assets/pptx/reference.pptx",
+  "clean_template_sha256": "06a45deb00e936f8c99c65da188739846a6074db7b4bf681473f5a902e89844c",
+  "preview": "assets/pptx/reference-preview.png",
+  "historical_reference": "/Volumes/ExternalSSD/work/projects/thesis/20260526_SeokhyunMoon_Dissertation.pptx",
   "workspace": "/Volumes/ExternalSSD/work/projects/thesis/research-talk-template",
   "source_inventory": "/Volumes/ExternalSSD/work/projects/thesis/research-talk-template/source-analysis/source-inventory.json",
-  "historical_reference": "/Users/mseok/.codex/skills/artifact-template-seokhyun-research/assets/source-dissertation.pptx",
   "sources": {
     ".pptx": {
       "path": "/Volumes/ExternalSSD/work/projects/thesis/20260526_SeokhyunMoon_Dissertation.pptx",
@@ -23,5 +23,6 @@
   "setup_note": {
     "namespace": "main",
     "path": "Inbox/Agents/local/2026-09-14 연구 발표 템플릿과 Obsidian 발표 흐름 research-talk--c2fa77a0.md"
-  }
+  },
+  "history": "Until 2026-11-13 the clean template lived in the host-local skill artifact-template-seokhyun-research on the Mac mini. That skill was deleted at the user's request; the template and its preview moved into this skill unchanged."
 }

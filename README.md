@@ -11,7 +11,8 @@ for setup, requirements, and validation limits.
 - `skills/codex/usage-progress/`: a Claude Code plugin, not a skill; it has no `SKILL.md`, so only the link in `~/.claude/skills` loads it.
 - `skills/claude`: a link to `skills/codex`, kept so that older paths resolve. There is one scope; do not add a second directory.
 - Retired skills are deleted, not archived; recover one from the Git history when it is needed again.
-- `skills/codex/verification-before-completion/`: copied unchanged from obra/superpowers at commit `8ca22db` (MIT; its `LICENSE` is kept beside the skill).
+- `skills/codex/verification-before-completion/`: adapted from obra/superpowers at commit `8ca22db` (MIT; its `LICENSE` is kept beside the skill). Since 2026-11-13 the upstream general sections are condensed into one paragraph and one table; the tables below them are this repository's own.
+- `hwp-agent-edit` is not in this repository (since 2026-11-13). Its only source is `skills/hwp-agent-edit` in the hwp-local-editor checkout, which links it into `~/.codex/skills` and `~/.claude/skills` with `node scripts/install-skill.mjs --link`; a host has the skill only where that checkout is installed.
 
 Skills are not grouped by agent (since 2026-11-10): a skill that only one harness can
 use says so in its own description.

@@ -73,3 +73,7 @@ One message: "v18a 는 QR 빼고 다 넣어도 될거같고, HTML 기본 PPTX �
 
 - "이건 지금 이번에 한거처럼 규칙을 정해두면 요청하는거 그대로 만들 수 있는거아닌가?" and "좋은거같애. 1 2b 가 좋을듯?" → the rules live in the skill so a request yields the deck directly; the taste benchmark of 2–3 slides stays as the one user checkpoint before the full build.
 - "나는 gpt 모델 (astra or sol high) 도 자주 쓰는데, 각각을 high, xhigh로 했을 때 비슷한 결과가 나오도록 하면 좋겟음" → the equivalence test (`equiv_run.py`, `references/loops-and-builders.md`); "비슷하다" = within ±3 on both design and message.
+
+## User decisions (2026-11-13, skill audit)
+
+- On the host-local `artifact-template-seokhyun-research` skill (the PPTX template registered with the app on 2026-09-14, from which this skill's PPTX route read its clean template): "ㅇㅇ 이건 걍 지우자" → that skill is deleted. To keep the PPTX route working, its clean twelve-slide template and its preview moved into this skill unchanged (`assets/pptx/reference.pptx`, `assets/pptx/reference-preview.png`; `pptx-template-location.json` now gives paths relative to the skill folder); the move is the agent's step, not a separate decision of the user. Its `design.md` was not carried over, because `pptx-design.md` is its successor and already overrode it. Its copy of the dissertation PPTX (126,723,301 bytes) had the same SHA-256 as the original under the thesis folder and went with the skill. The "Seokhyun Research" entry in the app's template picker is gone.
