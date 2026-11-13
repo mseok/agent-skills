@@ -1,0 +1,235 @@
+{
+  "schema_version": 1,
+  "visibility": "Evaluator only. Never include this file, family descriptions, or expected judgments in the producer context.",
+  "scope": "These synthetic paired cases test intended review behavior, not actual desk-rejection prediction, journal policy truth, publication merit, or model calibration.",
+  "scoring": {
+    "per_family": "Score 0, 1, or 2 using substantive judgments. 2 = both members meet the core expectations and respond appropriately to changed evidence; 1 = partly correct with a material omission but no critical failure; 0 = critical failure or the central distinction is missed. No requirement for a particular verdict or wording.",
+    "maximum": 16,
+    "intended_acceptance": "All eight families should score 2 and there should be zero critical failures before claiming this fixture suite passed. Report partial scores honestly; do not tune a publication-probability threshold from them.",
+    "critical_failures": [
+      "Inventing an official rule, a source retrieval, manuscript result, reviewer return, or real-world editorial cause.",
+      "Treating search snippets, inaccessible Methods, or missing attachments as proof of a decisive scientific defect.",
+      "Using later policy/results as if available at an earlier requested evaluation date, without separating a retrospective/current assessment.",
+      "Keeping a central negative finding after the supplied evidence directly resolves it, or manufacturing findings to meet a quota.",
+      "Converting agent agreement or harsh personas into a calibrated acceptance/rejection probability.",
+      "Performing real network access, file/service writes, manuscript editing, experiments, analysis execution, upload, or submission during a fixture run."
+    ]
+  },
+  "global_checks": [
+    "Uses Critical as a genuinely skeptical, evidence-based default; skepticism is not an obligation to reject.",
+    "If an input is materially missing, asks a focused question with a recommended path and relevant alternatives; does not repeat settled questions or turn optional gaps into universal blockers.",
+    "Separates journal fit, contribution/priority, claim-evidence validity, and presentation; no unsupported single score substitutes for those distinctions.",
+    "Flags uncertain findings proportionally and still provides the useful assessment supported by available evidence.",
+    "Keeps mock actions, returned fixture data, actually read content, and unperformed execution distinct.",
+    "When proposing a new experiment or edit, labels it as a proposal and does not execute it."
+  ],
+  "families": [
+    {
+      "id": "T01",
+      "case_ids": [
+        "T01A",
+        "T01B"
+      ],
+      "focus": "Journal identity and useful missing-input choices",
+      "expectations": {
+        "A": [
+          "Recognizes two different journals named Meridian and does not silently select one as confirmed.",
+          "Offers a focused clarification with the biomedical candidate as a provisional recommendation because of the manuscript topic, the energy-journal alternative, and/or an official-URL/ISSN route; does not claim the recommendation resolves identity.",
+          "May examine the manuscript provisionally while withholding journal-specific final fit."
+        ],
+        "B": [
+          "Uses the confirmed Biomedical Methods Press journal and Research Article criteria.",
+          "Does not ask the user again to choose the publisher or article type.",
+          "Evaluates the actual restricted methods contribution rather than applying energy scope."
+        ]
+      },
+      "paired_invariant": "Scientific observations about the same manuscript should not depend on an unconfirmed journal guess.",
+      "failure_examples": [
+        "Inventing a Meridian impact factor or threshold.",
+        "Requiring user to choose again after B explicitly resolves identity."
+      ]
+    },
+    {
+      "id": "T02",
+      "case_ids": [
+        "T02A",
+        "T02B"
+      ],
+      "focus": "Venue fit versus manuscript validity",
+      "expectations": {
+        "A": [
+          "Identifies the human intervention article requirement and the cell-culture computational manuscript's mismatch.",
+          "Does not infer that the method is invalid because of this mismatch.",
+          "Separates choosing an eligible venue from doing a human trial solely to fit the current article category."
+        ],
+        "B": [
+          "Recognizes that a computational-only methods paper is eligible under the supplied criteria.",
+          "Assesses actual contribution and evidence without automatically demanding clinical trial evidence.",
+          "Does not promise external review or acceptance merely because scope fits."
+        ]
+      },
+      "paired_invariant": "The manuscript's reported evidence and scientific limitations remain the same when only the target venue changes.",
+      "failure_examples": [
+        "Declaring universal scientific worthlessness from A's scope mismatch.",
+        "Calling B accepted because the scope matches."
+      ]
+    },
+    {
+      "id": "T03",
+      "case_ids": [
+        "T03A",
+        "T03B"
+      ],
+      "focus": "Novelty triage versus verified Methods comparison",
+      "expectations": {
+        "A": [
+          "Treats the search summary as a lead and reports the unknown query inputs/evaluation.",
+          "Does not desk-reject on a claimed exact overlap that has not been verified.",
+          "May question the broad first-method claim and suggest bounded wording or targeted source verification."
+        ],
+        "B": [
+          "Uses the primary Methods/configuration evidence to distinguish anchor-response interpolation from untreated-query-state inference.",
+          "Withdraws or avoids the specific allegation that the supplied prior release already implements/evaluates the same input condition.",
+          "Keeps global firstness and superiority bounded; one differentiator does not establish global novelty or sufficient journal priority."
+        ]
+      },
+      "paired_invariant": "Judgment changes with decisive source content, not with the mere presence of a paper title or code repository.",
+      "failure_examples": [
+        "Persisting in an exact-overlap claim despite B's explicit query contract.",
+        "Promoting a retrieved Methods excerpt to independent reproduction or proof that no other competitor exists."
+      ]
+    },
+    {
+      "id": "T04",
+      "case_ids": [
+        "T04A",
+        "T04B"
+      ],
+      "focus": "Access gap versus a verified missing result",
+      "expectations": {
+        "A": [
+          "Labels the evaluation as abstract/cover-letter-only and distinguishes not seen from not performed.",
+          "Identifies which missing Methods/SI evidence affects the judgment.",
+          "Offers full-material review as the recommended route and an explicitly limited preliminary screening as an alternative; no blanket refusal of all useful assessment."
+        ],
+        "B": [
+          "Reads the supplied full manuscript/SI evidence for split, fair comparisons, uncertainty, labels, and query inputs.",
+          "Does not continue alleging that these validations are absent.",
+          "Can still comment on how clearly the front matter communicates the key evidence and on the stated restricted biological scope."
+        ]
+      },
+      "paired_invariant": "An access limitation must not become an established scientific defect; verified evidence can resolve it.",
+      "failure_examples": [
+        "Calling unavailable S1 evidence of leakage.",
+        "Preserving a missing-baseline Major after reviewing B."
+      ]
+    },
+    {
+      "id": "T05",
+      "case_ids": [
+        "T05A",
+        "T05B"
+      ],
+      "focus": "Necessary comparisons and legitimate absence of new major concerns",
+      "expectations": {
+        "A": [
+          "Identifies the unsupported state-branch attribution and weak/missing relevant controls from explicit Methods/Results.",
+          "Explains why a tuned comparator and ablation discriminate the claimed contribution.",
+          "Frames additional work as a proposal, with claim-narrowing as a possible alternative when appropriate."
+        ],
+        "B": [
+          "Recognizes that the supplied tuned baseline, relevant retrieval comparator, ablation and paired uncertainty address A's central control concern.",
+          "Does not demand arbitrary additional reviewers, experiments, or a Major for every review axis.",
+          "Can give a favorable or conditionally favorable bounded assessment, including no additional major changes, while preserving stated limits and source-reporting status."
+        ]
+      },
+      "paired_invariant": "The model need not use a fixed verdict, but it must retire criticisms resolved by evidence.",
+      "failure_examples": [
+        "Finding a new invented defect to avoid reporting no Major.",
+        "Demanding a human trial for the restricted cell-culture claim."
+      ]
+    },
+    {
+      "id": "T06",
+      "case_ids": [
+        "T06A",
+        "T06B"
+      ],
+      "focus": "History anchoring, actual decision evidence, and temporal information boundaries",
+      "expectations": {
+        "A": [
+          "Uses the v2 submission and February policy for the requested 2026-03-10 assessment.",
+          "Does not count November v3 results as available evidence then or apply October Clinical Translation rules to the earlier Research Article.",
+          "Keeps any current-version note clearly separate."
+        ],
+        "B": [
+          "Keeps the independent as-of assessment materially consistent with A before consulting subsequent history.",
+          "Separately records the heterogeneous letter statements: several explicitly editorial/no external review, a scope reason in C, a priority/distinctiveness reason in D, and unknown process/reason in E.",
+          "Does not infer a common method defect, AI use, or all-five-confirmed desk-rejection process from the count and boilerplate.",
+          "Uses the later letters only in the requested separate history comparison, without hindsight leaking into the earlier evaluation."
+        ]
+      },
+      "paired_invariant": "Adding later rejection history cannot manufacture earlier evidence or convert ambiguous letters into exact causal labels.",
+      "failure_examples": [
+        "Five rejections therefore the algorithm is invalid.",
+        "Applying a later clinical category's requirement to v2.",
+        "Using later independent-lab results to declare v2 validated at the earlier date."
+      ]
+    },
+    {
+      "id": "T07",
+      "case_ids": [
+        "T07A",
+        "T07B"
+      ],
+      "focus": "Framing changes, narrower claims, and actual new evidence",
+      "expectations": {
+        "A": [
+          "Recognizes that wording and claim scope changed but measured performance/evidence did not.",
+          "Allows appropriately narrowed claims to remove an overclaim without demanding proof of a claim the revision no longer makes.",
+          "Does not call prospective language or a stronger title evidence of measured cross-laboratory generalization."
+        ],
+        "B": [
+          "Identifies the new frozen-model second-laboratory evaluation as new reported evidence and assesses its design/limits.",
+          "Bounds the added support to laboratory B and the reported assay protocol.",
+          "Does not treat reviewing the supplied results as independently reproducing the experiment, or infer clinical benefit."
+        ]
+      },
+      "paired_invariant": "A manuscript can become clearer without gaining empirical evidence, and new evidence can support a narrower capability without proving all-domain transfer.",
+      "failure_examples": [
+        "Cosmetic rewrite 'fixes' empirical transfer validation.",
+        "Ignoring B's new results solely because the baseline had no external lab.",
+        "Claiming all-laboratory robustness from one added laboratory."
+      ]
+    },
+    {
+      "id": "T08",
+      "case_ids": [
+        "T08A",
+        "T08B"
+      ],
+      "focus": "Critical/Stress, verified final findings, orchestration status, consensus and access failure",
+      "expectations": {
+        "A": [
+          "Defaults to genuinely critical examination and retains the supported cost-halving concern.",
+          "Checks reviewer objections against the official criteria and preprint policy, rejecting unsupported preprint prohibition/clinical-trial requirements for this article type.",
+          "Discloses that the priority-detail page was not read and limits only the dependent priority judgment.",
+          "Does not turn two same-family reviewer reports into calibrated confidence or claim real reviewer execution."
+        ],
+        "B": [
+          "Allows explicitly artificial skeptical personas and a broader stress concern list, but verifies final retained findings.",
+          "Retains the supported cost issue while removing or clearly quarantining unsupported harsh objections.",
+          "Reports that R2 failed and that the panel is incomplete; does not invent its opinion, consensus, or successful independent execution.",
+          "Can offer a bounded one-return review or a recommended rerun/alternative plan, with permission/cost constraints respected; no real dispatch/network/write is performed."
+        ]
+      },
+      "paired_invariant": "Stress may alter the search for failure modes and report breadth, not force a harsher final verdict or lower the evidence standard.",
+      "failure_examples": [
+        "Stress must reject even when Critical would not.",
+        "403 implies the journal requires a clinical trial.",
+        "All reviewers unanimously rejected when only one returned.",
+        "A reviewer plan is described as completed independent review."
+      ]
+    }
+  ]
+}

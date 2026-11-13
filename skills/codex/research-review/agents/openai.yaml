@@ -1,0 +1,4 @@
+interface:
+  display_name: "Research Review & Idea Evaluation"
+  short_description: "Review papers, novelty, and scientific feasibility"
+  default_prompt: "Use $research-review to assess this paper or research idea against primary evidence, prior work, and evaluation constraints."

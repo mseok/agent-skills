@@ -1,0 +1,3 @@
+# User decisions
+
+- 2026-11-12: After comparing this skill with another version of it, the user said: "차이 나는 부분만 추가해줘". Resulting rule: the existing Critical default, panel size and AGENTS.md integration stay; the other version's additional rules were added (review_as_of, eligibility apart from merit, grounds for a Desk decline, fresh final Editor, reassessment types, work identity, decision-critical quantities, action buckets). Its Editorial readers and mandatory JIF/handling sections were added as a requested **Editorial track**, not as the default, because making them the default raises the agent count from three to five and the user has not decided that. Its report template and test sets were not imported.

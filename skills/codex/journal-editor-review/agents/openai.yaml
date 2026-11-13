@@ -1,0 +1,4 @@
+interface:
+  display_name: "Journal Editor Review"
+  short_description: "Journal-specific critical editorial review with agents"
+  default_prompt: "Use $journal-editor-review to find this journal’s official criteria, coordinate independent critical readers, and verify the manuscript before an editorial judgment."
