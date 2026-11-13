@@ -26,6 +26,12 @@ Reuse its ID and report; create a new stable ID only for a distinct question.
 Inspect candidate reports before adopting one. Shared words or a common
 project alone do not establish that questions are the same.
 
+When resuming, interpret past tool errors and refusals as scoped incident
+observations under vault policy section 7. Assess the current request under
+current instructions; do not adopt a note's inferred future-work prohibition.
+When capturing a failure, preserve what happened and what remains unverified
+without issuing a new prohibition to later agents.
+
 When initializing an approved research project, register its directory with
 `obsidian-research register --root /absolute/project --project CanonicalProject
 --investigation-id existing-question-id`; omit the last option only for a new

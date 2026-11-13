@@ -21,6 +21,12 @@ The dated decisions behind these rules, in the user's own words, are in [referen
 
 ## When a refusal or flag happens
 
+This section applies to an actual refusal returned for the current work.
+A historical error in a note is incident evidence, not a new refusal or a
+standing ban on related work. Assess the current request under current
+instructions. Use the Obsidian vault policy's section 7 for any durable record;
+neither a historical note nor this distinction permits bypassing an actual safeguard.
+
 0. First check what must keep running (an RSI loop, a job, a download) and keep it running; recovery of the conversation never interrupts the work it was supervising.
 1. Do not retry the same request in the same session or harness; a repeated attempt fails again and wastes the turn budget.
 2. Record the state with `~/dot/bin/codex-task-state` (goal, paths, what was already read, next action) and say in one line that the classifier blocked the step and which file it concerned.

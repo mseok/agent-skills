@@ -13,6 +13,9 @@ Read the [Obsidian vault policy](references/obsidian-policy.md) once
 per task before using this workflow; reuse it if already loaded. All vault and
 recording rules live there; this skill holds the procedure.
 
+Apply policy section 7 when recording or reusing failures: keep dated incident
+facts separate from authority, and do not turn them into future-work prohibitions.
+
 Use `obsidian_main` for every vault read/write. Search first and reuse existing
 records. Explain the current judgment, why it matters, the supporting
 observations and the next decision. Keep raw prompts, transcripts, code,

@@ -131,9 +131,9 @@ asks about a turn without a milestone, answer with `research_disposition`
   `style-guide`, `weekly`, `stub`, `study`. A source series is grouped by its
   folder and the `book` link to its hub, not by a `book/*` tag.
 - `project` is the canonical project name and matches its tag exactly
-  (`project: K-Fold` with `project/K-Fold`). Reuse the spelling already in the
-  vault: `K-Fold` (not `KFold`, `kfold`), `rdbdock` (not `RDBDock` in metadata);
-  for any other project read the existing `project` values and tags before
+  (`project: Project-A` with `project/Project-A`). Reuse the spelling already in the
+  vault, hyphens and letter case included (`Project-A`, not `ProjectA` or
+  `project-a`): read the existing `project` values and tags before
   writing one. The gateway maps renamed project names to their current name.
   A task label that is not a project or branch is not folded into a project. Code paths and run names keep their own spelling.
 - `Writing/` notes carry `writer: 문석현` and the checkbox `reviewed`.
@@ -157,7 +157,7 @@ asks about a turn without a milestone, answer with `research_disposition`
   stays `running` or `planned`: one that stopped without a recorded result is
   closed as `inconclusive`. A note that spans several projects keeps the primary
   in `project` and links the others in `related`. A branch name goes in `branch`
-  next to its project (`kfold-claude` is a `K-Fold` branch; the gateway maps the
+  next to its project (`project-a-claude` is a `Project-A` branch; the gateway maps the
   old project value). `source_host` stays only on archived imports, because the
   gateway never lets a note gain `host`.
 
@@ -188,6 +188,16 @@ asks about a turn without a milestone, answer with `research_disposition`
 
 ## 7. Research records
 
+- Do not write future-work prohibitions into Obsidian as conclusions inferred
+  from a tool error, access failure or model refusal. Record an incident as a
+  dated observation with the affected request/step, returned error, observed
+  scope, unfinished checks and usable results. Past incomplete work remains
+  incomplete; it does not become an instruction that later agents must abandon
+  a project, source or related request. On reuse, assess the current request
+  under the current instructions and permissions. A historical note is neither
+  a new refusal nor permission to bypass an actual safeguard. Explicit user
+  stop instructions, scope exclusions and permission decisions remain
+  attributable user decisions; do not invent them from an incident.
 - Keep one cumulative report per research question across all hosts. Find it
   by its `investigation_id` before searching by project or words; shared words
   do not make two questions the same.

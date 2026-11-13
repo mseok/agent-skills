@@ -51,7 +51,7 @@ This adopts the first-mention and unresolved-link practice from [Kepano's Links 
 ## Workflow
 
 1. **Check vault context first (`obsidian_main`):**
-   - Run bounded `knowledge_search` queries (and `knowledge_read` when relevant) across `Concepts/`, `Writing/`, `Notes/`, and `Inbox/Agents/` so terminology, equations, and `[[wikilinks]]` align with existing concept titles, unresolved links and project hubs (such as `[[K-Fold]]` or `[[RDBDock]]`). A missing concept note still receives an unresolved link.
+   - Run bounded `knowledge_search` queries (and `knowledge_read` when relevant) across `Concepts/`, `Writing/`, `Notes/`, and `Inbox/Agents/` so terminology, equations, and `[[wikilinks]]` align with existing concept titles, unresolved links and project hubs (such as `[[Project-A]]` or `[[Project-B]]`). A missing concept note still receives an unresolved link.
 2. **Draft detailed, high-signal prose at the depth the user needs:**
    - Do not impose a character, line or paragraph limit on the finished note. Keep one coherent requested narrative in one note; split only when the topics serve genuinely separate reading purposes or the user asks. A tool request-size limit is not a reason to shorten or split the note.
    - Open immediately with a 2–3 sentence core definition or takeaway in clear Korean with standard English technical terms. Skip empty template banners or decorative emoji headings.
@@ -66,7 +66,7 @@ This adopts the first-mention and unresolved-link practice from [Kepano's Links 
      - `title`: exact user-chosen title when the user provides one, or a concise natural concept/topic title when omitted. Do not prepend dates or append `--hash` suffixes (`note_draft_create` saves directly to `Writing/<title>.md` and records `created: YYYY-MM-DD` in YAML frontmatter).
      - `body`: Markdown body prose without frontmatter.
      - `tags`: 1–16 canonical tags describing the actual personal writing, such as `kind/meeting` or a project tag. A concept tag is not a substitute for routing a standalone reference to Concepts.
-     - `project`: optional canonical project name (`"K-Fold"`, `"RDBDock"`, etc.) when tied to a project.
+     - `project`: optional canonical project name (`"Project-A"`, `"Project-B"`, etc.) when tied to a project.
      - Omit `source_refs` for `note_draft_create`: that argument renders an internal provenance footer in the personal note. Keep operational provenance in task state or the research record. `knowledge_revise` still requires source references for its revision journal; pass them there without copying them into the note body.
      - `attachment_ids`: optional IDs returned by `attachment_upload` when an approved figure is embedded.
      - `operation_id`: fresh unique ID (`>= 8` chars, `[A-Za-z0-9._-]+`), reused only when retrying the exact same payload.
