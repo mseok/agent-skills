@@ -1,0 +1,202 @@
+/* concept-figure kit. Sizes are physical (pt, mm, in): the figure prints at exactly the width it declares.
+   Vocabulary and attributes: references/kit.md. */
+:root {
+  --font: Arial, Helvetica, "Liberation Sans", Pretendard, "Apple SD Gothic Neo", "Noto Sans CJK KR", sans-serif;
+  --font-serif: "Times New Roman", "Nimbus Roman", "TeX Gyre Termes", Times, serif;
+  --font-mono: Menlo, "DejaVu Sans Mono", "Liberation Mono", monospace;
+  --fs: 7pt; --fs-sm: 6pt; --fs-lg: 8pt;
+  /* neutrals: one cool gray family, defined by lightness (OKLCH), so that ink, wires and hairlines belong together */
+  --ink: oklch(0.27 0.02 258); --ink-2: oklch(0.47 0.02 258); --ink-3: oklch(0.66 0.015 258);
+  --line: oklch(0.45 0.025 258); --hair: oklch(0.87 0.008 258); --paper: #fff;
+  --lw: 0.55pt; --r: 2.5pt; --gap: 6pt;
+}
+html, body { margin: 0; padding: 0; background: var(--paper); }
+html.screen body { background: #e9ecef; padding: 12px; }
+@media print { html.screen body { background: none; padding: 0; } }
+html.screen .fig { margin: 0 auto; outline: 1px solid #d0d5db; }
+
+.fig { position: relative; box-sizing: border-box; background: var(--paper); color: var(--ink);
+  font: var(--fs)/1.2 var(--font); padding: 7pt; break-inside: avoid;
+  -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  --fill: #fff; --pale: #fff; --soft: oklch(0.74 0.012 258); --edge: var(--line); --deep: var(--ink);
+  /* wires, read by figure.js: weight in pt, corner radius in pt, head length and width in stroke widths, notch depth as a share of the length */
+  --wire-w: 0.7; --wire-r: 2.5; --head-l: 6; --head-w: 4.4; --head-notch: 0.3; }
+.fig *, .fig *::before, .fig *::after { box-sizing: border-box; }
+.fig[data-font="serif"] { font-family: var(--font-serif); }
+.fig .katex { font-size: 1.1em; }
+
+/* Colour roles. Each role is one hue at five lightness steps (OKLCH), the same steps for every hue, so any two roles sit
+   together: --pale container background, --fill box tint, --soft box outline, --edge wires, chips and solid fills, --deep text.
+   Warm hues are kept a little lighter, as the eye expects. */
+.fig [data-c="blue"]   { --pale: oklch(0.978 0.011 252); --fill: oklch(0.945 0.028 252); --soft: oklch(0.80 0.065 252); --edge: oklch(0.60 0.12 252); --deep: oklch(0.40 0.10 252); }
+.fig [data-c="teal"]   { --pale: oklch(0.978 0.011 200); --fill: oklch(0.945 0.028 200); --soft: oklch(0.80 0.060 200); --edge: oklch(0.62 0.095 200); --deep: oklch(0.40 0.07 205); }
+.fig [data-c="green"]  { --pale: oklch(0.978 0.013 152); --fill: oklch(0.945 0.032 152); --soft: oklch(0.81 0.070 152); --edge: oklch(0.63 0.115 152); --deep: oklch(0.40 0.08 152); }
+.fig [data-c="yellow"] { --pale: oklch(0.984 0.020 95);  --fill: oklch(0.958 0.050 95);  --soft: oklch(0.86 0.095 92);  --edge: oklch(0.75 0.125 90);  --deep: oklch(0.46 0.08 85); }
+.fig [data-c="orange"] { --pale: oklch(0.981 0.014 68);  --fill: oklch(0.950 0.038 66);  --soft: oklch(0.83 0.085 62);  --edge: oklch(0.69 0.135 56);  --deep: oklch(0.44 0.095 50); }
+.fig [data-c="red"]    { --pale: oklch(0.978 0.012 20);  --fill: oklch(0.945 0.030 20);  --soft: oklch(0.81 0.075 22);  --edge: oklch(0.62 0.150 24);  --deep: oklch(0.42 0.125 25); }
+.fig [data-c="purple"] { --pale: oklch(0.978 0.012 300); --fill: oklch(0.945 0.030 300); --soft: oklch(0.80 0.070 300); --edge: oklch(0.58 0.125 300); --deep: oklch(0.40 0.105 300); }
+.fig [data-c="gray"]   { --pale: oklch(0.980 0.003 258); --fill: oklch(0.958 0.005 258); --soft: oklch(0.84 0.008 258); --edge: oklch(0.62 0.012 258); --deep: oklch(0.38 0.015 258); }
+.fig [data-c="none"]   { --pale: #fff; --fill: #fff; --soft: oklch(0.74 0.012 258); --edge: var(--line); --deep: var(--ink); }
+
+/* layout helpers */
+.row, .col { display: flex; gap: var(--gap); align-items: center; }
+.fig .col { flex-direction: column; }
+.fig .row { flex-direction: row; }
+
+/* module box */
+.node { position: relative; display: flex; flex: none; align-items: center; justify-content: center; text-align: center;
+  min-height: 14pt; padding: 2pt 5pt; border-radius: var(--r); background: var(--fill);
+  border: var(--lw) solid var(--soft); line-height: 1.15; white-space: nowrap; }
+.node.col { gap: 0.5pt; }
+.node.wrap { white-space: normal; }
+.fig[data-style="ink"] .node, .fig[data-style="ink"] .tok { border-color: var(--line); }
+.fig[data-style="flat"] .node { border-color: transparent; }
+/* quiet: boxes stay neutral and a role shows only as a pale fill with its outline; colour then lives on wires, glyphs and containers */
+.fig[data-style="quiet"] .node:not([data-c]) { --fill: oklch(0.968 0.004 258); --soft: oklch(0.84 0.008 258); }
+.fig[data-style="quiet"] .node[data-c] { background: var(--pale); }
+.fig[data-style="quiet"] .node.solid { background: var(--edge); }
+/* the one part the figure is about: a heavier edge and a bold name, in any style */
+.fig .node.strong, .fig .group.strong { border-width: 1.1pt; border-color: var(--edge); }
+.fig .node.strong, .fig .group.strong > .gl { font-weight: 700; }
+.node.solid { background: var(--edge); border-color: var(--edge); color: #fff; }
+.node.plain { background: #fff; }
+.node.ghost { background: transparent; border-style: dashed; border-color: var(--edge); }
+.node.pill { border-radius: 99pt; padding-left: 7pt; padding-right: 7pt; }
+.node.sm { min-height: 10pt; padding: 1pt 3.5pt; font-size: var(--fs-sm); }
+.node.lg { min-height: 20pt; padding: 4pt 8pt; font-size: var(--fs-lg); }
+.node.shape { background: none; border: none; isolation: isolate; }
+.node.shape > svg.shape-bg { position: absolute; left: 0; top: 0; z-index: -1; overflow: visible; }
+.node > .badge { position: absolute; top: -3.5pt; right: -3.5pt; background: var(--paper); border-radius: 50%; padding: 0.6pt; }
+.flow { display: block; }
+.sub { display: block; font-size: var(--fs-sm); color: var(--ink-2); }
+.node.solid .sub { color: rgba(255, 255, 255, 0.85); }
+.faded { opacity: 0.38; }
+/* context that must stay readable while the contribution (.strong) stands out */
+.fig .context { opacity: 0.62; }
+.stack { box-shadow: 1.7pt -1.7pt 0 calc(-1 * var(--lw)) var(--fill), 1.7pt -1.7pt 0 0 var(--soft),
+  3.4pt -3.4pt 0 calc(-1 * var(--lw)) var(--fill), 3.4pt -3.4pt 0 0 var(--soft); margin: 3.4pt 3.4pt 3.4pt 0; }
+/* exactly two: one copy behind (a model called twice, a pair) */
+.stack.two { box-shadow: 2pt -2pt 0 calc(-1 * var(--lw)) var(--fill), 2pt -2pt 0 0 var(--soft); margin: 2pt 2pt 2pt 0; }
+
+/* operators and variables */
+.op { display: inline-flex; flex: none; align-items: center; justify-content: center; width: 9pt; height: 9pt;
+  border-radius: 50%; border: var(--lw) solid var(--line); background: #fff; font-size: 7pt; line-height: 1; }
+.var { display: inline-flex; flex: none; align-items: center; justify-content: center; width: 15pt; height: 15pt;
+  border-radius: 50%; border: var(--lw) solid var(--line); background: #fff; line-height: 1; }
+.op[data-c], .var[data-c] { border-color: var(--edge); }
+.var[data-c] { background: var(--fill); }
+.dot { display: inline-block; flex: none; width: 0; height: 0; }
+/* free placement for small geometric pictures: children of .plane with .at or .pt are placed by left/top (their centre for .pt) */
+.plane { position: relative; flex: none; }
+.plane > .at { position: absolute; white-space: nowrap; line-height: 1.1; }
+.pt { position: absolute; width: 4pt; height: 4pt; border-radius: 50%; background: var(--edge); transform: translate(-50%, -50%); }
+.pt.strong { width: 5.5pt; height: 5.5pt; outline: 1.2pt solid color-mix(in oklab, var(--edge) 28%, #fff); }
+.ink { display: inline-block; line-height: 1; }
+
+/* grouping */
+.group { position: relative; display: flex; gap: var(--gap); align-items: center; padding: 10pt 5pt 5pt;
+  border-radius: 3.5pt; border: var(--lw) dashed var(--soft); }
+.group:not([data-c]) { --pale: oklch(0.980 0.003 258); --fill: oklch(0.958 0.005 258); --soft: oklch(0.84 0.008 258); --edge: oklch(0.62 0.012 258); --deep: oklch(0.38 0.015 258); }
+.group.frame { border-style: solid; }
+.group.tint { border-style: solid; border-color: color-mix(in oklab, var(--soft) 45%, #fff); background: var(--pale); }
+.group.tint.frame { border-color: var(--soft); }
+.group.bare { padding: 0; border: none; }
+.gl { position: absolute; top: 1.8pt; left: 4.5pt; font-size: var(--fs-sm); line-height: 1.1; color: var(--deep); white-space: nowrap; }
+.gl.tr { left: auto; right: 4.5pt; } .gl.bl { top: auto; bottom: 1.8pt; }
+.gl.br { top: auto; bottom: 1.8pt; left: auto; right: 4.5pt; }
+.gl.tc { left: 50%; transform: translateX(-50%); }
+.gl.on { top: 0; transform: translateY(-55%); background: var(--paper); padding: 0 2.5pt; }
+.fig .b { font-weight: 700; }
+
+/* text */
+.label { white-space: nowrap; line-height: 1.15; flex: none; }
+.label.wrap { white-space: normal; }
+.dim { font-size: var(--fs-sm); color: var(--ink-2); }
+.mono { font-family: var(--font-mono); }
+.tc { color: var(--deep); }
+.title { font-size: var(--fs-lg); font-weight: 700; white-space: nowrap; }
+
+/* panels: "(a) name" under the panel is the ML convention; data-profile="nature" puts a bold letter top-left */
+.panels { display: flex; gap: 10pt; align-items: stretch; }
+.panel { position: relative; display: flex; flex-direction: column; align-items: center; gap: 5pt; flex: 1 1 0; min-width: 0; }
+.panel > .body { flex: 1 1 auto; display: flex; align-items: center; justify-content: center; width: 100%; }
+.panel > .cap { text-align: center; line-height: 1.15; }
+.cap > .tag::before { content: "("; } .cap > .tag::after { content: ") "; }
+.cap.b { font-weight: 700; }
+.fig[data-profile="nature"] .panel { padding-top: 11pt; }
+.fig[data-profile="nature"] .panel > .cap { position: absolute; top: 0; left: 0; text-align: left; font-weight: 400; }
+.fig[data-profile="nature"] .cap > .tag { font-size: 8pt; font-weight: 700; margin-right: 3pt; }
+.fig[data-profile="nature"] .cap > .tag::before, .fig[data-profile="nature"] .cap > .tag::after { content: none; }
+.vr { align-self: stretch; flex: none; width: 0; border-left: var(--lw) dashed var(--ink-3); }
+.hr { align-self: stretch; flex: none; height: 0; border-top: var(--lw) dashed var(--ink-3); }
+
+/* tokens, matrices, glyphs */
+fig-tokens, .tokens { display: inline-flex; flex: none; gap: 1pt; --ts: 6.5pt; }
+fig-tokens[v] { flex-direction: column; }
+.tok { display: flex; align-items: center; justify-content: center; width: var(--ts); height: var(--ts); border-radius: 0.8pt;
+  background: var(--fill); border: 0.5pt solid color-mix(in oklab, var(--soft) 55%, var(--edge)); font-size: 5pt; line-height: 1; font-style: normal; }
+fig-tokens[solid] .tok { background: var(--edge); }
+.tok.mask { background: oklch(0.93 0.005 258); border-color: oklch(0.78 0.01 258); }
+.tok.gap { background: none; border: none; color: var(--ink-2); font-size: 6pt; }
+fig-matrix, fig-dist, fig-noise, fig-net, fig-points, fig-bars, fig-icon, fig-blob { display: inline-flex; flex: none; line-height: 0; }
+fig-icon { color: var(--deep); vertical-align: -0.12em; }
+.node.solid fig-icon { color: #fff; }
+svg.glyph { display: block; overflow: visible; }
+.img { display: block; flex: none; border-radius: 1.5pt; object-fit: cover; }
+.img.stack, fig-noise.stack { --fill: oklch(0.968 0.004 258); --soft: oklch(0.78 0.01 258); }
+.img.ph { background: oklch(0.955 0.005 258); border: 0.5pt solid var(--hair); }
+
+/* object card: a picture or glyph on top, a bold caption inside the card below it; without data-c it is a neutral tile */
+.obj { position: relative; display: flex; flex: none; flex-direction: column; align-items: center; justify-content: center; gap: 3pt;
+  padding: 5pt 6pt 4pt; border-radius: var(--r); background: #fff; border: var(--lw) solid var(--soft);
+  line-height: 1.15; text-align: center; white-space: nowrap; }
+.obj:not([data-c]) { --soft: oklch(0.84 0.008 258); }
+.obj.bare { border-color: transparent; background: none; padding: 0; }
+/* an object whose caption hangs below it without shifting the object off the flow axis */
+.hang { position: relative; display: inline-flex; flex: none; }
+/* the line height is large enough to hold inline math, so a caption with a symbol sits on the same baseline as one without */
+.hang > .hc { position: absolute; top: calc(100% + 1pt); left: 50%; transform: translateX(-50%); white-space: nowrap;
+  font-size: var(--fs-sm); line-height: 1.5; color: var(--ink-2); text-align: center; }
+/* caption beside the object instead, for an object on a vertical axis */
+.hang > .hc.r { top: 50%; left: calc(100% + 3pt); transform: translateY(-50%); text-align: left; }
+.hang > .hc.l { top: 50%; left: auto; right: calc(100% + 3pt); transform: translateY(-50%); text-align: right; }
+/* the one picture that matters */
+fig-noise.strong, .img.strong { outline: 1.1pt solid var(--edge); outline-offset: 0.7pt; border-radius: 0.8pt; }
+.chip { display: inline-flex; flex: none; align-items: center; justify-content: center; width: 9pt; height: 9pt; border-radius: 50%;
+  background: var(--edge); color: #fff; font-size: 6pt; font-weight: 700; font-style: normal; line-height: 1; }
+
+/* a share made visible: <div class="meter" style="width: 70pt; --v: 0.3"></div> fills 30 % of the track in the role colour */
+.meter { position: relative; flex: none; height: 3.6pt; border-radius: 2pt; background: oklch(0.93 0.005 258); overflow: hidden; }
+.meter::after { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: max(1.6pt, calc(var(--v, 0.5) * 100%)); background: var(--edge); border-radius: 2pt; }
+
+/* transcript and code cards */
+.card { position: relative; flex: none; border: var(--lw) solid var(--soft); border-radius: var(--r); background: #fff;
+  padding: 5pt 5pt 4pt; font: 6pt/1.35 var(--font-mono); white-space: pre-wrap; text-align: left; }
+.card > .tab { position: absolute; top: 0; left: 5pt; transform: translateY(-55%); background: var(--paper); padding: 0 2.5pt;
+  font: 700 var(--fs-sm)/1.2 var(--font); color: var(--deep); white-space: nowrap; }
+.card:has(> .tab) { margin-top: 4pt; }
+.hl { background: var(--fill); border-radius: 1pt; padding: 0 0.8pt; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+.kw { color: var(--deep); font-weight: 700; }
+
+/* keys */
+.legend { display: flex; flex: none; gap: 8pt; align-items: center; font-size: var(--fs-sm); color: var(--ink-2); }
+.legend.v { flex-direction: column; align-items: flex-start; gap: 2.5pt; }
+.legend.boxed { border: 0.5pt solid var(--hair); border-radius: 2pt; padding: 2.5pt 4pt; }
+.key { display: inline-flex; align-items: center; gap: 2.5pt; white-space: nowrap; }
+.sw { display: inline-block; width: 7pt; height: 7pt; border-radius: 1.2pt; background: var(--fill); border: 0.5pt solid var(--soft); }
+.sw.solid { background: var(--edge); }
+.wk { display: inline-block; width: 14pt; height: 6pt; line-height: 0; }
+
+/* wire layer (drawn by figure.js) */
+fig-wire, fig-brace, fig-zoom { display: none; }
+svg.wires { position: absolute; left: 0; top: 0; z-index: 1; overflow: visible; pointer-events: none; }
+.wire-label { position: absolute; z-index: 2; font-size: var(--fs-sm); line-height: 1.1; color: var(--ink-2); white-space: nowrap; }
+.wire-label.on { background: var(--paper); padding: 0 1.5pt; }
+/* wire labels stay slate whatever the wire's colour: the line carries the role, the text stays one colour */
+
+/* layout utilities come last and carry the .fig prefix so they win over a component's own defaults (a .group that is also .g5) */
+.fig .start { align-items: flex-start; } .fig .end { align-items: flex-end; } .fig .stretch { align-items: stretch; }
+.fig .between { justify-content: space-between; } .fig .around { justify-content: space-around; }
+.fig .evenly { justify-content: space-evenly; } .fig .middle { justify-content: center; }
+.fig .grow { flex: 1 1 0; min-width: 0; } .fig .fill { width: 100%; }
+.fig .g0 { gap: 0; } .fig .g1 { gap: 2pt; } .fig .g2 { gap: 4pt; } .fig .g3 { gap: 8pt; } .fig .g4 { gap: 12pt; } .fig .g5 { gap: 18pt; } .fig .g6 { gap: 26pt; }

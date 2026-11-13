@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>kit sheet: every component of the kit with its class or tag</title>
+<link rel="stylesheet" href="../kit/katex/katex.min.css">
+<link rel="stylesheet" href="../kit/figure.css">
+<script src="../kit/katex/katex.min.js"></script>
+<script src="../kit/katex/contrib/auto-render.min.js"></script>
+<script src="../kit/icons.js"></script>
+<script src="../kit/figure.js"></script>
+</head>
+<body>
+<!-- Specimen sheet, not a figure: each component with the class or tag that draws it. Render it after changing the kit. -->
+<main class="fig" data-width="nature">
+  <div class="col g4" style="align-items: stretch">
+
+    <div class="row g3" style="align-items: flex-end">
+      <div class="col g1"><div class="node" data-c="blue">node</div><span class="label dim">data-c="blue"</span></div>
+      <div class="col g1"><div class="node solid" data-c="blue">node</div><span class="label dim">.solid</span></div>
+      <div class="col g1"><div class="node plain" data-c="blue">node</div><span class="label dim">.plain</span></div>
+      <div class="col g1"><div class="node ghost" data-c="blue">node</div><span class="label dim">.ghost</span></div>
+      <div class="col g1"><div class="node pill" data-c="green">node</div><span class="label dim">.pill</span></div>
+      <div class="col g1"><div class="node sm" data-c="green">node</div><span class="label dim">.sm</span></div>
+      <div class="col g1"><div class="node lg" data-c="green">node</div><span class="label dim">.lg</span></div>
+      <div class="col g1"><div class="node faded" data-c="orange">node</div><span class="label dim">.faded</span></div>
+      <div class="col g1"><div class="node stack" data-c="orange">batch</div><span class="label dim">.stack</span></div>
+      <div class="col g1"><div class="node" data-c="gray">Encoder<fig-icon class="badge" name="snowflake" size="7"></fig-icon></div><span class="label dim">.badge icon</span></div>
+      <div class="col g1"><div class="node" data-c="red">Adapter<span class="sub">rank 8</span></div><span class="label dim">.sub</span></div>
+      <div class="col g1"><div class="node">node</div><span class="label dim">no data-c</span></div>
+    </div>
+
+    <div class="row g3" style="align-items: flex-end">
+      <div class="col g1"><div class="node trap-r" data-c="blue" style="width: 34pt; height: 30pt">enc</div><span class="label dim">.trap-r</span></div>
+      <div class="col g1"><div class="node trap-l" data-c="blue" style="width: 34pt; height: 30pt">dec</div><span class="label dim">.trap-l</span></div>
+      <div class="col g1"><div class="node trap-u" data-c="purple" style="width: 40pt; height: 22pt">up</div><span class="label dim">.trap-u</span></div>
+      <div class="col g1"><div class="node trap-d" data-c="purple" style="width: 40pt; height: 22pt">down</div><span class="label dim">.trap-d</span></div>
+      <div class="col g1"><div class="node cyl" data-c="yellow" style="width: 36pt; height: 28pt; padding-top: 6pt">index</div><span class="label dim">.cyl</span></div>
+      <div class="col g1"><div class="row g2"><span class="op">+</span><span class="op">&times;</span><span class="op" data-c="red">$\sigma$</span></div><span class="label dim">.op</span></div>
+      <div class="col g1"><div class="row g2"><span class="var">$x$</span><span class="var" data-c="gray">$z$</span></div><span class="label dim">.var</span></div>
+      <div class="col g1"><div class="row g2"><fig-icon name="snowflake"></fig-icon><fig-icon name="flame" data-c="red"></fig-icon><fig-icon name="lock"></fig-icon><fig-icon name="database"></fig-icon><fig-icon name="search"></fig-icon><fig-icon name="bot"></fig-icon><fig-icon name="wrench"></fig-icon><fig-icon name="check" data-c="green"></fig-icon><fig-icon name="x" data-c="red"></fig-icon></div><span class="label dim">fig-icon name="…"</span></div>
+      <div class="col g1"><div class="img ph" style="width: 26pt; height: 20pt"></div><span class="label dim">.img.ph</span></div>
+    </div>
+
+    <div class="row g3" style="align-items: flex-end">
+      <div class="col g1"><fig-tokens n="6" data-c="blue" mask="2,3" gap="4"></fig-tokens><span class="label dim">fig-tokens mask gap</span></div>
+      <div class="col g1"><fig-tokens n="4" v solid data-c="teal" colors="-,red"></fig-tokens><span class="label dim">v solid colors</span></div>
+      <div class="col g1"><fig-matrix rows="4" on="diag" data-c="blue"></fig-matrix><span class="label dim">fig-matrix on="diag"</span></div>
+      <div class="col g1"><fig-matrix rows="4" on="lower" dim data-c="gray"></fig-matrix><span class="label dim">on="lower" dim</span></div>
+      <div class="col g1"><fig-matrix rows="3" cols="4" data-c="purple" values="0.1,0.8,0.3,0.05,0.6,0.2,0.9,0.1,0.3,0.4,0.15,0.7"></fig-matrix><span class="label dim">values</span></div>
+      <div class="col g1"><fig-dist w="34" h="18" mix="0.3:0.1,0.72:0.08:0.7" fill data-c="blue"></fig-dist><span class="label dim">fig-dist mix fill</span></div>
+      <div class="col g1"><div class="row g1"><fig-noise w="18" t="0"></fig-noise><fig-noise w="18" t="0.5"></fig-noise><fig-noise w="18" t="1"></fig-noise></div><span class="label dim">fig-noise t = 0, 0.5, 1</span></div>
+      <div class="col g1"><fig-net layers="3,4,4,2" data-c="orange"></fig-net><span class="label dim">fig-net layers</span></div>
+      <div class="col g1"><fig-points clusters="0.3:0.35:0.09:blue,0.7:0.65:0.1:orange" ring="0.3:0.35:0.3"></fig-points><span class="label dim">fig-points clusters ring</span></div>
+      <div class="col g1"><fig-bars values="0.2,0.9,0.4,0.1" on="1" data-c="green"></fig-bars><span class="label dim">fig-bars on</span></div>
+    </div>
+
+    <div class="row between" style="align-items: center; padding: 20pt 0 18pt">
+      <div class="row" style="gap: 22pt"><div class="node sm" id="a1">a</div><div class="node sm" id="a2">b</div></div>
+      <div class="row" style="gap: 22pt; align-items: flex-start"><div class="node sm" id="b1">a</div><div class="node sm" id="b2" style="margin-top: 16pt">b</div></div>
+      <div class="row" style="gap: 26pt; align-items: flex-start"><div class="node sm" id="c1">a</div><div class="node sm" id="c2" style="margin-top: 16pt">b</div></div>
+      <div class="col" style="gap: 6pt"><div class="node sm" id="d2">b</div><div class="node sm" style="width: 34pt">mid</div><div class="node sm" id="d1">a</div></div>
+      <div class="row" style="gap: 30pt"><div class="node sm" id="e1">a</div><div class="node sm" id="e2">b</div></div>
+      <div class="node sm" id="f1" style="width: 30pt">loop</div>
+      <div class="col" style="gap: 12pt"><span class="var" id="g0" style="width: 11pt; height: 11pt"></span><div class="row g3"><span class="var" id="g1" style="width: 11pt; height: 11pt"></span><span class="var" id="g2" style="width: 11pt; height: 11pt"></span></div></div>
+      <div class="row" style="gap: 20pt"><div class="node sm" id="h1">a</div><div class="node sm" id="h2">b</div></div>
+      <div class="row g1" id="br"><fig-noise w="12" res="5"></fig-noise><fig-noise w="12" res="5" seed="2"></fig-noise><fig-noise w="12" res="5" seed="3"></fig-noise></div>
+    </div>
+
+    <div class="row g4" style="align-items: flex-end">
+      <div class="col g1"><div class="obj" data-c="blue"><fig-blob w="26" data-c="blue"></fig-blob>Object</div><span class="label dim">.obj + fig-blob</span></div>
+      <div class="col g1"><div class="obj"><fig-tokens n="4" data-c="purple"></fig-tokens>Tile</div><span class="label dim">.obj, no data-c</span></div>
+      <div class="col g1"><div class="row g1"><i class="chip" data-c="orange">1</i><i class="chip" data-c="orange">2</i></div><span class="label dim">.chip</span></div>
+      <div class="col g1"><div class="row g2"><fig-blob w="24" data-c="blue"></fig-blob><fig-blob w="24" seed="5" data-c="red"></fig-blob><fig-blob class="faded" w="24" seed="9" data-c="gray"></fig-blob></div><span class="label dim">fig-blob seed, .faded</span></div>
+      <div class="col g1" style="padding-bottom: 9pt"><span class="hang"><fig-noise w="18" scene="dusk"></fig-noise><span class="hc">.hang .hc</span></span></div>
+      <div class="col g1"><div class="row g1"><fig-noise w="18"></fig-noise><fig-noise w="18" scene="dusk"></fig-noise></div><span class="label dim">fig-noise scene="dusk"</span></div>
+    </div>
+
+    <div class="row between" style="align-items: flex-end; padding: 0 14pt">
+      <div class="col g1"><div class="node stack two" data-c="blue">pair</div><span class="label dim">.stack.two</span></div>
+      <div class="col g1"><div class="node context" data-c="gray">earlier</div><span class="label dim">.context</span></div>
+      <div class="col g1"><div class="node plain plane" style="width: 62pt; height: 22pt"><i class="pt" id="k0" data-c="gray" style="left: 10pt; top: 11pt"></i><i class="pt" id="k1" data-c="blue" style="left: 29pt; top: 11pt"></i><i class="pt strong" id="k2" data-c="blue" style="left: 52pt; top: 11pt"></i></div><span class="label dim">.plane .pt .pt.strong</span></div>
+      <div class="col g1"><div class="meter" data-c="orange" style="width: 46pt; --v: 0.3"></div><span class="label dim">.meter --v: 0.3</span></div>
+      <div class="col g1"><fig-noise class="strong" w="18" scene="sunset" data-c="blue"></fig-noise><span class="label dim">.strong, scene="sunset"</span></div>
+      <div class="col g1"><span class="hang" style="margin-right: 30pt"><fig-bars values="0.2,0.8,0.3" on="1" w="20" h="13" data-c="gray"></fig-bars><span class="hc r">.hc.r</span></span><span class="label dim" style="align-self: flex-start">side caption</span></div>
+    </div>
+
+    <div class="row g4" style="align-items: stretch">
+      <div class="group" style="width: 60pt"><span class="gl">.group</span></div>
+      <div class="group frame" data-c="teal" style="width: 60pt"><span class="gl">.frame</span></div>
+      <div class="group tint" data-c="orange" style="width: 60pt"><span class="gl">.tint</span><span class="gl br">$\times N$</span></div>
+      <div class="group frame" data-c="purple" style="width: 66pt"><span class="gl on b">.gl.on</span></div>
+      <div class="card" data-c="gray" style="width: 110pt"><span class="tab">.card .tab</span><span class="kw" data-c="blue">Action</span> lookup("x")
+<span class="kw" data-c="green">Obs</span> <span class="hl" data-c="green">42</span> .hl</div>
+      <div class="legend v boxed" style="align-self: center">
+        <span class="key"><i class="wk"></i>.wk</span>
+        <span class="key"><i class="wk" data-kind="dash" data-c="blue"></i>data-kind="dash"</span>
+        <span class="key"><i class="wk" data-kind="dot"></i>data-kind="dot"</span>
+        <span class="key"><i class="sw" data-c="orange"></i>.sw</span>
+      </div>
+      <div class="col g1" style="justify-content: center"><span class="title">.title</span><span class="label">.label <span class="tc" data-c="red">.tc coloured term</span></span><span class="label dim">.dim <span class="mono">.mono</span></span></div>
+    </div>
+
+  </div>
+
+  <fig-wire from="a1" to="a2" label="h" ls="t"></fig-wire>
+  <fig-wire from="b1" to="b2" route="hv" label="hv" ls="t"></fig-wire>
+  <fig-wire from="c1" to="c2" route="hvh" label="hvh" ls="r"></fig-wire>
+  <fig-wire from="d1" to="d2" route="u" via="l" label="u" ls="l"></fig-wire>
+  <fig-wire from="e1" to="e2" route="curve" side="t" bend="12" kind="dash" data-c="blue" label="curve" ls="t"></fig-wire>
+  <fig-wire from="e2" to="e1" route="curve" side="b" bend="12" head="both" data-c="red"></fig-wire>
+  <fig-wire from="f1.t@0.75" to="f1.t@0.25" route="curve" side="t" bend="11" label="$\times T$" ls="t"></fig-wire>
+  <fig-wire from="g0" to="g1" route="line"></fig-wire>
+  <fig-wire from="g0" to="g2" route="line" kind="faint"></fig-wire>
+  <fig-wire from="h1" to="h2" shift="-3"></fig-wire>
+  <fig-wire from="h2" to="h1" shift="3" kind="dot"></fig-wire>
+  <fig-brace of="br" side="b" label="fig-brace"></fig-brace>
+  <fig-wire from="k0" to="k1" route="line" head="none" kind="faint"></fig-wire>
+  <fig-wire from="k1" to="k2" route="line" data-c="blue"></fig-wire>
+</main>
+</body>
+</html>

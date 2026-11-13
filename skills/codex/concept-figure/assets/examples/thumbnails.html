@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>thumbnails: three candidate concepts for one claim</title>
+<link rel="stylesheet" href="../kit/katex/katex.min.css">
+<link rel="stylesheet" href="../kit/figure.css">
+<script src="../kit/katex/katex.min.js"></script>
+<script src="../kit/katex/contrib/auto-render.min.js"></script>
+<script src="../kit/icons.js"></script>
+<script src="../kit/figure.js"></script>
+</head>
+<body>
+<!-- Concept thumbnails, not a figure: three different patterns for one claim, low fidelity on purpose.
+     Claim: "Adapters make fine-tuning cheap: the pretrained blocks stay frozen and only small added matrices are trained,
+     where full fine-tuning stores a whole model per task." Gray = given, orange = the contribution.
+     Under each sketch: the sentence a reader would say after five seconds. Show these to the author before polishing any. -->
+<main class="fig" data-width="neurips" data-style="flat">
+  <div class="panels" style="gap: 8pt">
+
+    <div class="panel">
+      <span class="label b">A · one difference</span>
+      <div class="body row g4">
+        <div class="col g1"><div class="node sm" data-c="orange" style="width: 34pt">head</div><div class="node sm" data-c="orange" style="width: 34pt">block</div><div class="node sm" data-c="orange" style="width: 34pt">block</div><span class="label dim">full</span></div>
+        <div class="col g1 start"><div class="node sm" data-c="orange" style="width: 34pt">head</div>
+          <div class="row g1"><div class="node sm" data-c="gray" style="width: 34pt">block</div><i class="chip" data-c="orange">+</i></div>
+          <div class="row g1"><div class="node sm" data-c="gray" style="width: 34pt">block</div><i class="chip" data-c="orange">+</i></div><span class="label dim" style="width: 34pt; text-align: center">adapters</span></div>
+      </div>
+      <div class="cap label wrap dim">"Only the small orange parts are trained."</div>
+    </div>
+
+    <div class="vr"></div>
+
+    <div class="panel">
+      <span class="label b">B · cost made visible</span>
+      <div class="body row g4" style="align-items: flex-end">
+        <div class="col g1"><div class="node stack" data-c="orange" style="width: 34pt; height: 34pt; margin-bottom: 0">model</div><span class="label dim" style="text-align: center">one copy<br>per task</span></div>
+        <div class="col g1 start"><div class="row g1" style="align-items: flex-end"><div class="node" data-c="gray" style="width: 34pt; height: 34pt">model</div>
+          <div class="col g0" style="height: 34pt; justify-content: space-between"><i class="chip" data-c="orange">a</i><i class="chip" data-c="orange">b</i><i class="chip" data-c="orange">c</i></div></div><span class="label dim" style="width: 34pt; text-align: center">one chip<br>per task</span></div>
+      </div>
+      <div class="cap label wrap dim">"Each new task costs a chip, not a model."</div>
+    </div>
+
+    <div class="vr"></div>
+
+    <div class="panel" style="flex-grow: 1.3">
+      <span class="label b">C · one example's journey</span>
+      <div class="body row g4" style="padding-top: 14pt">
+        <fig-tokens id="t-in" n="3" size="6" data-c="gray" style="margin-right: 10pt"></fig-tokens>
+        <span class="hang"><div class="node sm" id="t-b" data-c="gray" style="width: 34pt">block</div>
+          <div class="node sm pill" id="t-a" data-c="orange" style="position: absolute; bottom: calc(100% + 9pt); left: 50%; transform: translateX(-50%)">$BA$</div></span>
+        <span class="op" id="t-add">+</span>
+        <fig-tokens id="t-out" n="3" size="6" data-c="orange"></fig-tokens>
+      </div>
+      <div class="cap label wrap dim">"The input takes a frozen path and a small trained side path."</div>
+    </div>
+
+  </div>
+  <fig-wire id="t-w" from="t-in" to="t-b"></fig-wire>
+  <fig-wire from="t-b" to="t-add"></fig-wire>
+  <fig-wire from="t-w@0.3" to="t-a.l" route="vh" dot></fig-wire>
+  <fig-wire from="t-a.r" to="t-add.t" route="hv"></fig-wire>
+  <fig-wire from="t-add" to="t-out"></fig-wire>
+</main>
+</body>
+</html>

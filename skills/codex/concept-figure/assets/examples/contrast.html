@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>contrast: two rows on one skeleton, the differing step drawn as what it does</title>
+<link rel="stylesheet" href="../kit/katex/katex.min.css">
+<link rel="stylesheet" href="../kit/figure.css">
+<script src="../kit/katex/katex.min.js"></script>
+<script src="../kit/katex/contrib/auto-render.min.js"></script>
+<script src="../kit/icons.js"></script>
+<script src="../kit/figure.js"></script>
+</head>
+<body>
+<!-- Contrast with the earlier method: two rows on one skeleton (classifier guidance above, classifier-free guidance below).
+     Both rows read inputs, networks, combination step, next sample. The columns line up and two lanes run through both rows:
+     the sample x_t above, the condition c below (in the earlier method the sample also feeds the classifier). Gray and lighter (.context) = the earlier method; blue (.strong) = the
+     contribution, and the one blue stroke in the figure is the step the claim is about. That step is drawn as what it does,
+     three predictions on a line in a .plane, each shown as the picture it points to, with its rule hanging under the box.
+     Every arrow into a combination box is labelled with what flows on it. Notation follows the common guidance-scale
+     convention, guided = uncond + w (cond - uncond). -->
+<main class="fig" data-width="neurips">
+  <div class="col" style="gap: 9pt; align-items: stretch">
+
+    <div class="group tint row context" id="cg" style="justify-content: space-between; padding: 21pt 12pt 9pt">
+      <span class="gl">Classifier guidance: two models</span>
+      <div class="col" style="margin-top: -3.5pt; gap: 7.5pt"><fig-noise id="a-x" w="24" t="0.6" seed="3"></fig-noise><div class="node sm pill" id="a-c">$c$: "dusk"</div></div>
+      <div class="col" style="gap: 5pt">
+        <div class="node" id="a-den" data-c="gray" style="width: 86pt; height: 16pt">Denoiser $\epsilon_\theta(x_t)$</div>
+        <div class="node" id="a-cls" data-c="gray" style="width: 86pt; height: 16pt">Classifier $p_\phi(c \mid x_t)$</div>
+      </div>
+      <div class="node plain" id="a-mix" style="width: 112pt; height: 35pt">$\epsilon_\theta - s\,\sigma_t \nabla_{x_t} \log p_\phi(c \mid x_t)$</div>
+      <span class="hang" id="a-out"><fig-noise w="24" t="0.42" seed="5" scene="dusk"></fig-noise><span class="hc">$x_{t-1}$</span></span>
+    </div>
+
+    <div class="group tint row strong" id="cf" data-c="blue" style="justify-content: space-between; padding: 17pt 12pt 13pt">
+      <span class="gl">Classifier-free guidance: one model, called twice</span>
+      <div class="col g2" style="margin-top: -7pt"><fig-noise id="b-x" w="24" t="0.6" seed="3"></fig-noise><div class="node sm pill" id="b-c">$c$: "dusk"</div></div>
+      <div class="node stack two" id="b-den" style="width: 84pt; height: 35pt">Denoiser $\epsilon_\theta(x_t, \cdot)$</div>
+      <span class="hang">
+        <div class="node plain plane" id="pl" style="width: 112pt; height: 35pt">
+          <fig-noise class="at" id="p0" w="14" t="0.2" seed="11" scene="day" style="left: 10pt; top: 5pt"></fig-noise>
+          <fig-noise class="at" id="p1" w="14" t="0.2" seed="12" scene="dusk" style="left: 42pt; top: 5pt"></fig-noise>
+          <fig-noise class="at strong" id="p2" w="14" t="0.2" seed="13" scene="sunset" style="left: 86pt; top: 5pt"></fig-noise>
+          <span class="at dim" style="left: 17pt; top: 21.5pt; transform: translateX(-50%)">$\epsilon_\varnothing$</span>
+          <span class="at dim" style="left: 49pt; top: 21.5pt; transform: translateX(-50%)">$\epsilon_c$</span>
+          <span class="at b tc" style="left: 93pt; top: 22pt; transform: translateX(-50%)">$\tilde\epsilon$</span>
+        </div>
+        <span class="hc">$\tilde\epsilon = \epsilon_\varnothing + w\,(\epsilon_c - \epsilon_\varnothing)$</span>
+      </span>
+      <span class="hang" id="b-out"><fig-noise w="24" t="0.42" seed="5" scene="dusk"></fig-noise><span class="hc">$x_{t-1}$</span></span>
+    </div>
+
+  </div>
+
+  <fig-wire id="a-w" from="a-x" to="a-den" route="h" label="$x_t$" ls="t" lp="0.28"></fig-wire>
+  <fig-wire from="a-w@0.55" to="a-cls.l@0.28" route="vh" dot></fig-wire>
+  <fig-wire from="a-c" to="a-cls.l@0.72" route="h"></fig-wire>
+  <fig-wire from="a-den" to="a-mix" route="h" label="$\epsilon_\theta$" ls="t"></fig-wire>
+  <fig-wire from="a-cls" to="a-mix" route="h" label="gradient" ls="t"></fig-wire>
+  <fig-wire from="a-mix" to="a-out" route="h"></fig-wire>
+
+  <fig-wire from="b-x" to="b-den.l@0.2" route="h" label="$x_t$" ls="t"></fig-wire>
+  <fig-wire from="b-c" to="b-den.l@0.8" route="h" label="or $\varnothing$" ls="t"></fig-wire>
+  <fig-wire from="b-den.r@0.2" to="pl" route="h" label="$\epsilon_\varnothing$" ls="t"></fig-wire>
+  <fig-wire from="b-den.r@0.8" to="pl" route="h" label="$\epsilon_c$" ls="t"></fig-wire>
+  <fig-wire from="p0" to="p1" route="line" head="none" kind="faint"></fig-wire>
+  <fig-wire from="p1" to="p2" route="line" data-c="blue" weight="1.3" label="$w > 1$" ls="t"></fig-wire>
+  <fig-wire from="pl" to="b-out" route="h"></fig-wire>
+</main>
+</body>
+</html>

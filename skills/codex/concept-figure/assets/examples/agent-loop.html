@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>agent loop: components around a model, with a transcript</title>
+<link rel="stylesheet" href="../kit/katex/katex.min.css">
+<link rel="stylesheet" href="../kit/figure.css">
+<script src="../kit/katex/katex.min.js"></script>
+<script src="../kit/katex/contrib/auto-render.min.js"></script>
+<script src="../kit/icons.js"></script>
+<script src="../kit/figure.js"></script>
+</head>
+<body>
+<!-- Archetype: LLM or agent system. One colour per component, and a transcript card that shows one concrete episode
+     in the same colours, using every component drawn. The policy is the one strong box; the pieces pack into one block
+     with no empty corner. -->
+<main class="fig" data-width="neurips">
+  <div class="row" style="justify-content: space-between">
+
+    <div style="display: grid; grid-template-columns: auto auto auto; align-items: center">
+      <div class="card" id="task" data-c="gray" style="width: 66pt; margin: 0 29pt 0 0"><span class="tab">Task</span>How long is a
+marathon in km?</div>
+      <div class="node strong" id="llm" data-c="purple" style="width: 44pt; align-self: stretch">LLM policy</div>
+      <div class="col stretch" style="gap: 9pt; margin-left: 40pt">
+        <div class="group frame col g2" id="tools" data-c="blue" style="padding: 8pt 6pt 6pt">
+          <span class="gl on b">Tools</span>
+          <div class="node sm plain" data-c="blue" style="width: 34pt"><fig-icon name="search" size="7"></fig-icon>&nbsp;search</div>
+          <div class="node sm plain" data-c="blue" style="width: 34pt"><fig-icon name="code" size="7"></fig-icon>&nbsp;python</div>
+        </div>
+        <div class="node cyl" id="mem" data-c="yellow" style="height: 25pt; padding-top: 6pt">Memory</div>
+      </div>
+    </div>
+
+    <div class="vr"></div>
+
+    <div class="card" id="log" style="width: 135pt; margin-top: 0; align-self: stretch; display: flex; align-items: center"><span class="tab">One episode</span><span class="kw" data-c="purple">Thought</span> look it up, then convert
+<span class="kw" data-c="blue">Action</span> search("marathon distance")
+<span class="kw" data-c="green">Obs</span> <span class="hl" data-c="green">26.219 miles</span>
+<span class="kw" data-c="blue">Action</span> python("26.219 * 1.60934")
+<span class="kw" data-c="green">Obs</span> <span class="hl" data-c="green">42.195</span>
+<span class="kw" data-c="yellow">Write</span> marathon = 42.195 km
+<span class="kw" data-c="purple">Answer</span> 42.195 km</div>
+
+  </div>
+
+  <fig-wire from="task" to="llm" route="h" shift="-4.5"></fig-wire>
+  <fig-wire from="llm" to="task" route="h" shift="4.5" label="answer" ls="b"></fig-wire>
+  <fig-wire from="llm" to="tools.l@0.36" route="h" data-c="blue" label="action" ls="t"></fig-wire>
+  <fig-wire from="tools.l@0.68" to="llm" route="h" data-c="green" label="observation" ls="b"></fig-wire>
+  <fig-wire from="llm" to="mem" route="h" head="both" label="read / write" ls="b"></fig-wire>
+</main>
+</body>
+</html>

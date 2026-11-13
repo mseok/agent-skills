@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>comparison: paradigms on one skeleton</title>
+<link rel="stylesheet" href="../kit/katex/katex.min.css">
+<link rel="stylesheet" href="../kit/figure.css">
+<script src="../kit/katex/katex.min.js"></script>
+<script src="../kit/katex/contrib/auto-render.min.js"></script>
+<script src="../kit/icons.js"></script>
+<script src="../kit/figure.js"></script>
+</head>
+<body>
+<!-- Archetype: paradigm comparison. Three panels share one skeleton and one example (an image in, class scores out).
+     Orange = trained, gray = frozen. The two baselines are context (lighter); the proposal comes last, on a framed card with
+     a bold name. The bar under each panel makes the cost visible; it is a schematic share, not a measured number.
+     The right-hand column of the proposal holds the key, the adapters and what their symbol means, so no corner is empty. -->
+<main class="fig" data-width="neurips">
+  <div class="panels" style="gap: 8pt">
+
+    <div class="panel" style="flex: 0 0 88pt">
+      <div class="body col context" style="gap: 11pt">
+        <fig-bars id="a-y" values="0.1,0.7,0.2" on="1" w="44" h="15" data-c="gray"></fig-bars>
+        <div class="node" id="a-h" data-c="orange" style="width: 80pt">Head</div>
+        <div class="col g1" id="a-b">
+          <div class="node" data-c="orange" style="width: 80pt">Block $L$</div>
+          <span class="dim" style="line-height: 0.8">⋮</span>
+          <div class="node" data-c="orange" style="width: 80pt">Block 2</div>
+          <div class="node" data-c="orange" style="width: 80pt">Block 1</div>
+        </div>
+        <fig-noise id="a-x" w="40" h="28" res="8"></fig-noise>
+        <span class="hang" style="margin: -3pt 0 9pt"><div class="meter" data-c="orange" style="width: 80pt; --v: 1"></div><span class="hc">trained parameters</span></span>
+      </div>
+      <div class="cap"><span class="tag">a</span>Full fine-tuning</div>
+    </div>
+
+    <div class="vr"></div>
+
+    <div class="panel" style="flex: 0 0 88pt">
+      <div class="body col context" style="gap: 11pt">
+        <fig-bars id="b-y" values="0.1,0.7,0.2" on="1" w="44" h="15" data-c="gray"></fig-bars>
+        <div class="node" id="b-h" data-c="orange" style="width: 80pt">Head</div>
+        <div class="col g1" id="b-b">
+          <div class="node" data-c="gray" style="width: 80pt">Block $L$</div>
+          <span class="dim" style="line-height: 0.8">⋮</span>
+          <div class="node" data-c="gray" style="width: 80pt">Block 2</div>
+          <div class="node" data-c="gray" style="width: 80pt">Block 1</div>
+        </div>
+        <fig-noise id="b-x" w="40" h="28" res="8"></fig-noise>
+        <span class="hang" style="margin: -3pt 0 9pt"><div class="meter" data-c="orange" style="width: 80pt; --v: 0.02"></div><span class="hc">trained parameters</span></span>
+      </div>
+      <div class="cap"><span class="tag">b</span>Linear probing</div>
+    </div>
+
+    <div class="vr"></div>
+
+    <div class="panel">
+      <div class="body">
+        <div class="group tint strong" style="padding: 7pt 10pt 7pt">
+        <div style="display: grid; grid-template-columns: auto auto; column-gap: 15pt; row-gap: 2pt; align-items: center; justify-items: center">
+          <fig-bars id="c-y" values="0.1,0.7,0.2" on="1" w="44" h="15" data-c="gray" style="margin-bottom: 9pt"></fig-bars>
+          <div class="legend v" style="grid-row: span 2; justify-self: start; margin-bottom: 9pt">
+            <span class="key"><i class="sw" data-c="orange"></i>trained</span>
+            <span class="key"><i class="sw" data-c="gray"></i>frozen</span>
+          </div>
+          <div class="node" id="c-h" data-c="orange" style="width: 80pt; margin-bottom: 9pt">Head</div>
+          <div class="node" id="c-3" data-c="gray" style="width: 80pt">Block $L$</div><div class="node pill" id="c-a3" data-c="orange" style="width: 50pt">$+\,B_L A_L$</div>
+          <span class="dim" style="line-height: 0.8">⋮</span><span></span>
+          <div class="node" id="c-2" data-c="gray" style="width: 80pt">Block 2</div><div class="node pill" id="c-a2" data-c="orange" style="width: 50pt">$+\,B_2 A_2$</div>
+          <div class="node" id="c-1" data-c="gray" style="width: 80pt">Block 1</div><div class="node pill" id="c-a1" data-c="orange" style="width: 50pt">$+\,B_1 A_1$</div>
+          <fig-noise id="c-x" w="40" h="28" res="8" style="margin-top: 9pt"></fig-noise>
+          <span class="dim" style="grid-row: span 2; justify-self: start; text-align: left; margin-top: 9pt; line-height: 1.3">$B_\ell A_\ell$: low-rank<br>update of block $\ell$</span>
+          <span class="hang" style="margin: 6pt 0 9pt"><div class="meter" data-c="orange" style="width: 80pt; --v: 0.05"></div><span class="hc">trained parameters</span></span>
+        </div>
+        </div>
+      </div>
+      <div class="cap b"><span class="tag">c</span>Low-rank adapters</div>
+    </div>
+
+  </div>
+
+  <fig-wire from="a-x" to="a-b"></fig-wire><fig-wire from="a-b" to="a-h"></fig-wire><fig-wire from="a-h" to="a-y"></fig-wire>
+  <fig-wire from="b-x" to="b-b"></fig-wire><fig-wire from="b-b" to="b-h"></fig-wire><fig-wire from="b-h" to="b-y"></fig-wire>
+  <fig-wire from="c-x" to="c-1"></fig-wire><fig-wire from="c-3" to="c-h"></fig-wire><fig-wire from="c-h" to="c-y"></fig-wire>
+  <fig-wire from="c-a3" to="c-3"></fig-wire>
+  <fig-wire from="c-a2" to="c-2"></fig-wire>
+  <fig-wire from="c-a1" to="c-1"></fig-wire>
+</main>
+</body>
+</html>

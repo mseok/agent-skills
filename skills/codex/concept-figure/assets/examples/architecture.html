@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>architecture: overview with a zoomed block</title>
+<link rel="stylesheet" href="../kit/katex/katex.min.css">
+<link rel="stylesheet" href="../kit/figure.css">
+<script src="../kit/katex/katex.min.js"></script>
+<script src="../kit/katex/contrib/auto-render.min.js"></script>
+<script src="../kit/icons.js"></script>
+<script src="../kit/figure.js"></script>
+</head>
+<body>
+<!-- Archetype: architecture. Overview on the left (bottom-to-top), one block opened on the right.
+     Colour is the layer type, the same in both panels: blue = MLP, orange = attention, green = embedding and its tokens,
+     gray = normalisation, named in the key. The repeated block is the one strong box and is what the right panel opens;
+     the output bars stay gray so that they do not compete with it. -->
+<main class="fig" data-width="neurips">
+  <div class="row stretch" style="gap: 18pt">
+
+    <div class="col grow" style="justify-content: center; gap: 13pt; position: relative">
+      <div class="legend v" style="position: absolute; top: 1pt; left: 0">
+        <span class="key"><i class="sw" data-c="green"></i>embedding</span>
+        <span class="key"><i class="sw" data-c="orange"></i>attention</span>
+        <span class="key"><i class="sw" data-c="blue"></i>MLP</span>
+        <span class="key"><i class="sw" data-c="gray"></i>normalisation</span>
+      </div>
+      <span class="hang" id="out"><fig-bars values="0.12,0.72,0.1,0.06" on="1" w="40" h="17" data-c="gray"></fig-bars><span class="hc r">class scores</span></span>
+      <div class="node" id="head" data-c="blue" style="width: 110pt">MLP head</div>
+      <div class="group tint" id="enc" style="padding: 8pt 8pt 13pt">
+        <span class="gl bl">$\times L$</span>
+        <div class="node strong plain" id="blk" data-c="none" style="width: 172pt; height: 22pt">Transformer block</div>
+      </div>
+      <span class="hang" id="tok"><fig-tokens n="10" size="11" data-c="green" colors="none"></fig-tokens><span class="hc l">class token</span></span>
+      <div class="node" id="emb" data-c="green" style="width: 190pt">Linear projection + position embedding</div>
+      <div style="display: grid; grid-template-columns: 28pt auto 28pt; column-gap: 11pt; align-items: center">
+        <fig-noise id="img" w="28" res="15"></fig-noise>
+        <div class="row g1" id="patches">
+          <fig-noise w="13.5" res="5" view="0,0,0.333,0.333"></fig-noise>
+          <fig-noise w="13.5" res="5" view="0.333,0,0.667,0.333"></fig-noise>
+          <fig-noise w="13.5" res="5" view="0.667,0,1,0.333"></fig-noise>
+          <fig-noise w="13.5" res="5" view="0,0.333,0.333,0.667"></fig-noise>
+          <fig-noise w="13.5" res="5" view="0.333,0.333,0.667,0.667"></fig-noise>
+          <fig-noise w="13.5" res="5" view="0.667,0.333,1,0.667"></fig-noise>
+          <fig-noise w="13.5" res="5" view="0,0.667,0.333,1"></fig-noise>
+          <fig-noise w="13.5" res="5" view="0.333,0.667,0.667,1"></fig-noise>
+          <fig-noise w="13.5" res="5" view="0.667,0.667,1,1"></fig-noise>
+        </div>
+        <span class="dim" style="justify-self: start">patches</span>
+      </div>
+    </div>
+
+    <div class="group tint col" id="detail" style="gap: 11pt; padding: 8pt 13pt 8pt 27pt; justify-content: center">
+      <span class="label" id="zo">$z_{\ell+1}$</span>
+      <span class="op" id="add2">+</span>
+      <div class="node" id="mlp" data-c="blue" style="width: 102pt">MLP</div>
+      <div class="node" id="n2" data-c="gray" style="width: 102pt">LayerNorm</div>
+      <span class="op" id="add1" style="margin-top: 6pt">+</span>
+      <div class="node" id="attn" data-c="orange" style="width: 102pt"><fig-matrix rows="4" cols="4" size="2.3" style="vertical-align: middle" values="0.9,0.3,0.1,0.2,0.2,0.8,0.4,0.1,0.1,0.5,0.9,0.3,0.4,0.1,0.3,0.8"></fig-matrix>&nbsp;&nbsp;Multi-head attention</div>
+      <div class="node" id="n1" data-c="gray" style="width: 102pt">LayerNorm</div>
+      <span class="label" id="zi" style="margin-top: 6pt">$z_{\ell}$</span>
+    </div>
+
+  </div>
+
+  <fig-wire from="img" to="patches"></fig-wire>
+  <fig-wire from="patches" to="emb"></fig-wire>
+  <fig-wire from="emb" to="tok"></fig-wire>
+  <fig-wire from="tok" to="blk"></fig-wire>
+  <fig-wire from="blk" to="head"></fig-wire>
+  <fig-wire from="head" to="out"></fig-wire>
+  <fig-zoom from="blk" to="detail"></fig-zoom>
+
+  <fig-wire id="w1" from="zi" to="n1"></fig-wire>
+  <fig-wire from="n1" to="attn"></fig-wire>
+  <fig-wire from="attn" to="add1"></fig-wire>
+  <fig-wire id="w2" from="add1" to="n2"></fig-wire>
+  <fig-wire from="n2" to="mlp"></fig-wire>
+  <fig-wire from="mlp" to="add2"></fig-wire>
+  <fig-wire from="add2" to="zo"></fig-wire>
+  <fig-wire from="w1@0.3" to="add1.l" route="u" via="l" off="8"></fig-wire>
+  <fig-wire from="w2@0.3" to="add2.l" route="u" via="l" off="8"></fig-wire>
+</main>
+</body>
+</html>

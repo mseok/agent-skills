@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>pipeline: left-to-right method overview</title>
+<link rel="stylesheet" href="../kit/katex/katex.min.css">
+<link rel="stylesheet" href="../kit/figure.css">
+<script src="../kit/katex/katex.min.js"></script>
+<script src="../kit/katex/contrib/auto-render.min.js"></script>
+<script src="../kit/icons.js"></script>
+<script src="../kit/figure.js"></script>
+</head>
+<body>
+<!-- Archetype: pipeline. Left to right, each stage's output drawn as a concrete object, one example from the prompt
+     to the prediction. Blue = the conditioning, orange = the denoiser, which is the one strong part: it is drawn as the
+     container of the states it produces, so the condition enters the denoiser and the noise is where the chain starts. -->
+<main class="fig" data-width="icml">
+  <div class="row between" style="align-items: center; padding: 0 2pt">
+
+    <span class="hang" id="txt"><div class="card" style="height: 20pt; padding: 0 6pt; display: flex; align-items: center">"a hill at dusk"</div><span class="hc">prompt</span></span>
+
+    <div class="node trap-r" id="enc" data-c="blue" style="width: 50pt; height: 36pt">Text<br>encoder</div>
+
+    <span class="hang" id="rep"><fig-tokens v n="3" size="6" data-c="blue"></fig-tokens><span class="hc">$h$</span></span>
+
+    <div class="group tint row strong" id="gen" data-c="orange" style="gap: 16pt; padding: 15pt 10pt 15pt">
+      <span class="gl">Denoiser $\epsilon_\theta(x_t, h)$, applied $T$ times</span>
+      <span class="hang" id="xT"><fig-noise w="20" res="8" t="1" seed="5" scene="dusk"></fig-noise><span class="hc">noise $x_T$</span></span>
+      <fig-noise id="xa" w="20" res="8" t="0.66" seed="6" scene="dusk"></fig-noise>
+      <fig-noise id="xb" w="20" res="8" t="0.33" seed="7" scene="dusk"></fig-noise>
+      <span class="hang" id="x0"><fig-noise w="20" res="8" t="0" seed="9" scene="dusk"></fig-noise><span class="hc">sample $x_0$</span></span>
+    </div>
+
+    <span class="hang" id="cands"><fig-noise class="stack" w="20" res="8" t="0.04" seed="12" scene="dusk"></fig-noise><span class="hc" style="top: calc(100% - 2.4pt)">$K$ samples</span></span>
+
+    <div class="node" id="rank" data-c="gray" style="width: 40pt; height: 30pt">Ranker</div>
+
+    <span class="hang" id="best"><fig-noise w="20" res="8" t="0" seed="3" scene="dusk"></fig-noise><span class="hc">prediction</span></span>
+
+  </div>
+
+  <fig-wire from="txt" to="enc"></fig-wire>
+  <fig-wire from="enc" to="rep"></fig-wire>
+  <fig-wire from="rep" to="gen" route="h"></fig-wire>
+  <fig-wire from="xT" to="xa"></fig-wire>
+  <fig-wire from="xa" to="xb"></fig-wire>
+  <fig-wire from="xb" to="x0"></fig-wire>
+  <fig-wire from="gen" to="cands" route="h" label="$\times K$" ls="t"></fig-wire>
+  <fig-wire from="cands" to="rank"></fig-wire>
+  <fig-wire from="rank" to="best"></fig-wire>
+</main>
+</body>
+</html>

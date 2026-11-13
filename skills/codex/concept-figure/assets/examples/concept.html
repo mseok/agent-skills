@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>concept: one idea, two colours</title>
+<link rel="stylesheet" href="../kit/katex/katex.min.css">
+<link rel="stylesheet" href="../kit/figure.css">
+<script src="../kit/katex/katex.min.js"></script>
+<script src="../kit/katex/contrib/auto-render.min.js"></script>
+<script src="../kit/icons.js"></script>
+<script src="../kit/figure.js"></script>
+</head>
+<body>
+<!-- Archetype: concept or intuition. One idea on one concrete example, read left to right.
+     Everything about the usual route is slate; the one coloured stroke is the contribution, the single call that
+     replaces the chain. Both routes are named by who takes them. -->
+<main class="fig" data-width="neurips">
+  <div class="row" style="align-items: center; justify-content: center; gap: 14pt; padding: 14pt 0 25pt">
+
+    <span class="hang"><fig-dist w="44" h="40" mix="0.5:0.17:1" fill data-c="gray"></fig-dist><span class="hc">noise<br>$x_T \sim p_T$</span></span>
+
+    <div class="row" id="strip" style="gap: 14pt">
+      <fig-noise id="s4" w="40" res="12" t="1" seed="6"></fig-noise>
+      <fig-noise id="s3" w="40" res="12" t="0.7" seed="5"></fig-noise>
+      <fig-noise id="s2" w="40" res="12" t="0.45" seed="4"></fig-noise>
+      <fig-noise id="s1" w="40" res="12" t="0.22" seed="3"></fig-noise>
+      <fig-noise id="s0" w="40" res="12" t="0" seed="2"></fig-noise>
+    </div>
+
+    <span class="hang"><fig-dist w="44" h="40" mix="0.3:0.09:1,0.7:0.07:0.8" fill data-c="gray"></fig-dist><span class="hc">data<br>$x_0 \sim p_0$</span></span>
+
+  </div>
+
+  <fig-wire from="s4" to="s3"></fig-wire>
+  <fig-wire from="s3" to="s2"></fig-wire>
+  <fig-wire from="s2" to="s1"></fig-wire>
+  <fig-wire from="s1" to="s0"></fig-wire>
+  <fig-wire from="s4.b@0.5" to="s0.b@0.5" route="curve" side="b" bend="14" weight="1.35" data-c="blue" label="<b>distilled generator: one network call</b>" ls="b"></fig-wire>
+  <fig-brace of="s4,s3,s2,s1,s0" side="t" label="sampler: $T$ network calls"></fig-brace>
+</main>
+</body>
+</html>
