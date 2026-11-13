@@ -14,12 +14,14 @@ Keep hypotheses and consequential choices in the question report using
 an important decision about such a job may still be a question milestone.
 
 Before a durable experiment, state its purpose, comparison and the decision it
-will change. Run from committed source in the current checkout. Record `HEAD`
+will change. Run from committed source in the current checkout: commit the files
+you changed for the run, by path, before launch (AGENTS.md, Environment and tools;
+a local commit needs no request, a push always does). Record `HEAD`
 only with a clean tracked index/tree and no execution-affecting untracked file.
-Preserve unrelated changes; never reset, stash, commit, push or make a worktree just
-to satisfy bookkeeping: a dirty tree is recorded as the source with its diff hash,
-and committing happens only when the user asks. Ask about unrelated changes only
-when they actually block launch.
+Preserve unrelated changes; never reset, stash, push or make a worktree just
+to satisfy bookkeeping, and never commit changes that are not yours: a tree still
+dirty from them is recorded as the source with its diff hash. Ask about unrelated
+changes only when they actually block launch.
 
 Retain the exact code revision, execution-affecting config, data/checkpoint
 identity, launch method, measured comparison population and output location.
@@ -66,3 +68,7 @@ update the cumulative question report. Subsequent interpretation changes are
 dated milestones in that report. Use the gateway's revision/history facilities
 for authorized corrections. On delivery failure, retain the external outbox
 and resume later; never write a scratch vault file or use Git as a fallback.
+
+## User decisions
+
+The dated decisions behind these rules, in the user's own words, are in [references/user-decisions.md](references/user-decisions.md). Read it before editing this skill or when a rule's origin or scope is in doubt; record a new decision there and state the resulting rule in plain words in this file.
