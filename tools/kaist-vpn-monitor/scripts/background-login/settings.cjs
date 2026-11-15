@@ -16,8 +16,10 @@ function validateSettings(value) {
     throw new Error('OTP sender must be the exact mailbox from a user-verified legitimate KVPN email.');
   }
   // Optional SMS OTP fallback: the phone forwards the KVPN SMS code to this host over Tailscale.
-  let smsOtp = null;
-  if (value.smsOtp !== undefined) {
+  // Absent or null means off. The key is left out of the result when off, so setup.cjs writes no
+  // "smsOtp": null (a config written that way failed this validation on every later load).
+  let smsOtp;
+  if (value.smsOtp != null) {
     const {listen, port, phone} = value.smsOtp || {};
     const tailnet = address => typeof address === 'string' &&
       /^100\.(6[4-9]|[7-9]\d|1[01]\d|12[0-7])\.\d{1,3}\.\d{1,3}$/.test(address) &&
@@ -27,7 +29,7 @@ function validateSettings(value) {
     }
     smsOtp = {listen, port, phone};
   }
-  return {sshTarget:value.sshTarget, codexBinary:value.codexBinary, otpSender:value.otpSender.toLowerCase(), smsOtp};
+  return {sshTarget:value.sshTarget, codexBinary:value.codexBinary, otpSender:value.otpSender.toLowerCase(), ...(smsOtp && {smsOtp})};
 }
 function loadSettings() {
   try {return validateSettings(JSON.parse(fs.readFileSync(settingsPath, 'utf8')));}

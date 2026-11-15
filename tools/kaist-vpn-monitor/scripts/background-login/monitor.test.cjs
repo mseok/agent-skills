@@ -1,7 +1,7 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const {canRetryConnector} = require('./monitor.cjs');
+const {canRetryConnector,otpRoute} = require('./monitor.cjs');
 
 const inactive = {status:'needs_recovery',stage:'native',reason:'native_inactive',attempts:0};
 const outage = {needsAttention:true,result:{status:'blocked',stage:'connector',reason:'gmail_connector_unavailable',attempts:0}};
@@ -39,4 +39,16 @@ test('connector diagnostics expose only fixed error codes',()=>{
  const {connectorDetail}=require('./monitor.cjs');
  assert.equal(connectorDetail(new Error('gmail_search_temporarily_unavailable')),'gmail_search_temporarily_unavailable');
  assert.equal(connectorDetail(new Error('private@example.invalid 123456')),'connector_failure');
+});
+
+test('an unreachable Gmail connector starts the login with SMS when the phone route is configured', () => {
+  const phone = {listen:'100.64.0.1',port:40000,phone:'100.64.0.2'};
+  assert.deepEqual(otpRoute(undefined,phone),{args:[]});
+  assert.deepEqual(otpRoute(undefined,null),{args:[]});
+  assert.deepEqual(otpRoute(new Error('connector_timeout'),phone),{args:['--sms-first'],detail:'connector_timeout'});
+  assert.deepEqual(otpRoute(new Error('spawn ENOENT'),phone),{args:['--sms-first'],detail:'connector_failure'});
+});
+
+test('without the phone route an unreachable Gmail connector still stops before any login', () => {
+  assert.deepEqual(otpRoute(new Error('connector_timeout'),null).blocked,{...outage.result,detail:'connector_timeout'});
 });

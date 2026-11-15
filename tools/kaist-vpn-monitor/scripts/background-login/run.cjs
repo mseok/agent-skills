@@ -262,7 +262,8 @@ async function acknowledgeSignInNotice(page) {
 }
 async function authenticate(page) {
   const {smsOtp} = loadSettings();
-  let method = 'email';
+  // --sms-first: the monitor found the Gmail connector unreachable, so every login in this run asks by SMS.
+  let method = process.argv.includes('--sms-first') && smsOtp ? 'sms' : 'email';
   for (const wait of [0,10000,30000]) {
     if (wait) await delay(wait);
     await page.goto(ORIGIN + '/', {waitUntil:'domcontentloaded'});
@@ -312,9 +313,9 @@ async function authenticate(page) {
           receipt = {status:'received',code:await waitConnectorOtp(scope)};
         } catch (error) {
           const timedOut = error.safeReason === 'connector_email_timeout';
-          // After an OTP mail timeout, later logins in this run ask for the code by SMS.
-          if (timedOut && smsOtp) method = 'sms';
-          if (timedOut && attempts < 3) continue;
+          // After an OTP mail timeout or a Gmail connector failure, later logins in this run ask for the code by SMS.
+          if (smsOtp) method = 'sms';
+          if ((timedOut || smsOtp) && attempts < 3) continue;
           stop(timedOut ? 'connector_email_timeout' : 'connector_email_unavailable');
         }
       }

@@ -49,9 +49,9 @@ class GmailClient {
       ephemeral:true,cwd:path.join(os.homedir(),'Library','Caches','kaist-vpn-monitor'),approvalPolicy:'never'
     });
     this.threadId = result.thread.id;
-    const inventory = await this.call('mcpServerStatus/list', {threadId:this.threadId,detail:'toolsAndAuthOnly',limit:50});
-    const server = inventory.data?.find(item => item.name === 'codex_apps');
-    if (!server?.tools?.['gmail.search_emails'] || !server?.tools?.['gmail.read_email']) throw new Error('gmail_tools_unavailable');
+    // No mcpServerStatus/list inventory here: on 2026-11-15 that call stopped returning (codex-cli 0.164.0,
+    // over 240 s) while gmail.search_emails itself answered in 3 s. ready() proves the connector with a real
+    // search; a missing gmail.read_email now shows up when the OTP mail is read.
   }
   send(message) {this.process.stdin.write(JSON.stringify({jsonrpc:'2.0',...message})+'\n');}
   call(method, params, timeoutMs = 30000) {

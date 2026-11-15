@@ -47,6 +47,12 @@ test('agent setup writes only nonsecret local configuration with private permiss
     assert.equal(fs.statSync(config).mode & 0o777, 0o600);
     assert.equal(fs.statSync(path.dirname(config)).mode & 0o777, 0o700);
     assert.equal(fs.existsSync(path.join(home, 'Applications')), false);
+    // The configuration setup wrote must load again, also in the form setup wrote before 0.2.5 ("smsOtp": null).
+    const load = "console.log(JSON.stringify(require(process.argv[1]).loadSettings()))";
+    const loaded = () => JSON.parse(execFileSync(process.execPath, ['-e', load, path.resolve(__dirname, 'settings.cjs')], {env:{...process.env, HOME:home}, encoding:'utf8'}));
+    assert.deepEqual(loaded(), {sshTarget:'lab-vpn-check', codexBinary:process.execPath, otpSender:'vpn@example.invalid'});
+    fs.writeFileSync(config, JSON.stringify({...JSON.parse(fs.readFileSync(config)), smsOtp:null}));
+    assert.deepEqual(loaded(), {sshTarget:'lab-vpn-check', codexBinary:process.execPath, otpSender:'vpn@example.invalid'});
   } finally {fs.rmSync(home, {recursive:true, force:true});}
 });
 

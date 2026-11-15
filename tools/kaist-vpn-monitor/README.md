@@ -37,7 +37,7 @@ ssh -o BatchMode=yes -o ConnectTimeout=10 -o ConnectionAttempts=1 lab-vpn-check 
 
 Codex에 다음 요청을 전달하면 스킬을 설치할 수 있습니다.
 
-> https://github.com/mseok/agent-skills/tree/kaist-vpn-monitor-v0.2.4/tools/kaist-vpn-monitor 의 스킬을 설치해줘.
+> https://github.com/mseok/agent-skills/tree/kaist-vpn-monitor-v0.2.5/tools/kaist-vpn-monitor 의 스킬을 설치해줘.
 
 스킬이 설치된 다음 턴에 다음처럼 요청하세요.
 
@@ -51,7 +51,7 @@ Codex에 다음 요청을 전달하면 스킬을 설치할 수 있습니다.
 
 ### 1. 소스와 의존성
 
-[공유용 소스 ZIP](https://github.com/mseok/agent-skills/releases/tag/kaist-vpn-monitor-v0.2.4)을
+[공유용 소스 ZIP](https://github.com/mseok/agent-skills/releases/tag/kaist-vpn-monitor-v0.2.5)을
 받았다면 압축을 풀고 `kaist-vpn-monitor` 폴더에서 아래의 `npm ci`부터 실행하세요.
 Git으로 받는 경우는 다음과 같습니다.
 
@@ -121,6 +121,29 @@ node install.cjs --enable
 
 이 명령은 현재 VPN 연결을 직접 끊지 않습니다. 실행 중인 점검·복구는
 중복 실행 방지로 겹치지 않으며, 기존 인증 실패 중단 정책도 유지합니다.
+
+### v0.2.5로 올리기 (앱을 다시 설치해야 합니다)
+
+v0.2.5는 앱 안에 복사되는 실행 코드를 바꿉니다. 아래 "중지, 업데이트, 제거"의
+업데이트 절차대로 새 소스에서 앱을 다시 설치하세요. 로컬 설정과 키체인 항목은
+그대로 쓰며, 새로 빌드한 앱은 macOS 손쉬운 사용 재승인이 필요할 수 있습니다.
+
+- **Gmail 연결 확인 수정.** 복구 직전의 연결 확인에서 Codex app-server의
+  `mcpServerStatus/list` 호출을 뺐습니다. 2026-11-15에 codex-cli 0.164.0에서 이 호출이
+  240초 넘게 응답하지 않아, Gmail 도구가 정상인데도 복구가 매번 로그인 전에
+  `gmail_connector_unavailable`(`detail: connector_timeout`)로 멈췄습니다. Gmail 연결은
+  기존의 실제 검색 호출로 확인합니다.
+- **새 설치의 `settings_unavailable` 수정.** 2026-11-10 커밋 이후의 `main`에서는 `node setup.cjs`가
+  설정 파일에 `"smsOtp": null`을 써 넣었고, 앱이 그 파일을 읽지 못해 매번
+  `settings_unavailable`로 멈췄습니다. 이제 그 값을 쓰지 않으며, 이미 그렇게 만들어진
+  설정 파일도 그대로 읽습니다.
+- **Gmail이 안 될 때 문자 OTP(선택 기능).** 설정에 `smsOtp`가 있을 때만, Gmail 연결이
+  안 되면 문자 OTP로 로그인합니다. `smsOtp`가 없으면 이전처럼 로그인 전에 멈춥니다.
+  `smsOtp`는 본인 휴대폰이 KVPN 문자 코드를 Tailscale로 이 Mac에 전달하도록 따로
+  구성해야 하며, 그 구성 방법은 아직 이 문서에 없습니다.
+- v0.2.4 태그 이후 `main`에만 있던 수정도 이 태그에 들어 있습니다: 본문이 아직 없는
+  페이지에서 대기 조건이 실패하던 문제, 안내용 Pre Sign-In Notification 통과(동의를
+  요구하면 중단), 포털이 스스로 클라이언트를 실행한 경우의 처리.
 
 ## 중지, 업데이트, 제거
 
@@ -194,6 +217,9 @@ v0.2.2는 Gmail의 간헐적인 검색 실패와 읽기 시간 초과에 대해 
 
 
 ## 로고가 포함된 앱 다운로드 (v0.2.3)
+
+**이 ZIP의 앱에는 v0.2.3 시점의 실행 코드가 들어 있어 v0.2.5의 수정이 없습니다.**
+v0.2.5의 수정이 필요하면 위의 소스 설치 방법을 사용하세요.
 
 [GitHub Release](https://github.com/mseok/agent-skills/releases/tag/kaist-vpn-monitor-v0.2.3)의
 `kaist-vpn-monitor-v0.2.3-macos-arm64.zip`은 Apple Silicon용 앱입니다.

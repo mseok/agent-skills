@@ -9,6 +9,7 @@ const readline = require('node:readline');
 const {spawn,execFile} = require('node:child_process');
 const {promisify} = require('node:util');
 const {GmailClient,receivedAtMs} = require('./connector-client.cjs');
+const {loadSettings} = require('./settings.cjs');
 const run = promisify(execFile);
 const delay = ms => new Promise(resolve => setTimeout(resolve,ms));
 const runtime = path.join(os.homedir(),'Library','Caches','kaist-vpn-monitor');
@@ -131,14 +132,24 @@ async function bridgeOtp(client, dependencies = {}) {
   } catch(error) {error.requestId=request.requestId;throw error;}
   // The existing runner owns the three-attempt email-timeout contract.
 }
+function otpRoute(connectorError, smsOtp) {
+  // Gmail ready: the runner starts with email. Gmail unreachable: it starts with SMS when the phone route is
+  // configured; without that route recovery stops before any login, as before.
+  if(!connectorError)return {args:[]};
+  const detail=connectorDetail(connectorError);
+  return smsOtp ? {args:['--sms-first'],detail} : {blocked:{status:'blocked',stage:'connector',reason:'gmail_connector_unavailable',attempts:0,detail}};
+}
 async function recover() {
   const client = new GmailClient();
   try {
-    await client.start();await client.ready();
+    let connectorError;
+    try {await client.start();await client.ready();} catch(error) {connectorError=error;}
+    const route=otpRoute(connectorError,loadSettings().smsOtp);
+    if(route.blocked)return route.blocked;
     return await new Promise((resolve,reject)=>{
-      const child = spawn(node,[runner,'--connector-otp'],{stdio:['ignore','pipe','ignore']});
+      const child = spawn(node,[runner,'--connector-otp',...route.args],{stdio:['ignore','pipe','ignore']});
       const lines = readline.createInterface({input:child.stdout});
-      let final, bridge=Promise.resolve(), bridgeFailed=false, detail;
+      let final, bridge=Promise.resolve(), bridgeFailed=false, detail=route.detail;
       lines.on('line',line=>{
         let value;try{value=JSON.parse(line);}catch{return;}
         final=safeResult(value);
@@ -149,7 +160,8 @@ async function recover() {
       child.once('error',()=>reject(new Error('runner_unavailable')));
       child.once('close',async code=>{
         await bridge;lines.close();
-        if(final?.status==='connected'&&code===0)resolve(final);
+        // detail on a connected result: Gmail failed (that reason) and the code came by SMS.
+        if(final?.status==='connected'&&code===0)resolve(detail ? {...final,detail} : final);
         else {
           const result = final?.status==='blocked' ? final : {status:'blocked',stage:'recovery',reason:bridgeFailed?'connector_email_unavailable':'runner_unavailable',attempts:final?.attempts||0};
           resolve(detail ? {...result,detail} : result);
@@ -181,7 +193,8 @@ async function main() {
   const healthy=result.status==='connected';
   const state={version:1,lastCheckedAt:now(),lastHealthyAt:healthy?now():previous.lastHealthyAt||null,needsAttention:!healthy,result,modelCallsThisRun:0};
   if(healthy) {
-    if(previous.needsAttention||result.reusedConnection===false)await notify('연결 복구를 확인했습니다.');
+    if(result.detail)await fs.appendFile(path.join(stateRoot,'gmail-fallback.log'),now()+' recovered by SMS; Gmail: '+result.detail+'\n',{mode:0o600}).catch(()=>{});
+    if(previous.needsAttention||result.reusedConnection===false)await notify(result.detail?'Gmail 연결 문제로 문자 인증을 써서 복구했습니다.':'연결 복구를 확인했습니다.');
   } else {
     state.incidentAt=now();
     await save(state);
@@ -199,4 +212,4 @@ if(require.main===module)main().catch(async()=>{
 }).finally(async()=>{
   if(lock){await lock.close();await fs.unlink(path.join(stateRoot,'monitor.lock'));}
 });
-module.exports={safeResult,bridgeOtp,submit,receivedAtMs,canRetryConnector,connectorDetail};
+module.exports={safeResult,bridgeOtp,submit,receivedAtMs,canRetryConnector,connectorDetail,otpRoute};
