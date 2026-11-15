@@ -216,14 +216,12 @@ v0.2.2는 Gmail의 간헐적인 검색 실패와 읽기 시간 초과에 대해 
 손쉬운 사용 권한을 다시 승인해야 합니다.
 
 
-## 로고가 포함된 앱 다운로드 (v0.2.3)
+## 로고가 포함된 앱 다운로드 (v0.2.5)
 
-**이 ZIP의 앱에는 v0.2.3 시점의 실행 코드가 들어 있어 v0.2.5의 수정이 없습니다.**
-v0.2.5의 수정이 필요하면 위의 소스 설치 방법을 사용하세요.
-
-[GitHub Release](https://github.com/mseok/agent-skills/releases/tag/kaist-vpn-monitor-v0.2.3)의
-`kaist-vpn-monitor-v0.2.3-macos-arm64.zip`은 Apple Silicon용 앱입니다.
-macOS 13 이상을 빌드 대상으로 하며 실제 실행 검증 환경은 macOS 26입니다.
+[GitHub Release](https://github.com/mseok/agent-skills/releases/tag/kaist-vpn-monitor-v0.2.5)의
+`kaist-vpn-monitor-v0.2.5-macos-arm64.zip`은 Apple Silicon용 앱입니다.
+macOS 13 이상을 빌드 대상으로 하며, macOS 26에서 서명 검증과 `--status` 실행을
+확인했습니다. 이 앱을 설치한 실제 로그인은 확인하지 않았습니다.
 Homebrew Node.js 22.19 이상이 `/opt/homebrew/bin/node`에 필요합니다.
 Ivanti, Chrome, Codex CLI와 Gmail 연결 및 개인 설정·키체인 등록은 별도입니다.
 Intel Mac 또는 다른 Node 경로에서는 위 소스 설치 방법을 사용하세요.
@@ -234,6 +232,10 @@ ZIP을 풀고 `KAIST VPN Monitor Community.app`을 `~/Applications`에 넣으세
 켜야 합니다. 이 앱은 ad-hoc 서명이며 Apple 공증을 받지 않았습니다.
 macOS 차단은 사용자가 시스템 설정에서 확인하고 승인해야 하며,
 Gatekeeper나 손쉬운 사용 보호 설정을 명령어로 우회하지 마세요.
+
+v0.2.3 릴리스의 앱 ZIP은 쓰지 마세요. v0.2.5의 수정이 없고, Node를
+`/opt/homebrew/Cellar/node/26.8.1/bin/node` 경로로만 실행하므로 Homebrew Node가
+그 버전이 아니면 실행되지 않습니다.
 
 ![KVPN logo](assets/kvpn-logo-concept-v1.png)
 

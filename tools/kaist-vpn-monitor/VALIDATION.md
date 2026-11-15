@@ -120,3 +120,21 @@ origin·경로·단일 클라이언트 헤더가 모두 있어야 중복 이동�
 
 확인하지 않은 것: 공유판 앱을 이 소스로 새로 빌드해 설치한 실제 로그인, 다른 계정,
 Gmail 불가 상태에서 문자 OTP로 끝까지 연결되는 복구.
+
+### v0.2.5 배포 앱
+
+`kaist-vpn-monitor-v0.2.5-macos-arm64.zip`은 릴리스의 소스 ZIP을 풀어 `npm ci` 뒤
+`install.cjs --build`로 빌드했습니다. 그 뒤 Info.plist의 `MonitorNodePath`를
+`/opt/homebrew/bin/node`로 바꾸고 설치기와 같은 명령으로 ad-hoc 서명을 다시 했습니다.
+설치기는 빌드한 Mac의 Node 실제 경로를 넣기 때문이며, v0.2.3 배포 앱에는
+`/opt/homebrew/Cellar/node/26.8.1/bin/node`가 들어 있었습니다.
+
+- 앱 안의 스크립트 25개와 아이콘이 v0.2.5 태그의 소스와 같습니다.
+- 실행 파일 8개 모두 arm64, 최소 macOS 13.0입니다.
+- ZIP을 `ditto`와 `unzip`으로 각각 풀어 `codesign --verify --deep --strict`가 통과했고,
+  빈 임시 홈에서 `--status`가 `{}`를 냈습니다(macOS 26.5.1).
+- 앱 전체에서 빌드한 Mac의 사용자 이름, 홈·임시 경로, 호스트 이름, 주소를 검색해
+  없음을 확인했습니다.
+
+확인하지 않은 것: 이 앱을 `~/Applications`에 설치한 실제 로그인, 손쉬운 사용 승인,
+내려받은 앱에 대한 macOS 차단과 그 승인 과정.
