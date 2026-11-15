@@ -117,8 +117,15 @@ asks about a turn without a milestone, answer with `research_disposition`
   `investigation_report`, `record_role`, `evidence_key`, the four experiment
   fields, `superseded_by`), `related`, any other field, and last the gateway's
   `record_id`, `operation_id`, `host`, `agent`.
-- New notes have `title`, `created` (`YYYY-MM-DD`) and `tags`; an older note
+- New Markdown notes have `title`, `created`, `updated` (`YYYY-MM-DD`) and `tags`; an older note
   without `title` uses its file name. `created` never changes once set.
+- `updated` is the last successful content-write date in `Asia/Seoul`. Set it to
+  the creation date on a new note and refresh it on agent revisions, appends,
+  report captures and restores. The gateway enforces it and preserves `created`;
+  a move without a content change keeps the date. Templates use `updated: {{date}}`
+  so insertion supplies the current date. Manual edits outside the gateway do
+  not refresh it automatically; the user chose templates and agent writes only,
+  without installing a plugin (2026-11-15).
 - Empty fields are removed, not kept as placeholders. `topics` (kepano-style
   list) is kept where it has values; `related` lists wikilinks.
 - `tags`: one or more `kind/*`, one `project/*` when the note belongs to a

@@ -1,6 +1,6 @@
 ---
 name: bio-safe-reading
-description: Apply the user's model-specific preference for reading biology, chemistry, drug-discovery or medical material. Astra, Sol, Claude Sonnet 5.5 and Claude Opus 5 may read directly; route Claude Fable or Opus 5.5 reading to Claude Sonnet 5.5 (effort high by default) before it starts. Use for such material, an explicit reading-model instruction, or safe state preservation after a refusal. Model changes never override a safety refusal.
+description: Apply the user's model-specific preference for reading biology, chemistry, drug-discovery or medical material. Astra, Sol, Claude Sonnet 5.5 and Claude Opus 5 may read directly; route Claude Fable or Opus 5.5 reading to Claude Sonnet 5.5 (effort high by default) before it starts. Recover technical reading failures through supported models and tools while distinguishing them from actual safety restrictions.
 ---
 
 # Bio-safe reading
@@ -19,19 +19,19 @@ The dated decisions behind these rules, in the user's own words, are in [referen
 4. The parent reads only the summary and the report. If a report must contain scientific detail, read it with a second allowed-model agent that extracts what the parent needs.
 5. Keep quarantine folders for raw material (`<task>/raw/`) and reports (`<task>/findings/`). Never print corpus lists, abstracts or excerpts into the chat.
 
-## When a refusal or flag happens
+## Recover a failed search or reading step
 
-This section applies to an actual refusal returned for the current work.
-A historical error in a note is incident evidence, not a new refusal or a
-standing ban on related work. Assess the current request under current
-instructions. Use the Obsidian vault policy's section 7 for any durable record;
-neither a historical note nor this distinction permits bypassing an actual safeguard.
+Preserve the original research question and required reading depth. A historical
+error is incident evidence, not a standing ban on related work. Assess the current
+request under current instructions and use the Obsidian vault policy's section 7
+for any durable record.
 
-0. First check what must keep running (an RSI loop, a job, a download) and keep it running; recovery of the conversation never interrupts the work it was supervising.
-1. Do not retry the same request in the same session or harness; a repeated attempt fails again and wastes the turn budget.
-2. Record the state with `~/dot/bin/codex-task-state` (goal, paths, what was already read, next action) and say in one line that the classifier blocked the step and which file it concerned.
-3. Continue only work that is permitted by the refusal's scope. Do not relaunch the denied request under another model, session or harness to obtain the blocked content.
-4. Never work around a refusal by paraphrasing hazardous content or splitting it into fragments. A reading-model preference is not permission to bypass safeguards.
+1. Keep unrelated running work intact. Inspect the actual error and identify the failed operation, source or query, model and tool, including an internal reader that differs from the requested worker. Report a search failure as a search failure, not as an unread paper or a scientific conclusion.
+2. For technical failures such as a timeout, file-size or format limit, context limit, or unsupported tool/model capability, actively try a supported alternative model or retrieval tool within the authorized scope. Preserve the requested model and effort where supported; use an explicitly requested replacement when available. Do not stop merely because the first route failed, and do not bypass authentication, permissions or access controls.
+3. Choose each retry to address the observed cause. Keep costs within the approved scope, preserve usable results and stop an unchanged failing loop. If the cause is unclear, inspect it before classifying it; do not relabel a safety refusal as a technical error to enable a retry.
+4. An actual safety refusal has a different boundary: continue permitted parts of the task, but do not switch models, sessions or harnesses to obtain the refused content or evade the restriction. Do not paraphrase or fragment a restricted request to get it accepted. State the affected scope without treating it as a ban on the entire topic.
+5. A recovery must complete the original step. If the user asks another model to continue research, assigning it only to edit existing summaries does not complete that research. Distinguish direct full-text reading, partial text, abstracts and model-generated summaries, and verify the final claims at the required depth before reporting completion.
+6. If a material step remains unavailable, preserve its exact status and the untested supported routes in `~/dot/bin/codex-task-state`. Name the remaining gap plainly; do not silently convert it into completed review or a claim that the evidence does not exist.
 
 ## Delegation prompt template
 

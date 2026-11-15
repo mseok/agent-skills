@@ -4,6 +4,7 @@ Dated decisions of the user behind this skill's rules, in the user's own words. 
 
 ## User decisions
 
+- 2026-11-15: "동기화 상태도 확인해줘. 그리고 지금 추가된 것, 그리고 앞으로 추가될 모든 문서 메타데이터에 updated 라는 항목을 추가하자. 언제 마지막으로 수정되었는지 알 수 있게. 그리고 template 에도 추가해야할듯." Asked about installing a date-update plugin for manual edits, the user chose "설치 없이 template·에이전트 경로만 적용". All new Markdown notes and successful agent content writes therefore carry `updated`, while `created` stays unchanged. Template insertion supplies the initial date; no plugin is installed for manual edits.
 - 2026-11-13: asked whether the project names used as examples in the published policy and skills should be replaced with placeholders, with the note that the spelling rule would lose its concrete examples, the user answered: "그래." The policy therefore names no project: it shows a placeholder pattern and tells the agent to read the existing `project` values and tags before writing one.
 - 2026-11-11: "그럼 과거 오류를 현재 작업 금지처럼 적어둔 문구는 Obsidian에서 고쳐줘. 그 기록 때문에 다음 에이전트도 작업을 포기하면 안 되잖아." "그리고 앞으로 obsidian 에 작업 금지에 대한 내용은 적어두지 않는다고 skill? 도 수정해줘." Incident facts are retained as dated observations; inferred prohibitions on future work are not stored as authority. The recording rule lives in obsidian-policy.md section 7.
 - 2026-11-06: `"호출 이름도 obsidian-user-note랑 obsidian-agent-record로 바꾸자. 참조하는 곳도 같이 맞추고 다른 호스트에도 동기화해줘."`

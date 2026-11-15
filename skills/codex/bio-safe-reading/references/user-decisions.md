@@ -4,6 +4,7 @@ Dated decisions of the user behind this skill's rules, in the user's own words. 
 
 ## User decisions
 
+- 2026-11-15: "일단 스킬에서 저 다시 확인하지 않는다 내용을 바꾸고 싶어. 거절이 되었을 때는 다른 모델로 최대한 시도해본다. 이런 느낌으로." The user requested active recovery instead of the blanket no-retry rule. The applied rule retries technical or capability failures through supported models/tools while preserving the original reading task. Actual safety restrictions and access permissions remain in force; the unrestricted model-switching interpretation was not applied. This request followed a source-reading task in which the requested replacement model was assigned only to review existing drafts.
 - 2026-11-11: "과거 오류를 현재 작업 금지처럼 적어둔 문구는 Obsidian에서 고쳐줘." "그 기록 때문에 다음 에이전트도 작업을 포기하면 안 되잖아." Distinguish an actual current refusal from a historical incident record, following the canonical vault policy section 7. The existing response to an actual refusal remains in effect.
 - 2026-10-18: "Opus 5 도 좋은데 Astra, sol 도 괜찮으니까 앞으로느 반드시 5로 할 필요는 없어. claude fable, opus 5.5 쓸 때만 opus 사용해야한다는거였어."
 - 2026-11-10 (ChatGPT app, Claude chat 01a1c3bb-3572-7cd3-990c-7dccc5a119e4): asked whether to add Sonnet 5.5 to the reader models after 33 Sonnet 5.5 medium reader runs over the chat stores finished without a block, the user answered: "sonnet 5.5 를 default 로 하자. 요청없으면 high 를 default 로." The default reader for Claude Fable and Opus 5.5 parents is therefore Claude Sonnet 5.5 at effort high; Opus 5 stays an allowed reader.
