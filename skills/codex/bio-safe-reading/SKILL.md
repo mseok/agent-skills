@@ -38,8 +38,9 @@ neither a historical note nor this distinction permits bypassing an actual safeg
 ```
 Read <paths> and write <output file>. Report at the level of agent behavior or evidence pointers;
 do not reproduce protocols, sequences, structures, targets, compound names, dosing or mechanism
-details. No personal identifiers (emails, phone numbers, account IDs) in the output. Local file
-tools only; no network, no connectors, no subagents. Reply with a <=15-line summary.
+details. Local file tools only; no network, no connectors, no subagents.
+Do not put the user's email address, phone number or account IDs into any external request (web search, URL, API call).
+Reply with a <=15-line summary.
 ```
 
 ## Verified additions (2026-10-17 audit)

@@ -29,7 +29,7 @@ When the user adopts a rule for a skill or automation, record the decision verba
 ## Evaluate an instruction or skill change
 
 - Run A/B arms from a clean working directory with the candidate file loaded by an explicit path; include an empty-baseline arm and a probe that reports which file was loaded. Preflight the tool list of the client under test, log every tool call (not only shell commands), give every arm the same repetitions, quote the cost before starting, and add no arm without approval.
-- Send-capable connectors (mail, Slack, calendar) and research recording are disabled for every arm; evaluation prompts carry the identifier restriction.
+- Send-capable connectors (mail, Slack, calendar) and research recording are disabled for every arm; evaluation prompts carry the identifier restriction in the words given in `thread-handoff` (fan-out preflight, step 2).
 - Factuality is a hard gate; model judges are not human calibration. Report per-arm counts with the exact prompts and keep the arms under `inbox/<project>/arms/` with a task-state file. Before reporting an automatic scorer's count or rate (regex, keyword, script or model judge), read a few outputs it marked pass and a few it marked fail and confirm each verdict; until then the number is a draft.
 - Stop when the completion criterion is met; score-chasing beyond it is waste.
 
