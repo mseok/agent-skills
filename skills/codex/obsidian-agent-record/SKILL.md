@@ -35,6 +35,14 @@ with a specific title, compact body, canonical tags/project and an operation ID.
 Add exact source references and, when applicable, `investigation_id` and a stable
 `evidence_key`. Reuse operation IDs only for identical retries. An evidence key
 identifies the original run/artifact/comparison, so another task can reuse it.
+When a new record belongs to an active question report, pass its path in
+`evidence_paths` and add it to the report's `## 2. 실행된 배치 및 단건 기록 색인 (Evidence Index)`
+table via `report_patch` so later agents can discover it even after the latest
+five events roll over. When delegating analysis, verification or follow-up work
+to a subagent (`spawn_agent`) or peer thread, include the relevant
+`Inbox/Agents/` record paths in the prompt so the recipient reads the primary
+record directly with `knowledge_read` rather than relying only on a free-text
+summary (omit only when blind isolation is required).
 
 For a terminal experiment use `experiment-ledger`; the recording policy covers
 judgment, provenance and user corrections.

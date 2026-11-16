@@ -22,9 +22,12 @@ it with `report_body`. Raise `events_limit` or pass `content=full` only when
 older judgments or source references are actually needed, `content=none` when
 only the current `sha256` is needed, and `content_offset` to continue a
 synthesis longer than one page. A question can span repositories and servers.
-Reuse its ID and report; create a new stable ID only for a distinct question.
-Inspect candidate reports before adopting one. Shared words or a common
-project alone do not establish that questions are the same.
+Reuse its ID and report for the same question; create and register a new stable
+ID when the work enters a distinct research phase or subdirectory (for example,
+`obsidian-research register --root /abs/project/subdir --project CanonicalProject
+--investigation-id new-phase-id`) so earlier phase logs do not bloat active
+context. Inspect candidate reports before adopting one. Shared words or a
+common project alone do not establish that questions are the same.
 
 When resuming, interpret past tool errors and refusals as scoped incident
 observations under vault policy section 7. Assess the current request under
@@ -57,15 +60,24 @@ written meanwhile. For a new report supply `question`, a specific `title` and
 and its SHA.
 
 The synthesis is the report body without frontmatter or the gateway's managed
-history. Structure it with level-2 headings such as 현재 판단과 다음 행동,
-관찰, 해석 and 열린 질문. To update it, prefer `report_patch`, a list of
+history. To avoid anchoring later agents on an earlier agent's subjective
+judgment or proposed next action, keep the synthesis strictly objective with
+two level-2 headings: `## 1. 사용자 확정 조건 (Adopted User Rules)` (dated
+rules and constraints explicitly approved by the user) and
+`## 2. 실행된 배치 및 단건 기록 색인 (Evidence Index)` (a compact table of
+executed batches/runs, verified metrics/costs, and `[[Inbox/Agents/...]]` or
+`[[Writing/...]]` links). Update these two sections with `report_patch` whenever
+a user rule is adopted or a batch/experiment record is created so that every
+record stays indexed even after `events` rolls past the latest five. To update
+it, prefer `report_patch`, a list of
 `{heading, body}` items: a matching heading has its section replaced and a new
 heading is appended, while other sections stay as they are; qualify a repeated
 title as `Parent::Child`. Send `report_body`
 only to restructure the whole synthesis or create a new report, and preserve
-relevant existing material when doing so. If only adding a milestone, omit
-both to retain the current synthesis unchanged. The gateway keeps the dated
-event history separately.
+relevant existing material when doing so. Keep hypotheses, interpretations and
+proposed next steps in the dated event `summary` rather than as standing
+directives in the synthesis. The gateway keeps the dated event history
+separately.
 
 Write in Korean or English only, using connected, compact paragraphs with
 normal spacing. This applies to `report_body`, record bodies and every
@@ -73,8 +85,10 @@ normal spacing. This applies to `report_body`, record bodies and every
 Chinese; the gateway rejects a `summary` that contains kana or Han characters.
 Order and separate the content as follows:
 
-- Current judgment and next action first; then motivation, hypothesis, method,
-  observed result and interpretation. Include algorithm/pseudocode only when
+- In the synthesis: adopted user rules first, then the evidence index table of
+  executed runs and linked records. In each event `summary`: state the
+  decision/observation status, then motivation, hypothesis, method, observed
+  result and interpretation. Include algorithm/pseudocode only when
   it explains an important implementation difference.
 - Keep `observation`, `working-assumption`, `proposed` and `adopted` distinct.
   A proposal is adopted only when the user's statement or subsequent actual
@@ -98,7 +112,13 @@ the same event across tasks and use a new ID for a new interpretation. Reuse
 `operation_id` only for an identical request. `event_kind=result` deduplicates
 the same evidence surface; use `interpretation` for a changed reading of it.
 Use `experiment-ledger` to retain separately comparable terminal evidence, then
-pass those `evidence_paths` to the question report.
+pass those `evidence_paths` to the question report and add the new record row
+to `## 2. 실행된 배치 및 단건 기록 색인 (Evidence Index)` via `report_patch`.
+When delegating analysis, verification or follow-up work to a subagent
+(`spawn_agent`) or peer thread, pass the relevant `Inbox/Agents/` record paths
+and `investigation_id` so the recipient reads primary records directly via
+`knowledge_read` or `investigation_context` instead of relying only on a
+free-text summary (except during intentionally isolated blind reviews).
 
 On SHA conflict, re-read current context, incorporate the concurrent material
 and send a new operation ID with the current SHA. Do not replay stale

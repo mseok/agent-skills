@@ -207,13 +207,30 @@ asks about a turn without a milestone, answer with `research_disposition`
   attributable user decisions; do not invent them from an incident.
 - Keep one cumulative report per research question across all hosts. Find it
   by its `investigation_id` before searching by project or words; shared words
-  do not make two questions the same.
-- Lead with the current judgment and next action, then why the question
-  matters, the hypothesis, the core method, what was observed and how it is
-  interpreted. Keep observations, working assumptions, proposals and adopted
-  decisions apart. Never invent the original hypothesis or record an agent
-  proposal as the user's decision; keep user corrections and the dates on
+  do not make two questions the same. When a project enters a distinct phase or
+  subdirectory (for example, moving from prompt-ablation probes to a
+  multi-agent campaign harness), register a separate `investigation_id` on that
+  subdirectory so earlier phase logs do not bloat the active context.
+- Keep the question report's top synthesis (`report_body` / `report_patch`)
+  free of subjective agent judgments or "next action" directives so later
+  agents are not anchored by an earlier agent's opinion. Structure the
+  synthesis into two objective sections: `## 1. 사용자 확정 조건 (Adopted User Rules)`
+  (only explicit user instructions, constraints and approved rules, with dates)
+  and `## 2. 실행된 배치 및 단건 기록 색인 (Evidence Index)` (a compact table of
+  executed runs/batches, verified metrics/costs, and `[[Inbox/Agents/...]]` or
+  `[[Writing/...]]` links, updated via `report_patch` whenever a batch record is
+  created so records remain discoverable after `events` rolls past five). Keep
+  observations, working assumptions, hypotheses, interpretations and proposed
+  next actions in the dated `events` log (`summary`), clearly separated from
+  adopted user decisions. Never invent the original hypothesis or record an
+  agent proposal as the user's decision; keep user corrections and the dates on
   which interpretations changed.
+- When delegating research analysis, verification or follow-up work to a
+  subagent (`spawn_agent`) or peer thread, pass the relevant `Inbox/Agents/`
+  record paths and `investigation_id` in the delegation prompt so the recipient
+  reads the primary records directly with `knowledge_read` or
+  `investigation_context` rather than relying only on the parent agent's
+  free-text summary (omit only when strict blind-review isolation is required).
 - Converging circumstantial evidence may support a bounded working assumption.
   State only the limitations that change the next decision. Missing provenance
   is a recovery issue, separate from the strength of an observed result; a run
