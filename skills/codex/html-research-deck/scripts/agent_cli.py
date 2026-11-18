@@ -2,6 +2,7 @@
 """agent_cli.py — run a builder or a judge on whichever CLI serves the requested model.
 
     claude-*            → `claude -p`   (Claude Opus 5.5, Fable 5.1, …)
+    gemini-*            → ValueError    (run through Antigravity native invoke_subagent / swarm / run_workflow, not codex exec)
     anything else       → `codex exec`  (gpt-6-astra, gpt-6.1-sol, gpt-6.1-terra, …; effort via -c model_reasoning_effort="…")
 
 run(prompt, model, effort, cwd, role, timeout, add_dirs) returns one env dict whatever the backend:
@@ -46,7 +47,12 @@ def codex_bin():
 
 
 def backend_of(model):
-    return 'claude' if str(model).startswith('claude') else 'codex'
+    name = str(model)
+    if name.startswith('gemini'):
+        raise ValueError(
+            f'gemini-* model {name!r} is not run via headless codex exec; use Antigravity native invoke_subagent, swarm, or run_workflow instead'
+        )
+    return 'claude' if name.startswith('claude') else 'codex'
 
 
 def reset_wait(text, default=18300):

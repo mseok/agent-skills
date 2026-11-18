@@ -38,7 +38,7 @@ The core acceptance target is 2/2 on every family and no critical failures. This
 
 ## Implementation validation — 2026-11-09
 
-- Structural checks: frontmatter/UI metadata, installer syntax, local Markdown links, 16 unique cases with eight A/B pairs, unique source IDs and reserved `.example` URLs passed. These checks do not evaluate scientific judgment.
+- Structural checks (`python3 -I -B scripts/validate_suite.py`): frontmatter/UI metadata, installer syntax, local Markdown links, 16 unique cases with eight A/B pairs, unique source IDs and reserved `.example` URLs passed. These checks do not evaluate scientific judgment.
 - First behavioral run: 16 responses in separate fresh contexts, one case per producer, without the paired case or evaluator rubric. Two independent evaluators scored the eight pairs **15/16**, with zero rubric-critical failures. T06 received 1/2 for inferring no external review at Venue D from an editorial letter without an attached report. T03's central comparison passed, but one response incorrectly called differently scoped firstness statements contradictory.
 - Narrow correction: explicitly compare subjects, qualifiers and scope before alleging contradiction; require explicit evidence for a historical review stage. Inputs and grading rubric were unchanged.
 - Targeted retest: four fresh responses for T03A/B and T06A/B. An independent evaluator scored both pairs 2/2, with no material or smaller unsupported claims identified. Combining unchanged-family results and these retests gives **16/16 across the eight families**. This was a targeted regression run, not a second execution of all 16 cases on the amended instructions.

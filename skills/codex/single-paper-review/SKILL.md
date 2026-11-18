@@ -25,14 +25,14 @@ description: >
 
 ## 작업 순서
 1. 대상 note 경로를 먼저 고정한다.
-   - 사용자가 특정 `.md` 파일을 주면 그 파일을 업데이트한다.
-   - 그렇지 않으면 논문 제목을 기반으로 새 note를 만든다.
+   - 사용자가 특정 `.md` 파일을 주면 그 파일을 업데이트한다(Mac mini에서는 `knowledge_revise`의 `action="revise"`와 `expected_sha256` 사용).
+   - 그렇지 않으면 논문 제목을 기반으로 새 note를 만든다(Mac mini의 `Sources/` 등 사용자 노트는 `knowledge_revise` `action="create"`, `messi` 등 원격 호스트는 `Inbox/Agents/<host>/` 아래 `record_create`).
    - 파일명은 사용자가 이미 링크한 경로가 있으면 그 경로를 유지한다.
 
 2. 본문 figure inventory를 먼저 확정한다.
    - 최소 집합은 main paper body에서 번호가 붙은 모든 Figure다. 즉, 본문에 등장하는 Figure 1..N은 빠짐없이 다룬다.
    - Supplementary/Appendix figure는 사용자가 요청하거나 method/result 이해에 꼭 필요할 때만 추가한다.
-   - 각 figure는 원 figure 단위의 PNG로 캡처해 로컬 작업 폴더에 `<paper-slug>-fig-N.png`로 저장하고, `obsidian_main`의 `attachment_upload`로 올린다. note에는 업로드 응답의 `wikilink`(경로 `Attachments/<paper-slug>-fig-N--<sha12>.png`)를 그대로 넣는다. `Attachments/<paper-slug>/fig-N.png` 같은 경로를 미리 지어 쓰지 않는다: 게이트웨이는 하위 폴더를 만들지 않으므로 그 링크는 깨진다.
+   - 각 figure는 원 figure 단위의 PNG로 캡처해 로컬 작업 폴더에 `<paper-slug>-fig-N.png`로 저장하고, `obsidian_main`(Antigravity에서는 MCP 서버 `migrated-settings_obsidian_main` 또는 `~/.local/bin/obsidian-main-mcp`)의 `attachment_upload`(`source_path` + `operation_id`)로 올린다. note에는 업로드 응답의 `wikilink`(경로 `Attachments/<paper-slug>-fig-N--<sha12>.png`)를 그대로 넣는다. `Attachments/<paper-slug>/fig-N.png` 같은 경로를 미리 지어 쓰지 않는다: 게이트웨이는 하위 폴더를 만들지 않으므로 그 링크는 깨진다.
    - 패널별 crop은 가독성 보조용으로만 추가할 수 있고, 원 figure embed를 대체하면 안 된다.
    - note에는 figure를 논문 순서대로 모두 모아 보는 전용 섹션을 반드시 둔다.
 
@@ -105,12 +105,12 @@ description: >
 
 ## Vault writes and verification (2026-10-17)
 
-- Attachments and notes go through `obsidian_main` (`attachment_upload`, `record_create`); never write into the vault's `Attachments/` or `Notes/` folders directly. When `obsidian_main` is not connected, deliver the note as a local file and say so.
+- Attachments and notes go through `obsidian_main` (in Antigravity: MCP server `migrated-settings_obsidian_main`, or `~/.local/bin/obsidian-main-mcp` when MCP tools are not directly bound): upload figures via `attachment_upload` (`source_path` + `operation_id`), create or update `Sources/` or existing `.md` notes on the Mac mini via `knowledge_revise` (`action="create"` or `action="revise"` with `expected_sha256`), and on remote hosts (`messi`) save under `Inbox/Agents/<host>/` via `record_create` (`project` required). Never write into the vault's `Attachments/` or `Notes/` folders directly; when `obsidian_main` is not connected (for example a local MacBook session), deliver the local `.md` and figure files and say so.
 - Every number in the note is spot-checked against the extracted text by a second pass before delivery; first-pass notes have carried 2 to 10 wrong numeric claims each.
 
 ## Attachment check (2026-11-07)
 
-- Embed only the path that `attachment_upload` returned for that file. Before delivery, open every image embed in the note with `attachment_preview` (`path`); one `attachment_not_found` means the note is not finished. Evidence: 34 `Sources/` notes written with this skill from 2026-10-07 linked 214 figures as `Attachments/<paper-slug>/fig-N.png` without uploading them, so every figure was broken until the 2026-11-07 repair.
+- Embed only the path that `attachment_upload` returned for that file. Run `python3 -I -B <skill folder>/scripts/check_review_note.py <note.md>` before upload or delivery to verify YAML field order (`title`, `created`, `updated`, `tags`), non-empty scalar fields, no CJK/kana characters, contiguous `### Figure 1..N` entries, and valid `Attachments/<stem>--<sha12>.<ext>` embeds, then open every listed `attachment_preview_paths` item with `attachment_preview` (`path`); one `attachment_not_found` means the note is not finished. Evidence: 34 `Sources/` notes written with this skill from 2026-10-07 linked 214 figures as `Attachments/<paper-slug>/fig-N.png` without uploading them, so every figure was broken until the 2026-11-07 repair.
 
 ## User decisions
 

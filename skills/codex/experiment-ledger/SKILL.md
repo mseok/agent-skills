@@ -10,8 +10,9 @@ per task before using this workflow; reuse it if already loaded. All vault and
 recording rules live there; this skill holds the procedure.
 
 Keep hypotheses and consequential choices in the question report using
-`research-workflow`. Planned/running job state stays in the execution system;
-an important decision about such a job may still be a question milestone.
+`research-workflow` via `obsidian_main` (`migrated-settings_obsidian_main` in
+Antigravity). Planned/running job state stays in the execution system; an
+important decision about such a job may still be a question milestone.
 
 Before a durable experiment, state its purpose, comparison and the decision it
 will change. Run from committed source in the current checkout: commit the files
@@ -37,37 +38,24 @@ run/artifact identity for an existing result. `record_create` accepts a stable
 and exact `source_refs`. Reuse the same key across servers/tasks; a new run or
 independently comparable analysis gets a distinct key.
 
-A screening, sweep or batch over many items, candidates or seeds is one
-comparable result: write one record per batch (or per screening round) with a
-table, or an attached file from `attachment_upload`, and one `evidence_key` for
-that batch. Never write one record per item. When the result is a key
-experiment behind a note the user writes in `Writing/` or `Notes/`, link that
-note from the record.
+Follow policy §7's batch and evidence rules: write one record and one
+`evidence_key` per batch, sweep or screening round (with a table or an
+`attachment_upload` file, never one record per item), link any `Writing/` or
+`Notes/` user note that builds on the run, and preserve primary null findings
+alongside exploratory signals while distinguishing failure boundaries from
+unmeasured endpoints. Lead with what was learned, the observed result, its
+interpretation and the current choice. Supply canonical `project`/`tags` (`kind/experiment`),
+the four flat terminal-experiment fields (`experiment_status`,
+`provenance_state`, `evidence_access`, `claim_state`) and any `superseded_by`
+link as defined in policy §5 (never on synthesis/strategy notes or in bulk on
+legacy notes).
 
-For `kind/experiment`, supply canonical project/tags and four flat fields:
-
-- `experiment_status`: actual terminal state.
-- `provenance_state`: `retained`, `partial`, `unverified`, `not-applicable`.
-- `evidence_access`: `durable`, `local-only`, `mixed`, `unknown`.
-- `claim_state`: `current`, `bounded`, `superseded`, `inconclusive`.
-
-`superseded_by` is only for an exact later note that changes the claim. Do not
-bulk-add experiment fields to unrelated legacy notes. A synthesis or proposed
-training strategy is a report/decision, not a completed training experiment.
-
-Lead with what was learned and its implication. Explain the observed result,
-interpretation and current choice; preserve primary null findings alongside
-exploratory signals. Missing provenance is a recovery issue, not automatic
-scientific inconclusiveness. Mention a missing field only when it matters to
-reproduction or the next judgment. Do not demand exhaustive ablations to retain
-a useful working assumption. A run that never reached the relevant measurement
-can establish a failure boundary, but cannot supply that measurement.
-
-Finally call `research_capture` with the result note's `evidence_paths` to
-update the cumulative question report. Subsequent interpretation changes are
-dated milestones in that report. Use the gateway's revision/history facilities
-for authorized corrections. On delivery failure, retain the external outbox
-and resume later; never write a scratch vault file or use Git as a fallback.
+Finally call `research_capture` with the result note's `evidence_paths` and
+`report_patch` to add the run to the question report's policy §7 evidence-index
+table. Subsequent interpretation changes are dated milestones in that report;
+use gateway revision/history tools (policy §2) for authorized corrections and
+retain failed deliveries in the external outbox (`obsidian-research`, policy §7)
+without direct vault file or Git fallbacks.
 
 ## User decisions
 

@@ -5,7 +5,7 @@ usage: check_examples.py [--out DIR] [--accept]
 
 Renders assets/examples/*.html into DIR (default: a new temporary folder), prints each example's errors and warnings,
 and compares each preview with assets/examples/renders/<name>.png. A kit change can alter any example without a
-warning, so every example listed as CHANGED must be looked at (preview and tiles, references/inspection.md) before the
+warning, so every example listed as CHANGED must be looked at (preview, grayscale copy and tiles, references/inspection.md) before the
 change is kept. --accept copies the new previews over the stored ones; use it only after that look.
 Exit status: 0 nothing changed and no errors, 1 errors or an unexpected warning, 3 previews changed and not accepted.
 """
@@ -52,7 +52,7 @@ def main():
                 shutil.copy(new, old)
     print(f"renders: {out}")
     if changed:
-        print(("accepted: " if args.accept else "look at each before accepting (preview and tiles): ") + ", ".join(changed))
+        print(("accepted: " if args.accept else "look at each before accepting (preview, grayscale copy and tiles): ") + ", ".join(changed))
     return 1 if bad else 3 if changed and not args.accept else 0
 
 

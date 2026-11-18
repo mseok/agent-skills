@@ -1,37 +1,41 @@
 ---
 name: thread-handoff
-description: Hand work between threads, sessions, harnesses (Codex, Claude Code) and hosts, resume from a handoff, and run subagent fan-outs or bulk thread operations safely. Use when a thread is long or compacted, when the user says 인계, 이어서, 새 스레드에서, 핸드오프, resume, continue in Codex/Claude, or before spawning several agents or archiving many threads.
+description: Hand work between threads, sessions, harnesses (Antigravity, Codex, Claude Code) and hosts, resume from a handoff, and run subagent, native swarm, workflow, or bulk thread operations safely. Use when a conversation is long or compacted (/compact), when the user says 인계, 이어서, 새 스레드에서, 핸드오프, resume, continue in Codex/Claude/AGY, or before spawning multiple subagents or swarm workers or archiving many threads.
 ---
 
-# Thread handoff and delegation
+# Thread handoff, swarm, and delegation
 
-## Write the handoff
+## Write the handoff (`codex-task-state`)
 
-1. Keep the current-state file in the task's artifact location with `~/dot/bin/codex-task-state` (read it first, pass `--expected-sha` on rewrite). The tool accepts only its documented fields, so put each item where it belongs: `goal`; `completion_criterion` (optional: the user's stopping test in their words with nothing added; the final reply says met, not met with the reason, or blocked with the one user action); `scope` (permitted changes, forbidden changes, and the exclusions the user ruled out); `decisions` (dated entries, including every user-fixed threshold or number with the user's wording when it was a correction); `sources` (exact paths, hosts, checkpoints, data and figure versions); `active_operations` (job and process IDs with hosts); `completed_checks`; `pending_questions`; `status`; `next_action`.
-2. Create it at the first compaction or before the first external-account change or bulk write; refresh it at material transitions, after about five compactions (then offer a fresh thread), when the user resets context, and before the thread is archived. A handoff carries decisions, not history: no chat summary, no exploration log.
-3. Keep it current, not cumulative. When the user reverses or replaces a decision, delete the old entry in the same write that adds the new one; drop finished operations, answered questions and sources no longer used. Do this only when the `read` output has a `history` key, which means the tool appends every removed entry verbatim to `<name>.history.jsonl`; an older tool has no history, so keep the old entry there. Never paraphrase, merge or shorten a decision to save space, and ask the user before removing a decision that is still in force.
-4. The tool prefixes each completed check with an ID such as `[k12]`. Append new checks at the end, keep the prefixes when you rewrite the list, and write `[k12]` in a decision, question or next action that rests on that check. Over 12,000 bytes the tool moves the oldest checks to the history, keeping the newest ten and every check those fields cite; a file still over budget is saved with a warning, and you clean it up as in step 3 at the next write. Read the history only when the user disputes a decision or the handoff names a gap.
-5. A tool error, access failure, model refusal or runner policy belongs in the state only as a dated incident for that run: affected step, observed result, unfinished checks and usable outputs. Never turn it into a standing prohibition on later work. A later request is assessed under its own current user instruction, permission and safety requirements. Preserve only explicit user scope decisions and actual safeguards as authority.
-6. Name the file with its absolute path and the SHA from the tool's output when you create it, at a handoff, or when the user must act on it. Routine refreshes are silent: no path, hash or moved-check report in the reply.
+1. Keep the current-state file in the task's artifact folder with `~/dot/bin/codex-task-state` (`read` first, pass `--expected-sha` on rewrite) so Antigravity, Codex, and Claude Code share one schema: `goal`; `completion_criterion` (optional: the user's stopping test verbatim with nothing added; the final reply says met, not met with the reason, or blocked with the one user action); `scope` (permitted changes, forbidden changes, and exclusions); `decisions` (dated verbatim user decisions and fixed numbers); `sources` (exact paths, hosts, checkpoints, data and figure versions); `active_operations` (job and process IDs with hosts); `completed_checks`; `pending_questions`; `status`; `next_action`.
+2. Create it at the first compaction (`/compact`), before the first external-account change or bulk write, and before switching harnesses; refresh at material transitions, after about five compactions (then offer a fresh thread), on context reset, and before archiving. Record decisions, not chat history or exploration logs.
+3. Keep it current, not cumulative. When `read` includes a `history` key, remove reversed decisions, finished operations, answered questions, and unused sources in the same write (archived verbatim to `<name>.history.jsonl`); keep old entries only on an older tool without `history`. Never paraphrase, merge, or narrow an active user decision without asking.
+4. Preserve `[kNN]` prefixes on `completed_checks`, append new checks at the end, and cite `[kNN]` in decisions, questions, or next actions resting on them. Over 12,000 bytes the tool moves the oldest checks to `<name>.history.jsonl`, retaining the newest ten and every cited check; clean up remaining bloat at the next write, and read the history only when a decision is disputed or the handoff flags a gap.
+5. Record tool errors, access failures, model refusals, or runner policies only as dated incidents for that run (affected step, observed result, unfinished checks, usable outputs), never as standing prohibitions on future work. Preserve only explicit user scope exclusions and actual safeguards as authority.
+6. Cite the file's absolute path and SHA when creating it, handing off, or asking the user to act on it; keep routine refreshes silent.
 
-## Resume
+## Resume and cross-harness transitions
 
-1. Read only the handoff and the files it points to; do not re-read raw history or earlier threads unless the handoff names a gap. When the read reports `copy_of`, the folder was duplicated and the original still exists: read it and ask which one is current before writing either.
-2. Start in the directory the handoff names; verify host, branch and data version before acting. A handoff is not permission: standing authorizations must be listed in it explicitly, otherwise ask once.
-3. Restate goal, scope and next action in two lines, then continue. If the user disputes a decision, quote the handoff's recorded decision, or its removed entry in the history, before answering.
+1. Read only the handoff and the files it points to; do not re-read raw transcripts unless the handoff flags a gap. If `read` reports `copy_of` while the original folder exists, ask which one is current before writing either.
+2. Start in the directory the handoff names and verify host, branch, and data version before acting. Standing permissions must appear explicitly in `decisions`; otherwise ask once.
+3. Restate goal, scope, and next action in two lines, then proceed; quote the recorded decision (or `.history.jsonl`) first if a decision is disputed.
+4. **Cross-harness routing**:
+   - Between Antigravity, Codex, and Claude Code, pass the `codex-task-state` file path rather than pasting chat transcripts; in Codex desktop, recover missing browser bindings via `~/dot/ai/codex/references/codex-browser.md`.
+   - `conversation://<id>` resolves only inside Antigravity, and private UI thread links from another harness cannot be opened directly—say so immediately, or for local Claude Code / `claude.ai/code` sessions locate the transcript under `~/.claude/projects/<cwd-key>/` on the host that ran it (over SSH when needed).
 
-## Cross-harness
+## Subagent, swarm, and workflow fan-out preflight
 
-- Codex → Claude: write the handoff file, then start the new thread with its path; do not paste the Codex transcript.
-- Claude → Codex: same file; a missing browser association follows `~/dot/ai/codex/references/codex-browser.md`.
-- Links to another harness's thread cannot be opened; say so immediately instead of trying.
-
-## Subagent fan-out preflight
-
-1. Before launching, state in one block: number of agents, model, effort (pass the requested model and effort through the host's own subagent tool: ChatGPT app `spawn_agent` with explicit `model` and `reasoning_effort`, Claude Code Agent `effort`; use `claude -p --effort` only where no native subagent tool exists, such as a plain terminal or Workflow; if no route supports it, say so before launching), expected token cost, search cap per agent, and output files. `~/dot/bin/fanout-preflight --agents N --model M --effort E [--chars C]` prints that line with the live quota; it only informs and never blocks a launch. Check the remaining usage budget first; stop launching when a usage warning appears. When the remaining budget cannot be read, size the first wave to one third of the plan and say so. Subagents used only to read pages or files because no fetch tool exists are a fan-out too.
-2. No nested subagents by default. Each prompt carries: the exact question, input paths, the output path, "local tools only", and the identifier restriction, pasted in these words and neither translated nor widened to cover outputs: "Do not put the user's email address, phone number or account IDs into any external request (web search, URL, API call)." The brief quotes the user's scope sentence, lists only the inputs the user named and carries the exclusions; any extra source is shown to the user before launch.
-3. The parent verifies subagent claims (citations, numbers, "done") against sources before relaying them, and never lets an inter-thread status message be the final reply to the user.
-4. Partial results are salvaged into files as agents finish; a crashed workflow must not lose finished work.
+1. **Choose the host's native delegation tool**:
+   - **Codex**: `spawn_agent` with explicit `model` and `reasoning_effort`.
+   - **Claude Code**: `Agent` tool (`effort`); use `claude -p --effort` only where no native subagent tool exists (such as a plain terminal or external workflow).
+   - **Antigravity**: `invoke_subagent` for a single bounded helper; `swarm` (`action: "add"`, `read_board`, `post_message`, `swarm_wait`) for multi-worker collaboration or independent verification (`workspace: "share"` when multiple workers edit/build repository code concurrently; `inherit` for readers/verifiers); `run_workflow` for homogeneous fan-outs or staged pipelines (read `run-workflow` first). Leave worker `model` unset to inherit the active model unless the user asked for a specific model; if no supported route exists, say so before launching.
+   - **Preflight line**: state agent count, model, effort, expected cost/quota (`~/dot/bin/fanout-preflight --agents N --model M --effort E [--chars C]` prints one non-blocking line with live quota; inside Antigravity, `swarm{action: "models", all: true}` also reports live Gemini/Claude/GPT remaining quotas with zero model inference), search cap per agent, and output files. Stop launching if a usage warning appears, or size the first wave to one third when remaining budget is unreadable (and when a reset time is near, launch after it or state the risk).
+2. **Mandatory worker brief invariants**: no nested subagents by default (`local tools only`), exact question, user-approved inputs and exclusions (ask before adding extra sources), disjoint output paths, host shell traps from `~/.codex/host-context.md` (`/bin/ls` instead of `ls`, `python3`, move unwanted files to scratch instead of `rm -f` / `rm -rf`, no GNU `timeout` assumptions), relevant Obsidian `Inbox/Agents/` paths or `investigation_id` when research context applies (for Antigravity `swarm` workers where MCP is blocked, stage a read-only snapshot in `scratch/` or use `~/.local/bin/obsidian-main-mcp` stdio—never direct vault `read_file`), and this exact verbatim English sentence (neither translated nor widened to outputs):
+   `"Do not put the user's email address, phone number or account IDs into any external request (web search, URL, API call)."`
+3. **Waiting and salvage**:
+   - In Antigravity, subagents and background tasks wake the turn automatically and `swarm_wait(since=<last_read_seq>)` sleeps at zero token cost—never poll in a shell `sleep` loop, `@mention` only the next acting peer on peer-to-peer swarm handoffs rather than CC'ing `@coordinator`, and `swarm{action: "kill"}` helpers you spawned after landing their work.
+   - In CLI/file fan-outs without reactive wakeup, have each worker write a marker file beside its completed output and reply with one status line; wait on the markers in one bounded loop (`< 2 min` steps) and read outputs only after completion. Give workers structured JSON sidecar files (one verdict/record object per case) beside prose reports so the parent aggregates deterministically by script, and filter possibly null results in workflow scripts. Salvage finished outputs as workers complete.
+4. **Parent verification**: check worker claims (citations, numbers, diffs, rendered artifacts) against primary sources before relaying them, and never surface raw inter-agent status posts as the final reply.
 
 ## Bootstrap template for a thread that must only wait
 
@@ -39,27 +43,15 @@ description: Hand work between threads, sessions, harnesses (Codex, Claude Code)
 Already verified: guidance sha <x> on <hosts>. Do not re-verify or connect to other hosts; read your handoff file, confirm readiness in one line, and wait.
 ```
 
-## Bulk thread operations
+## Bulk thread and server operations
 
-Archiving, renaming, restarting or deleting many threads or sessions: produce the dry-run list first, keep a protected set (active skill or evaluation threads, threads with running jobs), confirm, then act one batch at a time and verify each is back or gone. Restarting live agent servers follows the same rule: list affected sessions, restart one at a time, verify each.
+Produce a dry-run list first, protect active skill/evaluation threads and threads with running jobs, confirm, then archive, rename, restart, or delete one batch (or one live server) at a time and verify each. Under the 2026-10-17 audit rule, a restored or replacement thread counts as "back" only when visible in the user's sidebar/mobile UI (threads created via app-server tools are hidden—create replacements in the GUI or state that they are hidden), and imported cross-harness threads must be checked against `completed_checks` for gaps before continuing.
 
-## Verified additions (2026-10-17 audit)
+## Verified additions (2026-10-17 & 2026-11-10 audits)
 
-- Links to a `claude rc` or claude.ai/code session have their transcript on the host that runs it: find that host and folder and read `~/.claude/projects/<cwd-key>/` there by id and time (over SSH when needed) before asking the user to log in anywhere; only cloud-only sessions or another person's threads cannot be opened, and that is said at once.
-- Hand off also when the thread has accumulated many images or large tool outputs: slow or empty turn history is the trigger; a handoff plus a fresh thread preserves the old one, a fork does not help. Facts confirmed from a source that later numbers depend on go under `decisions` with the source and page. A decision relayed from another thread or read from a work folder authorizes only what the user's own words there authorized; quote that source before acting.
-- Sibling threads on one host: each handoff names the single thread that owns the host's GUI (browser, Figma, computer use, Hancom); the others work on local files and route GUI requests through the owner, and that request never appears in the user-facing reply. Each thread writes outputs to a directory it owns; if files you did not write appear there, continue in a new directory, say so once, and credit another session's results to it.
-- Fan-out: each agent gets its own working and download directory (shared folders are read-only to agents) and the host's shell traps from host-context (for example `/bin/ls` instead of `ls`, no GNU `timeout`); read a subagent's output only after its completion notification or wait call returns, since an existing file may still be rewritten; in Workflow scripts treat every agent result as possibly null and filter before reading its fields. Claude Code cannot read plan usage: before a fan-out of more than about five agents ask once for the user's usage figures, and when a reset time is near, launch after it or state the risk in the launch line.
-- To continue in another project folder on the Mac mini, start the session there with the host-context procedure (herdr workspace with `--cwd`, then `claude rc`); `create_session` cannot set the working directory, and a first-run folder-trust prompt needs the user's keypress.
-
-## Verified additions (2026-11-10 audit)
-
-- A mailbox or inter-thread post is not delivery: send direct input to the sibling and confirm from its reply or terminal that the work started before you report a handoff.
-- Have each fan-out agent finish by creating a marker file next to its output and replying with one status line (no findings in the reply). The parent waits on the markers with one shell loop, polled in steps under two minutes, instead of one wait call per agent, and reads outputs only after the marker exists.
-- Give agents categorical side files (verdict tables, one JSON object per case) next to their prose reports, so that the parent can count and pack the next stage with a script instead of reading every report.
-
-## Bulk operations: what "back" means (2026-10-17 audit)
-
-A restored or replacement thread counts as back only when it is visible where the user looks (sidebar and mobile); threads created through app-server tools are hidden there, so create replacements from the GUI or say that they are hidden. After importing a thread into another harness, compare the imported history with the handoff's completed checks and report any gap before continuing.
+- Hand off when accumulated images or large tool outputs slow or blank turn history (a fresh thread + handoff fixes it; forking does not). Record source-confirmed facts that downstream numbers depend on under `decisions` with source and page, and quote the user's original words before acting on any decision relayed from another thread or folder.
+- Sibling sessions on one host designate a single GUI owner (browser, Figma, computer use, Hancom / `hwp-browser`); siblings work on local files and route GUI steps silently through the owner. Each session owns its output directory—if foreign files appear there, move new outputs to a fresh subdirectory, note it once, and credit the other session's outputs accurately.
+- When `create_session` cannot set the working directory for another project folder, start the session directly inside that target directory (a first-run folder-trust prompt needs the user's keypress). An inter-thread mailbox post is not delivery until you send direct input or wake the sibling and confirm work started.
 
 ## User decisions
 

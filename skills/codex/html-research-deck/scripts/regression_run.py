@@ -20,6 +20,7 @@ only be seeded from a defect the skill's own files record. Standard library only
 import argparse
 import json
 import os
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -28,7 +29,18 @@ from pathlib import Path
 SKILL = Path(__file__).resolve().parent.parent
 SCRIPTS = SKILL / 'scripts'
 DECK = SKILL / 'assets' / 'deck'
-CHROME = os.environ.get('CHROME', '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome')
+CHROME = next(
+    (
+        c
+        for c in (
+            os.environ.get('CHROME'),
+            '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+            *map(shutil.which, ('google-chrome', 'google-chrome-stable', 'chromium', 'chromium-browser')),
+        )
+        if c and os.access(c, os.X_OK)
+    ),
+    '',
+)
 TOOLS = {'check_layout', 'check_deck', 'banned_copy_lint', 'manual'}
 NEEDS_CHROME = {'check_layout'}
 REQUIRED = ('id', 'date', 'source', 'quote', 'defect', 'tool')
@@ -52,7 +64,8 @@ def run_tool(tool, index, out_json):
     cmd = [sys.executable, str(SCRIPTS / f'{tool}.py'), str(index), '--json', str(out_json)]
     if tool == 'check_layout':
         cmd.append('--quiet')
-    run = subprocess.run(cmd, capture_output=True, text=True, check=False, timeout=600)
+    run = subprocess.run(cmd, capture_output=True, text=True, encoding='utf-8', errors='replace',
+                         env={**os.environ, 'PYTHONIOENCODING': 'utf-8'}, check=False, timeout=600)
     if not Path(out_json).is_file():
         raise RuntimeError(f'{tool} wrote no report (exit {run.returncode}): {(run.stderr or run.stdout).strip()[-300:]}')
     doc = json.loads(Path(out_json).read_text(encoding='utf-8'))
@@ -84,7 +97,7 @@ def check_case(case, args):
         return 'MANUAL', case.get('check', case['defect'])
     if not case.get('expect') or not case.get('bad'):
         return 'FAIL', 'a measured case needs expect and bad'
-    if case['tool'] in NEEDS_CHROME and (args.no_render or not os.access(CHROME, os.X_OK)):
+    if case['tool'] in NEEDS_CHROME and (args.no_render or not CHROME or not os.access(CHROME, os.X_OK)):
         return 'SKIP', 'needs headless Chrome'
     results = {}
     for variant in ('bad', 'fixed'):
@@ -102,6 +115,8 @@ def check_case(case, args):
 
 
 def main():
+    if hasattr(sys.stdout, 'reconfigure'):
+        sys.stdout.reconfigure(encoding='utf-8', errors='replace')
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument('--manifest', type=Path, default=SKILL / 'regression' / 'manifest.json')
     ap.add_argument('--only', default='')

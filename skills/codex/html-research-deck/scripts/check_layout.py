@@ -53,7 +53,18 @@ import sys
 import tempfile
 from pathlib import Path
 
-CHROME = os.environ.get('CHROME', '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome')
+CHROME = next(
+    (
+        c
+        for c in (
+            os.environ.get('CHROME'),
+            '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+            *map(shutil.which, ('google-chrome', 'google-chrome-stable', 'chromium', 'chromium-browser')),
+        )
+        if c and os.access(c, os.X_OK)
+    ),
+    '',
+)
 ERRORS = ('text-outside-panel', 'text-outside-stage', 'text-clipped', 'text-in-padding', 'text-overlap', 'text-crosses-shape',
           'text-crosses-line', 'text-crosses-path', 'text-crosses-image', 'shape-clipped', 'html-overflow', 'html-overlap',
           'h2-wraps', 'closing-wraps', 'tex-unrendered', 'box-tight', 'title-too-long')
@@ -359,6 +370,8 @@ def describe(f):
 
 
 def main():
+    if hasattr(sys.stdout, 'reconfigure'):
+        sys.stdout.reconfigure(encoding='utf-8', errors='replace')
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument('index')
     ap.add_argument('--json', help='write the full measurement report here')
@@ -369,8 +382,8 @@ def main():
     src = Path(a.index).resolve()
     if not src.is_file():
         sys.exit(f'not a file: {src}')
-    if not os.access(CHROME, os.X_OK):
-        sys.exit(f'Chrome not found at {CHROME} (set CHROME=...)')
+    if not CHROME or not os.access(CHROME, os.X_OK):
+        sys.exit(f'Chrome not found ({CHROME or "checked CHROME, macOS bundle, and PATH"}); set CHROME=...')
     html = src.read_text(encoding='utf-8')
     cut = html.rfind('</body>')
     if cut < 0:
@@ -381,7 +394,7 @@ def main():
         tmp.write_text(html[:cut] + MEASURE + html[cut:], encoding='utf-8')
         cmd = [CHROME, '--headless=new', '--disable-gpu', '--no-first-run', '--no-default-browser-check', f'--user-data-dir={profile}',
                '--window-size=1920,1080', f'--virtual-time-budget={a.budget}', '--dump-dom', f'file://{tmp}?export#/1/99']
-        run = subprocess.run(cmd, capture_output=True, text=True, timeout=600)
+        run = subprocess.run(cmd, capture_output=True, text=True, encoding='utf-8', errors='replace', timeout=600)
     finally:
         try:
             tmp.unlink()

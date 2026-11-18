@@ -6,9 +6,10 @@ Steps marked **[unverified]** are not recorded in any local file; confirm them o
 
 ## 1. Open the project
 
-- Run the browser preflight in `~/dot/ai/codex/references/codex-browser.md` once. Use the signed-in in-app browser (IAB) in a background tab: `cua.createBrowserTab("iab", <project url>, {visible: false})` worked for Overleaf on 2026-11-09 (host-context).
-- A "Restricted" page there was resolved with the normal Log in, then Log in with Google flow on the existing session; enter no credentials. A readable login page is a site state, not a browser fault.
-- Download in the IAB, not in Chrome: Chrome opened native Save dialogs on 2026-11-06 and a download wait timed out (host-context). The IAB download completed through `waitForEvent("download")` on 2026-11-09 without a dialog.
+- **Codex desktop app (`iab`)**: Run the browser preflight in `~/dot/ai/codex/references/codex-browser.md` once. Use the signed-in in-app browser (IAB) in a background tab: `cua.createBrowserTab("iab", <project url>, {visible: false})` worked for Overleaf on 2026-11-09 (host-context). Download in the IAB (`waitForEvent("download")`), not in desktop Chrome: desktop Chrome opened native Save dialogs on 2026-11-06 and a download wait timed out (host-context), whereas the IAB download completed on 2026-11-09 without a dialog.
+- **Antigravity**: Follow `~/dot/ai/gemini/rules/live-docs-and-gui.md` using a dedicated background Chrome tab or the `browser` subagent without stealing foreground focus; if native Save dialogs or login gates block automated export, hand the `shared-doc-apply plan` output, diff and compiled PDF to the user.
+- **Claude Code**: Use `claude --chrome` in a dedicated background tab under the same single-region, no-whole-file-upload rules; hand local `shared-doc-apply` artifacts to the user if download dialogs block.
+- A "Restricted" page on Overleaf was resolved on 2026-11-09 with the normal Log in, then Log in with Google flow on the existing session; enter no credentials. A readable login page is a site state, not a browser fault.
 
 ## 2. Download the source and hash it
 

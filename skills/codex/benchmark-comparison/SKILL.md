@@ -21,8 +21,10 @@ Read the project's facts file (`PROJECT_FACTS.md` or the task-state `decisions`)
 | selection rule | confidence-selected, oracle, best-of-N, first | per method |
 | metric and direction | name, higher or lower is better, denominator | facts file |
 | missingness | drop, impute, report separately | user decision |
+| authoritative reference | latest collaborator-posted table, figure or method note, with date and location | project record |
+| analysis parameters | value and why (tool default, literature, or convergence check with n) | facts file / code |
 
-If any row is unknown, ask once with a recommendation; do not fill it from memory. If the facts file does not exist, create it from the answers and record it in the task state so the next thread reads it.
+Settle factual rows (which inputs, seeds and variants exist per dataset and how they correspond) from the files first, then ask any remaining unknown choices in one round with a recommendation; do not fill from memory. If the facts file does not exist, create it from the answers and record it in the task state so the next thread reads it.
 
 ## 2. Compute with receipts
 
@@ -39,7 +41,7 @@ If any row is unknown, ask once with a recommendation; do not fill it from memor
 - Spot-check at least two cells against raw outputs (the score file, not the aggregated CSV).
 - Compare against the previously reported numbers for the same cell and explain every difference by one of the axes above.
 - A result that differs from the manuscript or a prior figure is a finding to flag in the first line, not to absorb quietly.
-- Write a short verification receipt (basis table, denominator table, spot checks, differences explained) beside the outputs; a figure or table rebuild ships with that receipt and the exact data version.
+- Write a short verification receipt (10-row basis, denominator/cohort counts with `removed_ids` and `removal_reason_source` whenever a cohort shrinks, panel comparator rows, spot checks, differences explained) beside the outputs and run `python3 -I -B <skill folder>/scripts/check_comparison_receipt.py <receipt.json>` (`--manifest <ids>` when available) until it exits `0`; a figure or table rebuild ships with that receipt and the exact data version.
 
 ## 4. Deliver
 
@@ -47,7 +49,6 @@ Draft the table or figure in the working folder with a versioned name; show it i
 
 ## Verified additions (2026-10-17 audit)
 
-- Basis table rows to add: `authoritative reference` (the latest collaborator-posted table, figure or method note for this benchmark, with date and where it was posted) and `analysis parameters` (value and why: tool default, literature, or a convergence check with n). Settle factual rows (which inputs, seeds and variants exist per dataset and how they correspond) from the files first, then ask the remaining choices in one round.
 - In a data × method 2×2, fix the population on the new-data × new-method cell unless the user says otherwise; "old" means the published numbers. The manifest marks exactly one cohort per benchmark as current; superseded cohorts appear only in the provenance document. When a population shrinks, report what was removed (counts, IDs) separately from why; the why needs a cited message, commit or document, otherwise say it is unknown.
 - Selection rules state a deterministic tie-break (seed, then sample index), never file or completion order. If the user still asks for a bare model name on an oracle or best-of-N result, state the mismatch once, comply, and keep the selection rule in every exported caption and legend.
 - Before saying prepared inputs match a model's official handling, run that model's installed loader or featurizer on every prepared input and compare its output with the intended features; until then the match is unverified. Input preparation for a comparison (입력 준비, benchmark inputs) is in scope of this skill.

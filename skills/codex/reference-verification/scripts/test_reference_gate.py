@@ -1,6 +1,10 @@
 """Behavior checks for finalization with absent, stale or unresolved evidence."""
 
 import copy
+import json
+import os
+import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -14,12 +18,14 @@ class ReferenceGateTest(unittest.TestCase):
         self.addCleanup(self.directory.cleanup)
         self.root = Path(self.directory.name)
         (self.root / "main.tex").write_text(
-            "\\input{section}\n\\bibliography{refs}\n"
+            "\\input{section}\n\\bibliography{refs}\n",
+            encoding="utf-8",
         )
-        (self.root / "section.tex").write_text("A bounded claim.\\cite{a,b}\n")
+        (self.root / "section.tex").write_text("A bounded claim.\\cite{a,b}\n", encoding="utf-8")
         (self.root / "refs.bib").write_text(
             "@article{a, title={Alpha}, author={One, A}, year={2026}}\n"
-            "@article{b, title={Beta}, author={Two, B}, year={2026}}\n"
+            "@article{b, title={Beta}, author={Two, B}, year={2026}}\n",
+            encoding="utf-8",
         )
         self.current = inventory(self.root, ["main.tex"])
         evidence = [{"url": "https://example.org/paper", "locator": "section 2",
@@ -43,7 +49,7 @@ class ReferenceGateTest(unittest.TestCase):
         self.assertEqual(check_review(self.current, self.review), [])
 
     def test_missing_bibliography_key_blocks(self):
-        (self.root / "section.tex").write_text("Claim.\\cite{missing}\n")
+        (self.root / "section.tex").write_text("Claim.\\cite{missing}\n", encoding="utf-8")
         current = inventory(self.root, ["main.tex"])
         self.assertTrue(current["problems"])
 
@@ -57,12 +63,12 @@ class ReferenceGateTest(unittest.TestCase):
 
     def test_changed_title_cannot_reuse_review(self):
         path = self.root / "refs.bib"
-        path.write_text(path.read_text().replace("Alpha", "Invented title"))
+        path.write_text(path.read_text(encoding="utf-8").replace("Alpha", "Invented title"), encoding="utf-8")
         self.assertTrue(check_review(inventory(self.root, ["main.tex"]), self.review))
 
     def test_changed_claim_cannot_reuse_review(self):
         path = self.root / "section.tex"
-        path.write_text(path.read_text().replace("bounded", "universal"))
+        path.write_text(path.read_text(encoding="utf-8").replace("bounded", "universal"), encoding="utf-8")
         self.assertTrue(check_review(inventory(self.root, ["main.tex"]), self.review))
 
     def test_recorded_metadata_mismatch_blocks(self):
@@ -111,26 +117,27 @@ class ReferenceGateTest(unittest.TestCase):
 
     def test_duplicate_keys_are_rejected(self):
         path = self.root / "refs.bib"
-        path.write_text(path.read_text() + "@article{a, title={Other}}\n")
-        with self.assertRaises(ValueError):
-            inventory(self.root, ["main.tex"])
+        path.write_text(path.read_text(encoding="utf-8") + "@article{a, title={Other}}\n", encoding="utf-8")
+        current = inventory(self.root, ["main.tex"])
+        self.assertTrue(any("Duplicate bibliography key: a" in p for p in current["problems"]))
+        self.assertTrue(check_review(current, self.review))
 
     def test_unresolved_include_blocks_inventory(self):
-        (self.root / "main.tex").write_text("\\input{absent}\n")
+        (self.root / "main.tex").write_text("\\input{absent}\n", encoding="utf-8")
         self.assertTrue(inventory(self.root, ["main.tex"])["problems"])
 
     def test_citation_placeholder_blocks_inventory(self):
-        (self.root / "section.tex").write_text("A claim [CITE: evidence needed].\n")
+        (self.root / "section.tex").write_text("A claim [CITE: evidence needed].\n", encoding="utf-8")
         self.assertTrue(inventory(self.root, ["main.tex"])["problems"])
 
     def test_unsupported_citation_command_cannot_silently_pass(self):
         for command in ("\\autocite{a}", "\\cites{a}{b}"):
             with self.subTest(command=command):
-                (self.root / "section.tex").write_text(f"A claim.{command}\n")
+                (self.root / "section.tex").write_text(f"A claim.{command}\n", encoding="utf-8")
                 self.assertTrue(inventory(self.root, ["main.tex"])["problems"])
 
     def test_single_citation_cannot_claim_group_support(self):
-        (self.root / "section.tex").write_text("A claim.\\cite{a}\n")
+        (self.root / "section.tex").write_text("A claim.\\cite{a}\n", encoding="utf-8")
         current = inventory(self.root, ["main.tex"])
         uid = next(iter(current["uses"]))
         review = copy.deepcopy(self.review)
@@ -141,6 +148,95 @@ class ReferenceGateTest(unittest.TestCase):
         del review["uses"][uid]["references"]["b"]
         review["uses"][uid]["references"]["a"].update(status="partial", disposition="covered_by_group")
         self.assertTrue(check_review(current, review))
+
+    def test_capitalized_natbib_commands_are_extracted(self):
+        (self.root / "section.tex").write_text(
+            "\\Citet{a} showed the bound, \\Citep[see][p.~2]{b} confirmed it, "
+            "and \\Citealt{a} with \\Citeauthor{b} agreed.\n",
+            encoding="utf-8",
+        )
+        current = inventory(self.root, ["main.tex"])
+        self.assertEqual(current["problems"], [])
+        self.assertEqual(set(current["references"]), {"a", "b"})
+        self.assertEqual(len(current["uses"]), 4)
+
+    def test_bib_percent_comments_ignored_and_unclosed_entry_recorded(self):
+        bib = self.root / "refs.bib"
+        bib.write_text(
+            "% @article{a, title={Old commented duplicate}}\n"
+            "  % @article{unclosed_comment, title={Ignored\n"
+            + bib.read_text(encoding="utf-8"),
+            encoding="utf-8",
+        )
+        clean_current = inventory(self.root, ["main.tex"])
+        self.assertEqual(clean_current["problems"], [])
+
+        bib.write_text(bib.read_text(encoding="utf-8") + "@article{broken, title={Missing brace\n", encoding="utf-8")
+        broken_current = inventory(self.root, ["main.tex"])
+        self.assertTrue(any("Unclosed bibliography entry: broken" in p for p in broken_current["problems"]))
+
+    def test_utf8_cli_io_under_ascii_locale(self):
+        (self.root / "section.tex").write_text("Müller et al. (2020–2026) studied 촉매.\\Citet{a}\n", encoding="utf-8")
+        (self.root / "refs.bib").write_text(
+            "@article{a, title={Über–Alpha}, author={Müller, A}, year={2026}}\n",
+            encoding="utf-8",
+        )
+        current = inventory(self.root, ["main.tex"])
+        uid = next(iter(current["uses"]))
+        evidence = [{"url": "https://example.org/muller", "locator": "p. 1–2", "accessed": "2026-11-18"}]
+        review = {
+            "snapshot_sha256": current["snapshot_sha256"],
+            "references": {
+                "a": current["references"]["a"]
+                | {
+                    "metadata_status": "verified",
+                    "evidence": evidence,
+                    "reason": "Verified Müller metadata.",
+                    "fields": {
+                        field: {
+                            "status": "verified" if field in {"title", "authors", "date"} else "not_applicable",
+                            "reason": "Checked UTF-8 record.",
+                        }
+                        for field in METADATA_FIELDS
+                    },
+                }
+            },
+            "uses": {
+                uid: {
+                    "context_sha256": current["uses"][uid]["context_sha256"],
+                    "references": {"a": {"status": "supported", "evidence": evidence, "reason": "Supported."}},
+                }
+            },
+        }
+        inv_path = self.root / "inventory.json"
+        rev_path = self.root / "review.json"
+        rev_path.write_text(json.dumps(review, ensure_ascii=False), encoding="utf-8")
+        script = Path(__file__).resolve().with_name("check_reference_gate.py")
+        env = {**os.environ, "LC_ALL": "C", "PYTHONUTF8": "0"}
+        proc = subprocess.run(
+            [
+                sys.executable,
+                "-B",
+                str(script),
+                "--source-root",
+                str(self.root),
+                "--roots",
+                "main.tex",
+                "--inventory",
+                str(inv_path),
+                "--review",
+                str(rev_path),
+                "--mode",
+                "full",
+            ],
+            env=env,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            check=False,
+        )
+        self.assertEqual(proc.returncode, 0, proc.stderr or proc.stdout)
+        self.assertEqual(json.loads(proc.stdout)["status"], "clear")
 
 
 if __name__ == "__main__":

@@ -38,7 +38,7 @@ Read the guide for the task or section at hand, plus `references/register.md`, i
 | Introduction | `references/introduction.md` |
 | Methods, Experimental setup | `references/methods.md` |
 | Results, Experiments | `references/results.md` |
-| Figures and panels | the `nature-figure` skill; read it before planning or producing any figure |
+| Figures and panels | the `nature-figure` skill for quantitative data charts and multi-panel plots, and the `concept-figure` skill for schematic, architecture, mechanism or pipeline diagrams; read the matching skill before planning or producing any figure |
 | Final integration across sections | `references/integration.md` |
 | Final reference verification, after all substantive edits | the `reference-verification` skill, full mode ([source](../reference-verification/SKILL.md)) |
 | Abstract, Discussion | end of this file |

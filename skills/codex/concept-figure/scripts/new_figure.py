@@ -25,7 +25,8 @@ def versions(dest):
 
 def skip_outputs(_folder, names):
     stems = {pathlib.Path(n).stem for n in names if n.endswith(".html")}
-    return [n for n in names if any(n in (f"{s}.pdf", f"{s}.png", f"{s}.preview.png", f"{s}.report.json") for s in stems)]
+    generated = {f"{s}{ext}" for s in stems for ext in (".pdf", ".png", ".preview.png", ".gray.png", ".report.json", ".inspection.md", ".tiles")} | {"judgement.json"}
+    return [n for n in names if n in generated]
 
 
 def main():

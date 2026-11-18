@@ -110,6 +110,20 @@ The mean is 53.9 against 53.7 in round 9: under the two points that the rubric s
 
 On preview v9 the user said: "이제 좋은거같은데?" The look and the eight examples are accepted as they stand.
 
+## Round 13 (2026-11-17): a comparison with the `visualize` skill (documents and `render.py` only)
+
+Not a kit round: `assets/kit/` and the examples are unchanged and `check_examples.py` reports all eight unchanged. The ChatGPT app's `visualize` skill (plugin 1.0.103) was read in full beside this one and five additions came out of it (`SKILL.md`, `design-rules.md`, `inspection.md`, `kit.md`, `user-decisions.md` entry of 2026-11-17): the grayscale copy with a second cue for a distinction that carries the message, the labels-covered look at every figure, matching marks for a far reference, an alt text in `caption.md`, and a boundary line towards `visualize`. Measured on the way: the palette's box fills for the seven hues span 2.2 L*, and in the grayscale copy of `architecture` the key's four swatches (embedding, attention, MLP, normalisation) are one gray. The example stays readable because each box names its type and was not changed, since the user accepted its look in round 12.
+
+Not taken over, so that the next reader does not propose them again without a new reason:
+
+- The 10 to 12 px gap between an arrow's tail and its source: round 10 moved the tail flush on its source because the judge penalised arrows that did not start there.
+- Oblique-projection objects with thin side faces: no reference figure described in `archetypes.md` is drawn that way, and a new glyph would change what `check_examples.py` makes everyone re-inspect.
+- Treating labelled boxes as a fault: labelled boxes are the convention for module diagrams (`design-rules.md`, Shapes).
+- Dark mode, narrow-width reflow, `Tweak` controls and the variant carousel: screen features of that host; a figure here has a fixed physical size and the thumbnail step already compares candidates side by side.
+- Working silently until the final reply: the shared working agreement asks for progress notes.
+
+No judge looked at a figure after this round, so the scores of rounds 9 and 10 stand.
+
 ## Open points
 
 - Identity (A3 is 2 for every example except `concept`): the judge's advice is one device used in every figure (faded baseline, framed contribution, one coloured stroke) and an image motif taken from each figure's own content. A real figure drawn with the kit should be scored and added here.

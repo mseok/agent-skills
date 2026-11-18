@@ -13,54 +13,40 @@ Read the [Obsidian vault policy](references/obsidian-policy.md) once
 per task before using this workflow; reuse it if already loaded. All vault and
 recording rules live there; this skill holds the procedure.
 
-Apply policy section 7 when recording or reusing failures: keep dated incident
-facts separate from authority, and do not turn them into future-work prohibitions.
+Use `obsidian_main` (`migrated-settings_obsidian_main` in Antigravity top-level
+sessions; `~/.local/bin/obsidian-main-mcp` over stdio or a coordinator-staged
+`scratch/` snapshot when `swarm` workers lack MCP access, per policy §1) for
+every vault read and write—never open or edit vault files directly. Search first
+and reuse existing records. State the current judgment, why it matters, the
+supporting observations and the next decision; keep raw prompts, transcripts,
+code, configs, datasets, logs and credentials in their source systems, and
+record failures strictly as dated incident observations under policy §7.
 
-Use `obsidian_main` for every vault read/write. Search first and reuse existing
-records. Explain the current judgment, why it matters, the supporting
-observations and the next decision. Keep raw prompts, transcripts, code,
-configs, datasets, logs and credentials in their source systems.
+Write each `Inbox/Agents/` record for later agent search and fetch: use a
+specific title, canonical `kind/*`, `project/*`, `topic/*` tags and `project`
+(with `updated` stamped per policy §5), and follow policy §7 on keeping one
+record per batch/sweep/screening round and linking related `Writing/` or
+`Notes/` user notes.
 
-`Inbox/Agents/` is the layer that later agents search and fetch; the user does
-not read every record. Write each record so a search finds it: a specific title,
-canonical `kind/*`, `project/*` and `topic/*` tags (policy section 5), and the
-canonical `project`. When a record is a key experiment or
-decision behind something the user writes in `Writing/` or `Notes/`, link that
-note from the record. A screening, sweep or batch over many items is one record
-per batch with a table or an attached file, never one record per item.
+Route ongoing research milestones to `research-workflow` (`research_capture`)
+and comparable terminal runs to `experiment-ledger`. For an independently
+reusable outcome, call `record_create` with a specific title, compact body,
+canonical tags/project, exact `source_refs`, a fresh `operation_id` (reused
+only for identical retries), and—when applicable—`investigation_id` and a stable
+`evidence_key`. When the record belongs to an active question report, pass its
+path in `evidence_paths` and patch the report's policy §7 evidence-index section
+via `report_patch`. When delegating analysis, verification or follow-up work to
+subagents (`spawn_agent`, Claude `Agent`, Antigravity `invoke_subagent` or
+`swarm`) or peer threads, pass the relevant `Inbox/Agents/` paths (or stage
+read-only snapshots / use `~/.local/bin/obsidian-main-mcp` stdio for MCP-blocked
+`swarm` workers, per policy §7; omit only for blind isolation).
 
-For research milestones use `research-workflow`: update a question report with
-`research_capture`. For an independently reusable outcome, use `record_create`
-with a specific title, compact body, canonical tags/project and an operation ID.
-Add exact source references and, when applicable, `investigation_id` and a stable
-`evidence_key`. Reuse operation IDs only for identical retries. An evidence key
-identifies the original run/artifact/comparison, so another task can reuse it.
-When a new record belongs to an active question report, pass its path in
-`evidence_paths` and add it to the report's `## 2. 실행된 배치 및 단건 기록 색인 (Evidence Index)`
-table via `report_patch` so later agents can discover it even after the latest
-five events roll over. When delegating analysis, verification or follow-up work
-to a subagent (`spawn_agent`) or peer thread, include the relevant
-`Inbox/Agents/` record paths in the prompt so the recipient reads the primary
-record directly with `knowledge_read` rather than relying only on a free-text
-summary (omit only when blind isolation is required).
-
-For a terminal experiment use `experiment-ledger`; the recording policy covers
-judgment, provenance and user corrections.
-
-Upload a small approved supporting file with `attachment_upload`; pass the
-returned attachment ID to the record. Raw bytes travel through HTTPS, never
-MCP JSON or base64. Embed a figure once.
-
-Use `knowledge_revise` with current SHA, reason and source references for an
-agent-record revision within the policy's permissions (section 2); on the Mac mini the tool also
-creates, moves, deletes and undeletes notes. History and exact-content
-restoration are available through that tool. `record_append` remains limited
-to unchanged same-host gateway records. On conflict, read current content and
-resolve only the affected note. Never force an overwrite or edit vault files.
-
-Failed deliveries remain in the bridge's external outbox. Inspect/replay them
-with `obsidian-research`; do not claim that pending content was saved. Git and
-the retired UniversalNotes publisher are not fallback writers.
+Upload small approved supporting files via `attachment_upload` (raw HTTPS bytes,
+never base64 or MCP JSON; embed once) and revise existing records via SHA-checked
+`knowledge_revise` or same-host `record_append` within policy §2 permissions.
+Inspect and replay failed deliveries through the external `obsidian-research`
+outbox (policy §7); never claim pending writes were saved or fall back to Git or
+retired publishers.
 
 ## User decisions
 

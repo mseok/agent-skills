@@ -32,9 +32,9 @@ Before any claim that work is done, fixed, passing, sent, published or unchanged
 | Cutover or migration done | Every consumer of the old path listed and switched (instruction files, skills, services, cron, deploy scripts) | The new path works |
 | State, cause or denial ("I did not rename it", "a run is in progress") | Checked on the surface in question before saying it | Memory of earlier turns |
 
-If the checking tool is broken, say "not visually verified" (or "not verified on the target") in the first line and name what was checked instead. Report each requested item as done or blocked; never present unfinished work as a follow-up suggestion.
+If the matching check could not run, open the first line in the user's language ("Not verified in <target>" / Korean: "<대상>에서는 확인하지 못했습니다") and name what was checked instead. Report each requested item as done or blocked; never present unfinished work as a follow-up suggestion.
 
-Cutover or migration checklist: list every consumer of the old path (loaded instruction files, skills, deploy scripts, services, cron, automations) and switch each; `rg -l '<old path or command>'` over every skill root and automation returns nothing, or each hit is listed in the final answer. A smoke test uses a real-sized input for the stage under test. Never explain away a user-visible defect as an editor or preview artifact without confirming it on the logged-out page first.
+Cutover or migration checklist: list every consumer of the old path (loaded instruction files, skills, deploy scripts, services, cron, automations) and switch each; `rg -l '<old path or command>'` over every instruction/skill root (`~/dot`, `~/agent-skills`, `~/.codex`, `~/.claude`, `~/.gemini/config/plugins`) and automation returns nothing, or each hit is listed in the final answer. A smoke test uses a real-sized input for the stage under test. Never explain away a user-visible defect as an editor or preview artifact without confirming it on the logged-out page first.
 
 ## More rows (2026-10-17 audit)
 

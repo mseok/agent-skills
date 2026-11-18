@@ -15,7 +15,7 @@ FAMILIES = {"T{:02d}".format(i) for i in range(1, 19)}
 
 
 def load_cases(path):
-    data = json.loads(path.read_text())
+    data = json.loads(path.read_text(encoding="utf-8"))
     if data.get("schema_version") != 1 or not isinstance(data.get("cases"), list):
         raise ValueError("Expected schema_version 1 and a cases list: {}".format(path))
     cases = data["cases"]
@@ -82,11 +82,12 @@ def prepare(inputs, destination):
     }
     destination.mkdir(parents=True)
     for index, cases in enumerate(batches, 1):
-        (destination / "inputs-{}.json".format(index)).write_text(
-            json.dumps({"synthetic": True, "cases": cases}, ensure_ascii=False, indent=2) + "\n"
+        (destination / f"inputs-{index}.json").write_text(
+            json.dumps({"synthetic": True, "cases": cases}, ensure_ascii=False, indent=2) + "\n",
+            encoding="utf-8",
         )
-    (destination / "evaluation-map.json").write_text(json.dumps(mapping, indent=2) + "\n")
-    (destination / "source-hashes.json").write_text(json.dumps(hashes, indent=2) + "\n")
+    (destination / "evaluation-map.json").write_text(json.dumps(mapping, indent=2) + "\n", encoding="utf-8")
+    (destination / "source-hashes.json").write_text(json.dumps(hashes, indent=2) + "\n", encoding="utf-8")
 
 
 def main():

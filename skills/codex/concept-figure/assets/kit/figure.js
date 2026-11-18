@@ -616,6 +616,17 @@
         if (len < (headed ? 8 : 4)) { add('warn', 'wire-leg', `wire ${w.from} → ${w.to} has a ${f2(len)} pt ${headed ? 'last leg, so only the arrowhead shows after the bend' : 'leg, which reads as a kink'} (move the boxes apart, or line them up and use a straight wire)`); break; }
       }
     }
+    /* two wires that run on top of each other along one axis merge into one line or clash in dash phase */
+    const wsegs = state.wires.filter((w) => w.pts && !w.curve && w.el.tagName === 'FIG-WIRE')
+      .flatMap((w, wi) => w.pts.slice(1).map((q, i) => ({ wi, name: `${w.from} → ${w.to}`, a: w.pts[i], b: q })));
+    for (let i = 0; i < wsegs.length; i++) for (let j = i + 1; j < wsegs.length; j++) {
+      const s = wsegs[i], u = wsegs[j]; if (s.wi === u.wi) continue;
+      const sh = Math.abs(s.a[1] - s.b[1]) < 0.8, uh = Math.abs(u.a[1] - u.b[1]) < 0.8;
+      const sv = Math.abs(s.a[0] - s.b[0]) < 0.8, uv = Math.abs(u.a[0] - u.b[0]) < 0.8;
+      const ov = sh && uh && Math.abs((s.a[1] + s.b[1]) / 2 - (u.a[1] + u.b[1]) / 2) <= 1.2 ? Math.min(Math.max(s.a[0], s.b[0]), Math.max(u.a[0], u.b[0])) - Math.max(Math.min(s.a[0], s.b[0]), Math.min(u.a[0], u.b[0]))
+        : sv && uv && Math.abs((s.a[0] + s.b[0]) / 2 - (u.a[0] + u.b[0]) / 2) <= 1.2 ? Math.min(Math.max(s.a[1], s.b[1]), Math.max(u.a[1], u.b[1])) - Math.max(Math.min(s.a[1], s.b[1]), Math.min(u.a[1], u.b[1])) : 0;
+      if (ov > 3 * PT) add('warn', 'wire-overlap', `wires ${s.name} and ${u.name} overlap along ${f2(ov / PT)} pt (branch from the target's axis with route="v"/"h" or offset with shift)`);
+    }
     /* text or an object that crosses a panel rule or leaves its panel collides with the neighbouring panel */
     for (const rule of $$('.vr, .hr', root)) {
       if (!rule.getClientRects().length) continue;

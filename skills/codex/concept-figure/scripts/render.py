@@ -3,7 +3,8 @@
 
 usage: render.py figure.html [--out DIR] [--dpi 600] [--preview-dpi 220] [--check-only]
 
-Writes <stem>.pdf, <stem>.png, <stem>.preview.png, <stem>.report.json, zoomed <stem>.tiles/ and an unticked
+Writes <stem>.pdf, <stem>.png, <stem>.preview.png, <stem>.gray.png (the preview in grayscale, to see which roles
+only hue tells apart), <stem>.report.json, zoomed <stem>.tiles/ and an unticked
 <stem>.inspection.md (the inspection gate, references/inspection.md) beside the HTML file (or in DIR)
 and prints the report. Exit status: 0 clean or warnings only, 1 layout errors, 2 Chrome or kit failure.
 Chrome comes from $CHROME, the macOS application path, or google-chrome / chromium on PATH.
@@ -127,10 +128,10 @@ CHECKLIST = [
     ("arrows", "Every arrow starts on its source and ends on its target; each leg is clearly longer than its head; no head sits at a bend; none runs through an unrelated object or label."),
     ("levels", "Boxes at one level share text size, height and style; arrows of one kind share weight and head."),
     ("alignment", "What should share an axis or a baseline does; equal gaps look equal; symbols are centred in their circles."),
-    ("colour", "Each colour has a meaning the figure states; the contribution is the most salient thing; nothing faded reads as empty."),
+    ("colour", "Each colour has a meaning the figure states; the contribution is the most salient thing; nothing faded reads as empty; in the grayscale view no two roles that carry the message differ only by hue (give them a second cue: badge, outline style, label)."),
     ("white space", "No empty band or corner, no object small in a large frame, no arrow longer than its label needs."),
     ("content", "The drawing does not misstate the method: inputs, order, what flows on each arrow, what is trained or frozen."),
-    ("whole figure", "At print size (the preview at 100 %) the reading order is obvious and the smallest text is readable."),
+    ("whole figure", "At print size (the preview at 100 %) the reading order is obvious and the smallest text is readable; with the text covered, the kinds of object, the flow and the contribution can still be told apart."),
 ]
 
 
@@ -153,11 +154,20 @@ def tiles(chrome, w, h, zoom, out, stem):
     return folder, names
 
 
+def gray_preview(chrome, w, h, zoom, dpi):
+    """The preview with a grayscale filter on the page, removed again so that nothing after it is affected."""
+    evaluate(chrome, "document.documentElement.style.filter = 'grayscale(1)'")
+    try:
+        return screenshot(chrome, w, h, zoom, dpi)
+    finally:
+        evaluate(chrome, "document.documentElement.style.filter = ''")
+
+
 def inspection_template(path, stem, folder, names):
     """A fresh render invalidates the last inspection: the receipt starts unticked again."""
     lines = [f"# Inspection of {stem}", "",
              "Tick a line only after looking; write what was found and fixed. Read references/inspection.md for the procedure.", "",
-             "Inspector: ", "", "## Views", "", f"- [ ] {stem}.preview.png at 100 %"]
+             "Inspector: ", "", "## Views", "", f"- [ ] {stem}.preview.png at 100 %", f"- [ ] {stem}.gray.png (the same view in grayscale)"]
     lines += [f"- [ ] {folder.name}/{n}" for n in names]
     lines += ["", "## Checklist", ""] + [f"- [ ] {key}: {text}" for key, text in CHECKLIST]
     lines += ["", "## Defects found in this version", "", "- "]
@@ -215,6 +225,8 @@ def main():
             report["png"] = {"dpi": args.dpi, "width_px": round(w * args.dpi / 96), "height_px": round(h * args.dpi / 96)}
             folder, names = tiles(chrome, w, h, zoom, out, src.stem)
             report["tiles"] = [f"{folder.name}/{n}" for n in names]
+            (out / f"{src.stem}.gray.png").write_bytes(gray_preview(chrome, w, h, zoom, args.preview_dpi))
+            report["gray"] = f"{src.stem}.gray.png"
             inspection_template(out / f"{src.stem}.inspection.md", src.stem, folder, names)
     finally:
         chrome.close()
@@ -230,7 +242,7 @@ def main():
         print(f"  {issue['level'].upper():5s} {issue['code']}: {issue['msg']}")
     print(f"{report['errors']} errors, {report['warnings']} warnings")
     if report.get("tiles"):
-        print(f"inspection gate: view {src.stem}.preview.png and the {len(report['tiles'])} tiles in {src.stem}.tiles/, then tick {src.stem}.inspection.md")
+        print(f"inspection gate: view {src.stem}.preview.png, {src.stem}.gray.png and the {len(report['tiles'])} tiles in {src.stem}.tiles/, then tick {src.stem}.inspection.md")
     return 1 if report["errors"] else 0
 
 

@@ -4,7 +4,7 @@ Implementation and live queries were checked on 2026-10-18 with Codex CLI `0.162
 
 ## What was retained from ai-quota
 
-The [ai-quota project](https://github.com/metyatech/ai-quota) provides provider-specific quota fetchers, a CLI, and an MCP `get_quota` tool. Its current Claude implementation reads a credential file, refreshes rejected or expiring OAuth tokens, and writes updates back. Its Codex implementation reads `auth.json` and calls a ChatGPT backend endpoint. This skill retains the quota-reading purpose and missing-data distinctions, and delegates authentication to native CLIs instead. It implements Codex, Claude, and the Gemini ACP bridge; Copilot is outside its scope.
+The [ai-quota project](https://github.com/metyatech/ai-quota) provides provider-specific quota fetchers, a CLI, and an MCP `get_quota` tool. Its current Claude implementation reads a credential file, refreshes rejected or expiring OAuth tokens, and writes updates back. Its Codex implementation reads `auth.json` and calls a ChatGPT backend endpoint. This skill retains the quota-reading purpose and missing-data distinctions, and delegates authentication to native CLIs and host runtimes instead. It implements Codex, Claude, Antigravity native model-roster quotas (`swarm{action: "models", all: true}` inside Antigravity sessions), and optional explicit Gemini ACP overrides; Copilot is outside its scope.
 
 ## Codex
 
@@ -26,13 +26,13 @@ Do not set `CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC`. On 2026-10-27 with Claude
 
 Each subprocess has one 25-second deadline and is terminated after its response. No automatic retry is performed. Missing CLIs, rejected initialization or quota requests, unexpected interactive requests, invalid stream JSON, and early exit produce a sanitized error. Raw initialization data, stderr, account identifiers, and token-bearing data are never printed or persisted. Native CLIs retain ownership of their ordinary authentication behavior.
 
-## Gemini via official Antigravity ACP
+## Gemini in Antigravity sessions and via official ACP
 
-Verified on 2026-11-02 with ACP 1.4.5 and the dedicated bridge profile. Send `initialize`, then `session/new` with no MCP servers. Wait for the asynchronous `available_commands_update`; it can arrive after the session/new response. Invoke exactly `/usage` via `session/prompt` only when advertised. The [official release notes](https://antigravity.google/docs/changelog) document this local slash command. No arbitrary prompt or authenticate request is sent.
+Inside an Antigravity session, `swarm{action: "models", all: true}` reads the local Language Server's live model table directly with zero model inference, returning `quota_remaining` percentages and `quota_resets` timestamps for Gemini models (`gemini-4-*`, `gemini-3.8-*`) and Google-provided Claude/GPT models.
 
-The live probe returned a local Session Usage / Quota Limits response with no model session tokens available, `usage_update.used = 0`, and zero tool calls. Gemini Models, Google-provided Claude and GPT models, and Gemini 4 Argon were distinct groups. Parse only explicit remaining percentages and reset timestamps; keep unknown formats unavailable. Native credential ownership and profile identity are preserved. The helper aborts on any tool call or positive context-token activity.
+On 2026-11-17 the third-party bridge's dedicated `acp/` directory and its Gemini login wrapper were retired across hosts (`renew-llm-logins` is now Claude-only). When `GEMINI_ACP_BIN` is unset and the retired `acp/runtime/agy_acp_server.par` binary is absent, `gemini-acp.mjs` returns `status: "unavailable", reason: "bridge_acp_retired"` so `node scripts/quota.mjs all` exits `0`.
 
-The dedicated ACP profile is distinct from the ordinary agy CLI profile. Never substitute the latter's quota on an ACP query failure. Overrides are `GEMINI_ACP_BIN` and `GEMINI_ACP_PROFILE`; default paths follow the local bridge. A missing runtime/profile is an explicit error, not a reason to install, log in, or read tokens.
+When `GEMINI_ACP_BIN` and `GEMINI_ACP_PROFILE` are explicitly set to an active ACP runtime and profile (verified on 2026-11-02 with ACP 1.4.5), `gemini-acp.mjs` sends `initialize`, then `session/new` with no MCP servers, waits for the asynchronous `available_commands_update`, and invokes `/usage` via `session/prompt` only when advertised (documented in the [official release notes](https://antigravity.google/docs/changelog)). It parses explicit remaining percentages and reset timestamps across Gemini and Google-provided Claude/GPT groups, preserves native credential ownership, and aborts on any tool call or positive `usage_update.used` token activity. An explicit `GEMINI_ACP_BIN` or `GEMINI_ACP_PROFILE` path that does not exist remains an explicit `error` (`acp_runtime_missing` / `acp_profile_missing`), never a reason to install, log in, or read tokens.
 
 ## Claude API bridge estimates
 

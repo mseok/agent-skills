@@ -23,9 +23,9 @@ export function normalizeGemini(text) {
   return windows;
 }
 
-// A sign-in failure of the official ACP runtime: ACP's auth_required error code (-32000) or an
-// authentication message. The quota reports it as `auth_required`; the bridge shows how to sign
-// in again (renew-gemini-login). User decision 2026-11-09: "3번도 넣어주라."
+// A sign-in failure of an explicit ACP runtime: ACP's auth_required error code (-32000) or an
+// authentication message, reported as `auth_required` (the bridge's dedicated ACP profile was
+// retired across hosts on 2026-11-17). User decision 2026-11-09: "3번도 넣어주라."
 export function isAcpAuthError(error) {
   if (!error) return false;
   return error.code === -32000 || /auth(entication)?[ _-]?required|unauthenticated|not (logged|signed) in|(log|sign)[ -]?in required|invalid_grant|reauth|credentials? (expired|invalid|missing)/i.test(String(error.message ?? ''));
@@ -33,10 +33,11 @@ export function isAcpAuthError(error) {
 
 export function readGeminiQuota({spawnChild=spawn,timeoutMs=25000,executable,profileDir}={}) {
   const state=process.env.BRIDGE_STATE_DIR??path.join(os.homedir(),process.platform==='darwin'?'Library/Application Support/chatgpt-claude-bridge':'.codex/claude-bridge/bridge');
+  const customBin=Boolean(executable??process.env.GEMINI_ACP_BIN);
   executable??=process.env.GEMINI_ACP_BIN??path.join(state,'acp/runtime/agy_acp_server.par');
   profileDir??=process.env.GEMINI_ACP_PROFILE??path.join(state,'acp/profile');
   const base={provider:'gemini',source:'official Antigravity ACP: advertised native /usage',accountScope:'dedicated ACP profile',checkedAt:new Date().toISOString(),windows:[]};
-  if(!fs.existsSync(executable))return Promise.resolve({...base,status:'error',reason:'acp_runtime_missing'});
+  if(!fs.existsSync(executable))return Promise.resolve({...base,status:customBin?'error':'unavailable',reason:customBin?'acp_runtime_missing':'bridge_acp_retired'});
   if(!fs.existsSync(profileDir))return Promise.resolve({...base,status:'error',reason:'acp_profile_missing'});
   const home=path.join(profileDir,'.home'),tmp=path.join(profileDir,'.tmp'),cwd=path.join(profileDir,'.quota-workspace');
   for(const dir of [home,tmp,cwd])fs.mkdirSync(dir,{recursive:true,mode:0o700});

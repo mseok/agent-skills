@@ -14,9 +14,11 @@ once per task and reuse it.
   on the Mac mini. Devices use Obsidian Sync. The old iCloud copy is not a
   vault; never read or edit it.
 - Every agent read and write goes through the host-local `obsidian_main` MCP
-  bridge to the Mac mini gateway, the single writer. Never read, write, move or
-  delete vault files directly, and never run Git in the vault: Git is a Mac mini
-  backup job that only commits and pushes. `un note`, `un push`,
+  bridge (`migrated-settings_obsidian_main` in Antigravity top-level sessions;
+  `~/.local/bin/obsidian-main-mcp` over stdio when an execution context blocks
+  MCP tools) to the Mac mini gateway, the single writer. Never read, write, move
+  or delete vault files directly, and never run Git in the vault: Git is a Mac
+  mini backup job that only commits and pushes. `un note`, `un push`,
   `codex_note_commit`, `obsidian_branch_publish.py` and remote vault checkouts
   are retired.
 - The authenticated token fixes the host (`local` is the Mac mini; `messi` and
@@ -226,11 +228,17 @@ asks about a turn without a milestone, answer with `research_disposition`
   agent proposal as the user's decision; keep user corrections and the dates on
   which interpretations changed.
 - When delegating research analysis, verification or follow-up work to a
-  subagent (`spawn_agent`) or peer thread, pass the relevant `Inbox/Agents/`
-  record paths and `investigation_id` in the delegation prompt so the recipient
-  reads the primary records directly with `knowledge_read` or
-  `investigation_context` rather than relying only on the parent agent's
-  free-text summary (omit only when strict blind-review isolation is required).
+  subagent (`spawn_agent`, Claude `Agent`, Antigravity `invoke_subagent` or
+  `swarm`) or peer thread, pass the relevant `Inbox/Agents/` record paths and
+  `investigation_id` in the delegation prompt so the recipient reads primary
+  records directly with `knowledge_read` or `investigation_context` rather than
+  relying only on the parent agent's free-text summary (omit only when strict
+  blind-review isolation is required). For workers where MCP tool calls are
+  blocked (such as Antigravity `swarm` workers), either stage a read-only
+  `knowledge_read` / `investigation_context` snapshot in the task `scratch/`
+  folder from the coordinator or read via the host-local
+  `~/.local/bin/obsidian-main-mcp` stdio bridge—never open vault files directly
+  with `read_file`.
 - Converging circumstantial evidence may support a bounded working assumption.
   State only the limitations that change the next decision. Missing provenance
   is a recovery issue, separate from the strength of an observed result; a run

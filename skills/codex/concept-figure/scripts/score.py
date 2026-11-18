@@ -74,7 +74,7 @@ def main():
     entry["inspected"] = open_items == 0
     if open_items != 0:
         print("NOT INSPECTED: " + (f"{open_items} lines of {receipt.name} are unticked" if open_items else f"{receipt.name} is missing; render again")
-              + ". View the preview and every tile first (references/inspection.md); a score without it is not a result to report.")
+              + ". View the preview, the grayscale copy and every tile first (references/inspection.md); a score without it is not a result to report.")
     if args.judgement:
         j = json.loads(pathlib.Path(args.judgement).read_text(encoding="utf-8"))
         scores = j["scores"]

@@ -115,6 +115,7 @@ CONTEXTUAL = [
     r"\binitial experiments?\b",
     r"[→⇒]",
     r"\b(?:statistically significant|significantly (?:higher|lower|better|worse|improved|reduced|outperforms?))\b",
+    r"\b(?:comparable to|competitive with|on par with)\b",
 ]
 
 GENERIC = [
@@ -134,19 +135,46 @@ GENERIC = [
     r"\bremarkabl[ey]\b",
     r"\bunprecedented\b",
     r"\bdramatic(?:ally)?\b",
+    r"\bnot (?:merely|simply|just) [^.,;\n]+, but\b",
+    r"\bit is not [^.,;\n]+; it is\b",
+    r"\bdelve(?:s|d|ing)?\b",
+    r"\btestament to\b",
+    r"\bunderscore(?:s|d|ing)?\b",
 ]
 
-HANGUL = re.compile(r"[ㄱ-ㆎ가-힣]")
+NON_ENGLISH = re.compile(r"[ㄱ-ㆎ가-힣\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff]")
 ACRONYM = re.compile(r"\b(?=[A-Z0-9]*[A-Z][A-Z0-9]*[A-Z])[A-Z][A-Z0-9]+s?\b")
 ACRONYM_ALLOW = {
     "GPU", "GPUs", "CPU", "CPUs", "RAM", "API", "URL", "PDF", "ID", "IDs",
-    "II", "III", "IV", "VI", "VII", "TODO", "TBD", "CITE", "AUTHOR", "USA", "UK", "EU",
+    "DNA", "RNA", "ATP", "2D", "3D",
+    "II", "III", "IV", "VI", "VII", "VIII", "IX", "XI", "XII",
+    "TODO", "TBD", "CITE", "AUTHOR", "USA", "UK", "EU",
 }
 REFERENCE = re.compile(
     r"(?:Supplementary|Extended Data)?\s*(?:Fig(?:ure)?s?\.?|Tables?|Tab\.|Eqs?\.?|Equations?|Sections?|Sec\.|"
     r"Notes?|Appendix|Algorithm|Alg\.)\s*~?\(?S?\d+(?:\.\d+)*[a-z]?\)?(?:\s*(?:[–-]|to)\s*\(?S?\d+(?:\.\d+)*[a-z]?\)?)?"
 )
-CITATION = re.compile(r"\[[\d,\s–-]+\]|\\(?:cite[tp]?|ref|eqref|label|tag)\{[^}]*\}|\[(?:CITE|AUTHOR):[^\]]*\]")
+CITATION = re.compile(
+    r"\[[\d,\s–-]+\]|\\(?:[Cc]ite\w*|nocite|ref|eqref|autoref|cref|Cref|label|tag)\*?(?:\[[^\]]*\])*\{[^}]*\}|\[(?:CITE|AUTHOR):[^\]]*\]"
+)
+LATEX_MARKER = re.compile(
+    r"\\(?:begin|end|section|subsection|subsubsection|paragraph|documentclass|usepackage|"
+    r"includegraphics|[Cc]ite\w*|nocite|ref|eqref|label|textbf|textit|emph|mathcal|mathrm|\[|%)"
+)
+DISPLAY_MATH = re.compile(
+    r"\\\[.*?\\\]|\$\$.*?\$\$|\\begin\{(?:equation|align|gather|multline)\*?\}.*?\\end\{(?:equation|align|gather|multline)\*?\}",
+    re.DOTALL,
+)
+LAYOUT_COMMAND = re.compile(
+    r"\\includegraphics(?:\s*\[[^\]]*\])?\s*\{[^}]*\}"
+    r"|\\(?:vspace|hspace|kern|raisebox|rule|setlength|addtolength)\*?\{[^}]*\}(?:\{[^}]*\})?"
+    r"|\\begin\{(?:tabular\*?|tabularx|minipage|subfigure|wrapfigure)\}(?:\[[^\]]*\])?\{[^}]*\}(?:\{[^}]*\})?"
+    r"|\[(?:width|height|scale|trim|clip|angle|page)=[^\]]*\]"
+)
+TRAILING_FIG_POINTER = re.compile(
+    r"\((?:see\s+)?(?:Supplementary\s+|Extended Data\s+)?(?:Fig(?:ure)?s?\.?|Tables?|Tab\.)[^()\n]{0,40}\)\s*[.!?][ \t]*$",
+    re.IGNORECASE,
+)
 NUMBER = re.compile(r"(?<![\w.])[-−+]?(?:\d{1,3}(?:,\d{3})+(?!\d|,\d)(?:\.\d+)?|\d+(?:\.\d+)?|\.\d+)(?:[eE][-−+]?\d+)?")
 THOUSANDS = re.compile(r"(?<=\d)(?:\{,\}|\\,|\u2009|\u202f)(?=\d{3})")
 ABBREV = re.compile(r"\b(?:e\.g|i\.e|et al|vs|Fig|Figs|Eq|Eqs|Sec|Tab|Ref|Refs|approx|cf)\.", re.I)
@@ -159,24 +187,33 @@ def split_notes_to_author(text):
     return (text[: m.start()], text[m.start():]) if m else (text, "")
 
 
+def strip_comments(text):
+    """Strip unescaped LaTeX % comments while preserving line numbers and Markdown percentages."""
+    pat = re.compile(r"(?<!\\)%.*") if LATEX_MARKER.search(text) else re.compile(r"(?<![\\0-9])%.*")
+    return "\n".join(pat.sub("", line) for line in text.splitlines())
+
+
 def prose_lines(text):
     """Yield prose lines, skipping headings, tables and display math (for sentence statistics)."""
     in_math = False
     for line in text.splitlines():
         s = line.strip().lstrip("> ").strip()
         if in_math:
-            if s.endswith("$$") or s.startswith("\\end{"):
+            if s.endswith(("$$", "\\]")) or s.startswith("\\end{"):
                 in_math = False
             continue
         if s.startswith("$$"):
             in_math = not (len(s) > 2 and s.endswith("$$"))
             continue
-        if s.startswith("\\begin{equation") or s.startswith("\\begin{align"):
-            in_math = True
+        if s.startswith("\\["):
+            in_math = not s.endswith("\\]")
+            continue
+        if re.match(r"\\begin\{(?:equation|align|gather|multline)\*?\}", s):
+            in_math = not re.search(r"\\end\{(?:equation|align|gather|multline)\*?\}", s)
             continue
         if not s or s.startswith(("#", "|", "%")):
             continue
-        yield line
+        yield re.sub(r"\\\[.*?\\\]", " ", line)
 
 
 def to_float(token):
@@ -232,9 +269,51 @@ def opening_issues(body):
     return issues
 
 
+def results_ending_issues(body):
+    """Flag Results paragraphs whose final prose line ends on a parenthetical figure/table pointer."""
+    issues = []
+    last_prose = None
+    in_math = False
+    for lineno, raw_line in enumerate(body.splitlines(), 1):
+        s = raw_line.strip().lstrip("> ").strip()
+        if in_math:
+            if s.endswith(("$$", "\\]")) or s.startswith("\\end{"):
+                in_math = False
+            continue
+        if not s:
+            if last_prose and (m := TRAILING_FIG_POINTER.search(last_prose[1])):
+                issues.append({"line": last_prose[0], "match": f"paragraph ends on figure/table pointer: {m.group(0).strip()}"})
+            last_prose = None
+            continue
+        if s.startswith("$$"):
+            in_math = not (len(s) > 2 and s.endswith("$$"))
+            continue
+        if s.startswith("\\["):
+            in_math = not s.endswith("\\]")
+            continue
+        if re.match(r"\\begin\{(?:equation|align|gather|multline)\*?\}", s):
+            in_math = not re.search(r"\\end\{(?:equation|align|gather|multline)\*?\}", s)
+            continue
+        if s.startswith(("#", "|", "%")) or re.match(r"^\\(?:sub)*section\*?\{", s):
+            continue
+        last_prose = (lineno, s)
+    if last_prose and (m := TRAILING_FIG_POINTER.search(last_prose[1])):
+        issues.append({"line": last_prose[0], "match": f"paragraph ends on figure/table pointer: {m.group(0).strip()}"})
+    return issues
+
+
 def check(draft, notes=None, section=None, spelling="us"):
-    body, author_notes = split_notes_to_author(draft)
+    raw_body, author_notes = split_notes_to_author(draft)
+    body = strip_comments(raw_body)
     british, british_names = find_british(body)
+    layout_hits = [
+        {"line": body.count("\n", 0, m.start()) + 1, "match": m.group(0).strip()[:60]}
+        for pat in (RUN_IN_LABEL, FIGURE_IN_HEADING)
+        for m in pat.finditer(body)
+    ]
+    if section == "results":
+        layout_hits.extend(results_ending_issues(body))
+    layout_hits.sort(key=lambda h: h["line"])
     report = {
         "report_register": find_all(REPORT_REGISTER, body),
         "weak_signpost": find_all(WEAK_SIGNPOST, body),
@@ -242,19 +321,18 @@ def check(draft, notes=None, section=None, spelling="us"):
                           for m in SUMMARY_LABEL.finditer(body)],
         "british_spelling": british if spelling == "us" else [],
         "opening": opening_issues(body) if section == "intro" else [],
-        "review_layout": [{"line": body.count("\n", 0, m.start()) + 1, "match": m.group(0).strip()[:60]}
-                          for pat in (RUN_IN_LABEL, FIGURE_IN_HEADING) for m in pat.finditer(body)],
+        "review_layout": layout_hits,
         "review_in_context": find_all(CONTEXTUAL, body) + (
             [{"line": h["line"], "match": h["match"] + " (proper name?)"} for h in british_names] if spelling == "us" else []),
         "generic": find_all(GENERIC, body),
         "non_english": [{"line": n, "text": line.strip()[:80]}
-                        for n, line in enumerate(body.splitlines(), 1) if HANGUL.search(line)],
+                        for n, line in enumerate(body.splitlines(), 1) if NON_ENGLISH.search(line)],
         "undefined_acronyms": [], "untraced_numbers": [], "untraced_small_integers": [],
         "declared_computed": [], "sentences": {},
     }
 
     prose = "\n".join(prose_lines(body))
-    plain = re.sub(r"\$[^$]*\$", " ", CITATION.sub(" ", prose))
+    plain = re.sub(r"\$[^$]*\$|\\\([^)]*\\\)", " ", CITATION.sub(" ", prose))
     seen = set()
     for m in ACRONYM.finditer(plain):
         acr = m.group(0)
@@ -268,7 +346,9 @@ def check(draft, notes=None, section=None, spelling="us"):
     if notes is not None:
         known = numbers_in(notes)
         declared = numbers_in(author_notes)
-        for tok in NUMBER.findall(THOUSANDS.sub("", CITATION.sub(" ", REFERENCE.sub(" ", re.sub(r"(?m)^(#+[ \t]*)\d+(?:\.\d+)*\.?[ \t]", r"\1", body))))):
+        num_source = LAYOUT_COMMAND.sub(" ", DISPLAY_MATH.sub(" ", body))
+        num_source = CITATION.sub(" ", REFERENCE.sub(" ", re.sub(r"(?m)^(#+[ \t]*)\d+(?:\.\d+)*\.?[ \t]", r"\1", num_source)))
+        for tok in NUMBER.findall(THOUSANDS.sub("", num_source)):
             v = to_float(tok)
             if v is None or v in known:
                 continue

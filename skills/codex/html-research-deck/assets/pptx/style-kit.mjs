@@ -1,5 +1,6 @@
 import { Presentation } from '@oai/artifact-tool';
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {spawnSync} from 'node:child_process';
@@ -69,7 +70,7 @@ export function ensureFont(){
   FONT_CHECKED=true;
   try{
     const here=path.dirname(fileURLToPath(import.meta.url));
-    const root=[process.env.RESEARCH_DECK_SKILL,process.env.RESEARCH_TALK_SKILL,path.resolve(here,'..','..'),'/Users/mseok/.codex/skills/html-research-deck'].filter(Boolean).find(r=>fs.existsSync(path.join(r,'scripts/pptx/ensure_font.py')));
+    const root=[process.env.RESEARCH_DECK_SKILL,process.env.RESEARCH_TALK_SKILL,path.resolve(here,'..','..'),path.join(os.homedir(),'.codex/skills/html-research-deck')].filter(Boolean).find(r=>fs.existsSync(path.join(r,'scripts/pptx/ensure_font.py')));
     if(!root){console.warn('ensureFont(): scripts/pptx/ensure_font.py not found (set RESEARCH_DECK_SKILL to the html-research-deck skill folder); make sure Pretendard is installed');return;}
     const r=spawnSync('python3',[path.join(root,'scripts/pptx/ensure_font.py')],{encoding:'utf8'});
     const msg=(r.stdout||'').trim();

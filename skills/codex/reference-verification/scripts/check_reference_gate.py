@@ -19,23 +19,27 @@ def active(text):
 
 
 def bibliography_entries(text):
+    cleaned = "\n".join("" if ln.lstrip().startswith("%") else ln for ln in text.splitlines())
     entries = {}
-    for match in re.finditer(r"@(\w+)\s*\{\s*([^,]+),", text):
+    issues = []
+    for match in re.finditer(r"@(\w+)\s*\{\s*([^,]+),", cleaned):
         if match[1].lower() in {"comment", "preamble", "string"}:
             continue
+        key = match[2].strip()
         depth = 1
         end = match.end()
-        while depth and end < len(text):
-            if end == 0 or text[end - 1] != "\\":
-                depth += (text[end] == "{") - (text[end] == "}")
+        while depth and end < len(cleaned):
+            if end == 0 or cleaned[end - 1] != "\\":
+                depth += (cleaned[end] == "{") - (cleaned[end] == "}")
             end += 1
         if depth:
-            raise ValueError(f"Unclosed bibliography entry: {match[2]}")
-        key = match[2].strip()
+            issues.append(f"Unclosed bibliography entry: {key}")
+            continue
         if key in entries:
-            raise ValueError(f"Duplicate bibliography key: {key}")
-        entries[key] = digest(text[match.start():end])
-    return entries
+            issues.append(f"Duplicate bibliography key: {key}")
+            continue
+        entries[key] = digest(cleaned[match.start():end])
+    return entries, issues
 
 
 def inventory(source_root, roots):
@@ -57,19 +61,22 @@ def inventory(source_root, roots):
             return
         seen.add(path)
         relative = str(path.relative_to(source_root))
-        raw = path.read_text()
+        raw = path.read_text(encoding="utf-8")
         files[relative] = digest(raw)
         text = active(raw)
         lines = text.splitlines()
         if re.search(r"\[CITE(?:\s*:|\])", text):
             problems.append(f"Unresolved citation placeholder: {relative}")
         commands = set(re.findall(r"\\([A-Za-z]*cite[A-Za-z]*)", text, re.IGNORECASE))
-        unsupported = sorted(command for command in commands
-                             if (not command.startswith("cite") and command != "nocite") or command.endswith("cites"))
+        unsupported = sorted(
+            command for command in commands
+            if (not command.lower().startswith("cite") and command.lower() != "nocite")
+            or command.lower().endswith("cites")
+        )
         if unsupported:
             problems.append(f"Citation commands need compiled-document review in {relative}: {', '.join(unsupported)}")
-        pattern = r"\\(?:cite\w*|nocite)\*?\s*(?:\[[^\]]*\]\s*){0,2}\{([^}]+)\}"
-        for ordinal, match in enumerate(re.finditer(pattern, text), 1):
+        pattern = re.compile(r"\\(?:cite\w*|nocite)\*?\s*(?:\[[^\]]*\]\s*){0,2}\{([^}]+)\}", re.IGNORECASE)
+        for ordinal, match in enumerate(pattern.finditer(text), 1):
             line = text[:match.start()].count("\n")
             start = end = line
             while start and lines[start - 1].strip():
@@ -99,9 +106,12 @@ def inventory(source_root, roots):
         if root is not None:
             walk(root, root_name, set())
     for path in sorted(bib_paths):
-        raw = path.read_text()
-        files[str(path.relative_to(source_root))] = digest(raw)
-        for key, entry_hash in bibliography_entries(raw).items():
+        raw = path.read_text(encoding="utf-8")
+        rel_bib = str(path.relative_to(source_root))
+        files[rel_bib] = digest(raw)
+        bib_entries, bib_issues = bibliography_entries(raw)
+        problems.extend(f"{issue} in {rel_bib}" for issue in bib_issues)
+        for key, entry_hash in bib_entries.items():
             if key in entries:
                 problems.append(f"Duplicate bibliography key across files: {key}")
             entries[key] = entry_hash
@@ -166,8 +176,12 @@ def main():
     parser.add_argument("--mode", choices=("metadata", "full"), required=True)
     args = parser.parse_args()
     current = inventory(args.source_root.resolve(), args.roots)
-    args.inventory.write_text(json.dumps(current, ensure_ascii=False, indent=2) + "\n")
-    failures = check_review(current, json.loads(args.review.read_text()), args.mode) if args.review else current["problems"]
+    args.inventory.write_text(json.dumps(current, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    failures = (
+        check_review(current, json.loads(args.review.read_text(encoding="utf-8")), args.mode)
+        if args.review
+        else current["problems"]
+    )
     result = {"status": "blocked" if failures else "clear" if args.review else "inventory_only",
               "mode": args.mode,
               "references": len(current["references"]), "citation_locations": len(current["uses"]),

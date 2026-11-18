@@ -7,11 +7,20 @@ set -eu
 [ $# -ge 2 ] || { echo "usage: $0 deck/index.html out_dir [scale]" >&2; exit 2; }
 IN="$(cd "$(dirname "$1")" && pwd)/$(basename "$1")"
 OUT="$2"; SCALE="${3:-0.5}"
-CHROME="${CHROME:-/Applications/Google Chrome.app/Contents/MacOS/Google Chrome}"
-[ -x "$CHROME" ] || { echo "Chrome not found at $CHROME (set CHROME=...)" >&2; exit 1; }
+if [ -z "${CHROME:-}" ]; then
+  if [ -x "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" ]; then
+    CHROME="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+  else
+    for c in google-chrome google-chrome-stable chromium chromium-browser; do
+      if command -v "$c" >/dev/null 2>&1; then CHROME="$(command -v "$c")"; break; fi
+    done
+  fi
+fi
+[ -n "${CHROME:-}" ] && [ -x "$CHROME" ] || { echo "Chrome not found (set CHROME=...)" >&2; exit 1; }
 mkdir -p "$OUT"
 N="$(python3 -c 'import re,sys; s=re.sub(r"<!--.*?-->","",open(sys.argv[1],encoding="utf-8").read(),flags=re.S); print(len(re.findall(r"<section class=\"slide", s)))' "$IN")"
 UD="$(mktemp -d "${TMPDIR:-/tmp}/deck-chrome.XXXXXX")"
+trap 'python3 -c "import shutil, sys; shutil.rmtree(sys.argv[1], ignore_errors=True)" "$UD"' EXIT
 i=1
 while [ "$i" -le "$N" ]; do
   P="$OUT/$(printf 'slide-%02d.png' "$i")"

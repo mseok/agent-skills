@@ -38,3 +38,18 @@ test('Gemini: a sign-in failure is auth_required, other rejections stay native_r
   }
  }finally{fs.rmSync(profileDir,{recursive:true,force:true});}
 });
+test('Gemini: retired default bridge ACP returns unavailable while an explicit missing binary stays error',async()=>{
+ const prevBin=process.env.GEMINI_ACP_BIN,prevState=process.env.BRIDGE_STATE_DIR;
+ const missingRoot=path.join(os.tmpdir(),`quota-retired-${process.pid}-${Date.now()}`);
+ delete process.env.GEMINI_ACP_BIN;
+ process.env.BRIDGE_STATE_DIR=missingRoot;
+ try{
+  const retired=await readGeminiQuota();
+  assert.equal(retired.status,'unavailable');assert.equal(retired.reason,'bridge_acp_retired');assert.equal(retired.windows.length,0);
+  const explicitMissing=await readGeminiQuota({executable:path.join(missingRoot,'missing-acp')});
+  assert.equal(explicitMissing.status,'error');assert.equal(explicitMissing.reason,'acp_runtime_missing');
+ }finally{
+  if(prevBin===undefined)delete process.env.GEMINI_ACP_BIN;else process.env.GEMINI_ACP_BIN=prevBin;
+  if(prevState===undefined)delete process.env.BRIDGE_STATE_DIR;else process.env.BRIDGE_STATE_DIR=prevState;
+ }
+});

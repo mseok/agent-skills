@@ -21,6 +21,9 @@ The user is judged by these texts, so they must read like the user, not like an 
 2. Send only with the user's explicit approval of that exact text in the current turn. Sending is irreversible; a retraction is not a fix.
 3. Never type the user's email address or other identifiers into an external service or a subagent prompt unless the user asked. Never send from an automated or evaluation run; send-capable connectors stay disabled there.
 4. After sending, report the recipient, time and whether delivery or receipt was confirmed; "delivery started" is not receipt.
+5. **Antigravity (`gmail` CLI plugin)**: write multiline plain-text bodies to `<scratch>/body.txt` and pass `--body-file <scratch>/body.txt` to `gmail mutate create-draft` or `gmail mutate update-draft DRAFT_ID` without `--md` (unless formatted email was explicitly requested), then verify with `gmail readonly get-draft DRAFT_ID`.
+   Never call `gmail mutate delete-draft` on a draft already handed to the user (it can permanently delete a message sent during Undo Send), and set `AGY_UNATTENDED=1` in automated or evaluation runs.
+   When no Slack plugin is installed in Antigravity, stop after presenting the plain-text fenced block for the user to paste.
 
 ## Slack specifics
 

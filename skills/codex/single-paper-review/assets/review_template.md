@@ -1,6 +1,7 @@
 ---
 title: "{{title}}"
 created: {{date}}
+updated: {{date}}
 tags:
   - kind/paper-review
 project:

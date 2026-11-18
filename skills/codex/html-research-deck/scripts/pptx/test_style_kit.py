@@ -6,7 +6,7 @@ Needs the Codex runtime node (it provides @oai/artifact-tool). Skips when the ru
 import os, shutil, subprocess, tempfile, unittest, zipfile
 from pathlib import Path
 
-RUNTIME = Path('/Users/mseok/.cache/codex-runtimes/codex-primary-runtime/dependencies/node')
+RUNTIME = Path(os.environ.get('CODEX_NODE_RUNTIME', Path.home() / '.cache/codex-runtimes/codex-primary-runtime/dependencies/node'))
 ASSETS = Path(__file__).resolve().parent.parent.parent / 'assets' / 'pptx'
 
 
@@ -34,7 +34,7 @@ class StyleKitTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as td:
             shutil.copy(ASSETS / 'style-kit.mjs', td)
             os.symlink(RUNTIME / 'node_modules', Path(td) / 'node_modules')
-            Path(td, 't.mjs').write_text(script)
+            Path(td, 't.mjs').write_text(script, encoding='utf-8')
             subprocess.run([node, 't.mjs'], cwd=td, check=True, capture_output=True, timeout=180)
             with zipfile.ZipFile(Path(td) / 'l.pptx') as z:
                 xml = z.read('ppt/slides/slide1.xml').decode()
@@ -51,7 +51,7 @@ class StyleKitTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as td:
             shutil.copy(ASSETS / 'style-kit.mjs', td)
             os.symlink(RUNTIME / 'node_modules', Path(td) / 'node_modules')
-            Path(td, 't.mjs').write_text(script)
+            Path(td, 't.mjs').write_text(script, encoding='utf-8')
             subprocess.run([node, 't.mjs'], cwd=td, check=True, capture_output=True, timeout=180)
             with zipfile.ZipFile(Path(td) / 's.pptx') as z:
                 xml = z.read('ppt/slides/slide1.xml').decode()
@@ -69,8 +69,8 @@ class StyleKitTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as td:
             shutil.copy(ASSETS / 'style-kit.mjs', td)
             os.symlink(RUNTIME / 'node_modules', Path(td) / 'node_modules')
-            Path(td, 't.mjs').write_text(script)
-            r = subprocess.run([node, 't.mjs'], cwd=td, check=True, capture_output=True, timeout=180, text=True)
+            Path(td, 't.mjs').write_text(script, encoding='utf-8')
+            r = subprocess.run([node, 't.mjs'], cwd=td, check=True, capture_output=True, timeout=180, text=True, encoding='utf-8')
             with zipfile.ZipFile(Path(td) / 's.pptx') as z:
                 xml = z.read('ppt/slides/slide1.xml').decode()
         self.assertIn('sz="4000"', xml)
@@ -87,7 +87,7 @@ class StyleKitTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as td:
             shutil.copy(ASSETS / 'style-kit.mjs', td)
             os.symlink(RUNTIME / 'node_modules', Path(td) / 'node_modules')
-            Path(td, 't.mjs').write_text(script)
+            Path(td, 't.mjs').write_text(script, encoding='utf-8')
             subprocess.run([node, 't.mjs'], cwd=td, check=True, capture_output=True, timeout=180)
             with zipfile.ZipFile(Path(td) / 's.pptx') as z:
                 xml = z.read('ppt/slides/slide1.xml').decode()
@@ -105,7 +105,7 @@ class StyleKitTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as td:
             shutil.copy(ASSETS / 'style-kit.mjs', td)
             os.symlink(RUNTIME / 'node_modules', Path(td) / 'node_modules')
-            Path(td, 't.mjs').write_text(script)
+            Path(td, 't.mjs').write_text(script, encoding='utf-8')
             subprocess.run([node, 't.mjs'], cwd=td, check=True, capture_output=True, timeout=180)
             with zipfile.ZipFile(Path(td) / 's.pptx') as z:
                 xml = z.read('ppt/slides/slide1.xml').decode()
@@ -127,7 +127,7 @@ class StyleKitTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as td:
             shutil.copy(ASSETS / 'style-kit.mjs', td)
             os.symlink(RUNTIME / 'node_modules', Path(td) / 'node_modules')
-            Path(td, 't.mjs').write_text(script)
+            Path(td, 't.mjs').write_text(script, encoding='utf-8')
             subprocess.run([node, 't.mjs'], cwd=td, check=True, capture_output=True, timeout=180)
             with zipfile.ZipFile(Path(td) / 's.pptx') as z:
                 xml = z.read('ppt/slides/slide1.xml').decode()
@@ -144,8 +144,8 @@ class StyleKitTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as td:
             shutil.copy(ASSETS / 'style-kit.mjs', td)
             os.symlink(RUNTIME / 'node_modules', Path(td) / 'node_modules')
-            Path(td, 't.mjs').write_text(script)
-            out = subprocess.run([node, 't.mjs'], cwd=td, check=True, capture_output=True, timeout=180, text=True).stdout
+            Path(td, 't.mjs').write_text(script, encoding='utf-8')
+            out = subprocess.run([node, 't.mjs'], cwd=td, check=True, capture_output=True, timeout=180, text=True, encoding='utf-8').stdout
         self.assertIn('"a":["Pretendard",20]', out)
         self.assertIn('"b":["Apple SD Gothic Neo",20.5]', out)
 
@@ -158,8 +158,8 @@ class StyleKitTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as td:
             shutil.copy(ASSETS / 'style-kit.mjs', td)
             os.symlink(RUNTIME / 'node_modules', Path(td) / 'node_modules')
-            Path(td, 't.mjs').write_text(script)
-            out = subprocess.run([node, 't.mjs'], cwd=td, check=True, capture_output=True, timeout=180, text=True).stdout
+            Path(td, 't.mjs').write_text(script, encoding='utf-8')
+            out = subprocess.run([node, 't.mjs'], cwd=td, check=True, capture_output=True, timeout=180, text=True, encoding='utf-8').stdout
         self.assertIn('not allowed', out)
         self.assertIn('"ok":true', out)
 

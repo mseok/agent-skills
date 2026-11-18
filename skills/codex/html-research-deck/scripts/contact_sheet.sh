@@ -3,9 +3,18 @@
 #   usage: tools/contact_sheet.sh shots_dir out.png [per_row]
 set -eu
 DIR="$(cd "$1" && pwd)"; OUT="$2"; PER="${3:-5}"
-CHROME="${CHROME:-/Applications/Google Chrome.app/Contents/MacOS/Google Chrome}"
+if [ -z "${CHROME:-}" ]; then
+  if [ -x "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" ]; then
+    CHROME="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+  else
+    for c in google-chrome google-chrome-stable chromium chromium-browser; do
+      if command -v "$c" >/dev/null 2>&1; then CHROME="$(command -v "$c")"; break; fi
+    done
+  fi
+fi
+[ -n "${CHROME:-}" ] && [ -x "$CHROME" ] || { echo "Chrome not found (set CHROME=...)" >&2; exit 1; }
 HTML="$DIR/.contact.html"
-N="$(ls "$DIR"/*.png | wc -l | tr -d ' ')"
+N="$(/bin/ls "$DIR"/*.png | wc -l | tr -d ' ')"
 ROWS=$(( (N + PER - 1) / PER ))
 TW=$(( 1920 / PER ))
 TH=$(( TW * 9 / 16 + 26 ))
@@ -15,6 +24,7 @@ TH=$(( TW * 9 / 16 + 26 ))
   echo "</div>"
 } > "$HTML"
 UD="$(mktemp -d "${TMPDIR:-/tmp}/deck-chrome.XXXXXX")"
+trap 'python3 -c "import shutil, sys; shutil.rmtree(sys.argv[1], ignore_errors=True)" "$UD"' EXIT
 "$CHROME" --headless=new --disable-gpu --no-first-run --no-default-browser-check --user-data-dir="$UD" \
   --window-size=1920,$(( ROWS * TH + 8 )) --force-device-scale-factor=1 --virtual-time-budget=6000 \
   --screenshot="$OUT" "file://$HTML" >/dev/null 2>&1
