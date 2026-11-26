@@ -8,6 +8,8 @@ Make a reverse outline from what was written, not what the original plan intende
 
 Read these sentences in order. Check what the reader learns next, why that information belongs here, whether prerequisites arrive before their use and whether the space given to each result matches its importance. Independent tests can stand in parallel. Do not force every result into one causal chain or add repeated slogans to manufacture coherence. Within the authorized scope, repair roles, order, repetition and proportion before polishing transitions.
 
+Judge the whole passage before scoring local features. Does it establish a problem worth solving, make the study's contribution intelligible and sustain a natural progression? A specific opener, early mention of the closest prior method or greater detail is useful only when it improves that progression. During comparisons, keep factual errors separate from editorial preference and do not reward compliance with this skill as evidence of better writing. Preserve an author's preferred baseline and make targeted corrections instead of forcing it into the skill's preferred shape.
+
 ## Check the sections together
 
 - The Introduction establishes the question and promises an advance that the Results actually address.
@@ -22,3 +24,4 @@ Read the Introduction's closing argument, the Results headings and core findings
 Use the contrasting examples and qualification rule in `register.md` to check what earns space in the prose. Keep useful explanation and interpretation, combine repetition, and place supporting detail where it serves the reader. Remove sentences that merely restate verification status, enumerate untested possibilities or defend an already accurate finding. The finished paper should develop its scientific message, not narrate the checks used to prepare it. Then polish sentences and complete the skill's factual and prose checks internally.
 
 For a single-section task, apply the pass to the supplied section and surrounding context. Do not expand the edit scope, invent missing sections or claim whole-paper alignment without reading them. Flag a material mismatch outside the authorized passage instead of rewriting it. Keep the reverse outline as working material, not manuscript prose or a mandatory extra deliverable.
+

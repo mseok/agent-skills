@@ -7,6 +7,8 @@ description: Write or revise English research-paper prose (Introduction, Methods
 
 The manuscript text you produce is the paper. Make its scientific question, contribution and meaning clear to the intended readers, with the information needed to assess and reproduce the work in the appropriate places. Write the strongest supported message in natural disciplinary language. Keep the writing process and evidence audit out of the manuscript.
 
+Use editorial guidance selectively to serve the whole argument. Natural progression, reader motivation and the author's direction take priority over stylistic heuristics. A broad scientific statement can establish essential context; a concrete example can distract. Do not make prose unusual, more technical or more detailed merely to satisfy a writing rule. Accuracy and faithful reporting remain required.
+
 ## Workflow
 
 1. **Choose the writing direction** from the research record and the author's goal (`references/planning.md`). For a new paper or a changed target, read `references/venue-adaptation.md`: establish the exact journal, article type and readers, inspect suitable published examples, and choose the most consequential question the available results answer. Audit the full research history, including corrections and unfavorable results; privately outline the argument and the role of each figure and paragraph.
@@ -73,12 +75,11 @@ Use the target's actual requirements for abstract form, word limits, section lab
 
 ## Self-check before returning
 
-Fix every failure, then return.
+Resolve factual errors and material omissions, then judge the draft as a connected scientific argument. Treat stylistic checks as prompts for judgment, not quotas or automatic reasons to rewrite sound prose.
 
 - [ ] Complete the integration pass in `references/integration.md`: the sections address the same central message at the same evidential scope. Compare the draft's editorial choices with the examples in `references/register.md`; facts are organized into findings, and each limitation earns its place by changing interpretation or satisfying a venue requirement.
 - [ ] Someone who reads only the Introduction can state the central contribution and why it matters to the target readers. It matches the evidence and the rest of the paper; its meaning stays consistent without repeated scope labels or defensive recaps.
-- [ ] Introduction: open with a concrete statement or question this paper needs, at the intended readers' knowledge level. Keep genuine frequency or conditionality; never mechanically strengthen a claim to sound confident. Introduce notation or technical names only when they help explain the problem. Scientific names such as Aβ or α-synuclein are not gratuitous mathematical notation.
-- [ ] No opener or sentence that could begin any paper in the field.
+- [ ] Introduction: establish a scientific problem and a reason for the intended reader to care, then develop the question and contribution. Use the level of abstraction that supports this progression; the opening need not be unique to this paper or describe its experimental contrast. Keep genuine frequency or conditionality, and introduce technical detail when it helps the reader understand the argument.
 - [ ] Each paragraph connects to where the previous one ended, in the argument rather than by repeated words, and none re-explains the paragraph before it.
 - [ ] Unfamiliar acronyms and symbols are defined where the intended readers need them, including independently read sections. Review long or dense sentences for readability; preserve necessary scientific terms and logical connections rather than targeting a fixed average length.
 - [ ] Methods: organize the actual study so the intended readers can follow its design and non-obvious steps. Define quantities before use; make controls and comparisons intelligible. Preserve required values across the appropriate main and supplementary materials, avoid repeating setup tables, and invent no motivation, symbol meaning or pointer.
@@ -101,3 +102,4 @@ If a shell is available, `python3 -I <skill folder>/scripts/check_prose.py DRAFT
 - Explain how the findings change the picture relative to the closest prior work. Keep established explanations apart from interpretations, and address an alternative explanation when a reader would raise it.
 - Discuss a limitation when it changes interpretation, explains a result, identifies a consequential open question or satisfies the target's requirements. Explain the scientific consequence once, in the relevant discussion; do not append a generic "this does not establish X" after each finding or enumerate unrelated things not tested. Preserve important contrary evidence without turning the Discussion into an audit.
 - End on the strongest grounded conclusion. Add a future direction only when it follows specifically from the findings.
+

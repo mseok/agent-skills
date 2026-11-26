@@ -6,15 +6,15 @@ The reader leaves the Introduction understanding the scientific question, why it
 
 Readers and editors decide in the first paragraph whether to keep reading, so it gets the most care.
 
-- **The first sentence** gives the target reader a concrete phenomenon, question or tension at the scale this study addresses. Prefer a direct declarative to a generic announcement of importance. Replace vague frequency or modal wording with the relevant condition when that improves precision; retain it when it expresses a real scientific distinction. Do not remove uncertainty by strengthening the claim.
-- **The first paragraph** starts from what this readership can reasonably be expected to know. Explain unfamiliar concepts that the argument needs; use established field terms for familiar objects. Do not turn a specialist opening into a general tutorial or enlarge a focused problem into a claim about the whole field. Mathematical formalism enters when it helps the argument; a standard scientific name such as Aβ is not distracting notation.
+- **The opening** establishes the scientific setting and why the problem deserves attention, at the intended reader's level. A general statement can do useful work when the paragraph develops it into a consequential question. A concrete phenomenon or example can also work when its significance is apparent. Choose the progression that makes this study intelligible; do not require the first sentence to identify this paper alone, introduce its variables or describe a control experiment. Retain uncertainty where it carries scientific meaning.
+- **The first paragraph** starts from what this readership can reasonably be expected to know and supplies the context needed to understand the question. Explain unfamiliar concepts and use established field terms. Choose the breadth from the scientific motivation, without inflating the contribution or prematurely reducing it to an experimental setup.
 - **Its ending** gives the next paragraph a reason to follow. This may be the unresolved question, a distinction or the next piece of background; there is no compulsory closing sentence or paragraph count.
-- **Make the problem concrete.** One illustration often does more than three abstract sentences: a worked number, a limiting case or a familiar consequence. Introduce it as an example in the prose ("For a clock that drifts by 0.1 s per day, …"), keep its premises explicit and its arithmetic exact, never present a hypothetical quantity as a measurement, and retain any calculation in the working notes. Prefer a number from the inputs; a hypothetical premise needs an explicit hypothetical frame ("Suppose …", "For a …") and no attribution to a real system. Keep it light: one comparison a reader can picture, such as a ratio, a fraction or a count of halvings. An illustration that needs its own explanation or a chain of calculations is too heavy for the opening paragraphs.
+- **Examples are optional.** Use an illustration when it clarifies a problem whose importance the reader can understand. Do not add a worked number, named system or imagined comparison merely to make the opening concrete. If a hypothetical example is useful, label its premises as hypothetical, keep its arithmetic exact and retain the calculation in working notes; never present it as a measurement.
 
 Synthetic contrast:
 
 - Weak: "Quantum processors sometimes exhibit correlated errors $e_{ij}$ between syndrome bits."
-- Strong: "A surface-code quantum processor must decode each round of syndrome measurements before the next round arrives, roughly every microsecond."
+- Better when the paper addresses decoding latency: "A surface-code quantum processor must decode each round of syndrome measurements before the next round arrives, roughly every microsecond." The deadline explains the problem's consequence. Its specificity alone does not make it a better opening for a different scientific question.
 
 ## Make the argument specific
 
@@ -50,7 +50,7 @@ Use the moves the argument needs, in the order it needs them.
   - Scoped once: "The probe measures soil moisture from one reference sample per soil type, instead of the laboratory calibration curve that current probes require."
 - Keep one central message. Place supporting contributions where they advance it, without making them compete as unrelated stories.
 - Explain the scientific contribution rather than merely naming a component swap. For a methods paper, the important difference may be an assumption, representation or objective. For another contribution, it may be the phenomenon explained, the quantity measured or the distinction resolved.
-- Do not undersell with hedges ("we attempt to", "a first step toward") or oversell with adjectives ("novel", "groundbreaking", "unprecedented"). The contrast and the number carry the emphasis.
+- Express the contribution at its supported strength. Explain what changes and why it matters; use a contrast or number when it helps, without requiring either to carry the emphasis.
 - "First" claims appear only when the inputs establish them; otherwise describe the specific capability.
 - Use a contributions list only when it suits the article type and target practice. Each item names a distinct contribution; routine implementation steps and a second copy of the results paragraph do not earn items.
 
@@ -74,7 +74,7 @@ When the Introduction previews results, select the findings that establish the c
 - Keep subject and main verb close together and early; at most one parenthetical per sentence.
 - Spell out every acronym at first use as "full name (ACRONYM)", including agencies and standard method variants, unless it is universal for the target reader (DNA, GPU); then use the short form consistently. Do not drop a useful acronym to avoid expanding it. If the inputs do not give the expansion, keep the supplied name and flag it in Notes to author. Define every symbol at first use, and keep one name per concept (do not alternate "surrogate", "emulator" and "proxy").
 - Verbs over nominalizations: "we estimate the noise" rather than "estimation of the noise is performed".
-- Concrete over abstract: a number, an example, a named regime.
+- Use the level of abstraction the argument needs. Add examples, numbers and named regimes when they clarify it, not as a default preference over a general scientific statement.
 - Citations support statements about what prior work does; they never replace that description.
 - Vary sentence length. Reread a dense sentence for competing ideas, distant subjects and verbs, or unnecessary qualifications; do not split a coherent explanation merely to meet a word-count target.
 
@@ -88,9 +88,10 @@ Specific version (compressed into one paragraph for illustration):
 
 > A surface-code quantum processor must decode each round of syndrome measurements before the next round arrives, roughly every microsecond. A slower decoder lets errors accumulate faster than they are corrected. Decoders that meet this deadline, from union-find to recent neural networks, assume that physical errors are independent across qubits and rounds [1–12]. On current hardware the assumption fails where it matters most: leakage and high-energy radiation events produce bursts of correlated errors, and these bursts cause most logical failures. Rather than correcting correlations after an independent-error decoder has run, we build the correlation structure into the decoder and estimate it from the syndrome stream while the device operates. On a distance-7 code, this lowers the logical error rate per round by a factor of 3.1 relative to the fastest independent-error decoder, within the same 1-µs budget.
 
-What changed: the opening could only begin this paper and needs no notation; the closest work is described by what it does and the assumption its members share; the shortfall has a mechanism and a consequence; the turn reuses "independent" and "correlated"; the evidence is one number against a named comparator, with its condition inside the claim. In a real paper each of these statements about hardware and prior decoders needs its source in the inputs.
+What changed: the opening gives a reason the problem matters; the closest work is described by what it does and the assumption its members share; the shortfall has a mechanism and a consequence; the turn reuses "independent" and "correlated"; the selected result explains the advance. This is one suitable argument for a latency-focused study, not a requirement to open every paper with a specific system, deadline or experimental contrast. In a real paper each statement about hardware and prior decoders needs its source in the inputs.
 
 A component description versus the scientific contribution in a computational methods paper:
 
 - Component: "We replace the reward model with a larger network trained on more preference data."
 - Idea: "Existing test-time adaptation methods assume the label distribution is the same at training and deployment; we estimate the deployment label distribution online and adapt the classifier to it."
+
