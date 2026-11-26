@@ -20,6 +20,14 @@ Keep a working map from the proposed central message to supporting and contrary 
 
 Identify a missing experiment only when it is necessary for a claim the paper proposes to make. Narrow or select another supported claim and record the consequential gap for the author. Do not list every untested downstream application, add a limitation for every possible extension or run new experiments as part of writing.
 
+## Recover the scientific motivation
+
+Read the author's problem-formulation notes, accepted framing and relevant research discussion before turning experimental records into an outline. Identify the scientific goal that motivated the work, the difficulty that makes it consequential, and how the proposed approach came to address it. If no framing note exists, construct these premises from the supplied direction, research record and relevant primary literature; do not require the author to provide a polished source document. Distinguish this motivating problem from the particular systems, datasets and comparisons used to investigate it. The order in which experiments were performed or recorded need not become the order in which the paper explains its purpose.
+
+When a useful framing document or prior draft exists, trace its central premises to the sources and editorial decisions that produced it. Record identifiable source passages, versions and substantive transformations in the preparation record; mark unavailable history as unknown. Recover the reasoning that made the framing work rather than copying its sentences. Do not infer that an input caused a better draft merely because that draft used it.
+
+Build a compact connected argument from the consequential broader scientific problem that motivates the study, through relevant existing knowledge, to the specific question and the study's answer. Make each narrowing step explain why the next question follows. Keep the central question stable when demonstration systems change unless the evidence or author changes its premise. Use this argument in the editorial brief, with source provenance kept in the preparation record and complete factual material separately available. Develop paragraphs from these substantive premises and connections; a sequence of background, gap and contribution labels is not an argument.
+
 ## Select the contribution before the outline
 
 Start from the author's supplied scientific purpose. Connect it to the closest established accomplishment, the useful method, capability or observation added here, and what that addition changes for the reader. A central sentence that merely describes the evaluation program is not enough. If the record supports competing contributions, compare plausible hierarchies within that purpose; change the purpose only when the evidence requires it or the author directs it.

@@ -10,6 +10,8 @@ Read these sentences in order. Check what the reader learns next, why that infor
 
 Judge the whole passage before scoring local features. Does it establish a problem worth solving, make the study's contribution intelligible and sustain a natural progression? A specific opener, early mention of the closest prior method or greater detail is useful only when it improves that progression. During comparisons, keep factual errors separate from editorial preference and do not reward compliance with this skill as evidence of better writing. Preserve an author's preferred baseline and make targeted corrections instead of forcing it into the skill's preferred shape.
 
+In an Introduction, check whether the reader understands why the research matters before being asked to follow a particular system, method or comparison. A clear description of a demonstration cannot supply a missing motivation. When that substitution has occurred, rebuild the progression from the scientific problem rather than merely adding a broad sentence before the existing opening.
+
 ## Reconstruct when coherence is not enough
 
 Read the draft without its plan and state what it enables, measures or explains for the reader. Compare that answer with the author's supplied purpose, the closest prior accomplishment and the selected evidence. A fluent sequence of background, literature, components and scores can remain intellectually unresolved. Check whether the question, contribution and final answer refer to the same scientific purpose, and whether controls serve that purpose at the weight their findings warrant.

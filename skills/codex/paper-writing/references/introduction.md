@@ -14,9 +14,11 @@ Construct the introduction as connected reasoning. Each paragraph should leave t
 
 ## Opening and importance
 
-Begin at the level at which the intended readers can recognize the problem. An established scientific goal, a consequential uncertainty or a practical limitation can provide that starting point. A general opening is useful when the paragraph develops its significance; a detailed example is useful when the reader already understands why the detail matters.
+Normally begin with the consequential broader scientific problem that motivates the study and narrow naturally toward its specific question. Choose a starting scale at which the intended readers can understand what is at stake, then explain the difficulty that makes a more specific question necessary. Breadth should supply a useful premise; a general declaration that a field is important does not do this work.
 
-Develop importance through a connection: what the question affects, why present knowledge or practice is insufficient for that purpose, and what answering it would change. Do not substitute a claim that the field is important, a striking number, an unusual first sentence or a list of applications for that connection. Do not require an experimental contrast, benchmark, variable definition or method name in the opening.
+Establish why the research matters before introducing its particular test systems, datasets or experimental comparisons. These can make the approach and evidence concrete once the motivating problem is clear. Begin with a specific system only when that problem itself carries the paper's significance and fits the author's direction; an available or vivid example is not sufficient.
+
+Let the narrowing follow the scientific relationships: what matters, what makes progress difficult, what existing work makes possible, and what question or opportunity remains. Paragraph boundaries and explanatory depth follow that reasoning. Do not turn the progression into fixed paragraph slots or invent a failure of prior work to complete it.
 
 ## Literature as reasoning
 
