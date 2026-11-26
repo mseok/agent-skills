@@ -1,6 +1,6 @@
 # Final accuracy and completeness review
 
-Read after the scientific argument has been drafted and reconstructed. These requirements apply throughout the task; their detailed review belongs here so that verification does not supply the manuscript outline. Keep the complete record available and repair factual meaning before polishing.
+Read in the coordinator's preparation and in the separate correction context after the scientific argument has been drafted and reconstructed (`delegation.md`). These requirements apply throughout the task. Give the fresh composer the complete facts and short composition card, without this detailed audit. Keep the complete record available to the corrector and repair factual meaning before polishing.
 
 ## Non-negotiables
 
@@ -18,12 +18,20 @@ Read after the scientific argument has been drafted and reconstructed. These req
 - **No fixed template.** Paragraph order and count follow the argument of this paper. The numbers in this skill (paragraph counts, sentence lengths, word ranges) are diagnostics that prompt a second look, not shapes to fill.
 - **Revision mode.** When revising a draft, change what the author asked for and, inside the passages that request covers, what violates this skill; keep the author's structure, terminology, citations and claims. Follow `revision.md` for before/after drafts, numbers-only updates and anything applied to a live shared manuscript.
 
+## Correct without replacing the paper
+
+Check the draft independently against the complete record, not only the editorial brief. For each factual error or consequential omission, identify the affected passage, the source, what changes scientifically and the smallest sufficient repair. Keep factual errors, unresolved source access and editorial preferences distinct. A missing repeated scope label is not an error when the surrounding passage already fixes the relevant conditions.
+
+Preserve the contribution, paragraph roles and useful scientific explanation when the evidence supports them. If a premise or central claim fails, identify the failure and the supported alternative; a cosmetic hedge is not enough. Return that scientific correction to the coordinator for reconstruction within the authorized scope. Do not silently turn a method paper into another kind of study, discard contrary findings or rewrite sound paragraphs into an account of their verification. For an approved or numbers-only revision, follow `revision.md` before changing the framing.
+
+After corrections, recheck their sources and meaning in context. Check all substantively changed claims again. The coordinator then completes the final full reference check on the version actually delivered. An isolated factual pass does not substitute for reference verification or establish whole-paper clearance from a section alone.
+
 ## Final review
 
 
-Resolve factual errors and material omissions, then judge the draft as a connected scientific argument. Treat stylistic checks as prompts for judgment, not quotas or automatic reasons to rewrite sound prose.
+The coordinator owns completion of this checklist. The separate corrector checks the draft's factual and prose requirements within the supplied scope; it reports any scientific mismatch but does not rerun the coordinator's integration or treat a still-pending final reference pass as a defect in the draft. Resolve factual errors and material omissions, then judge the draft as a connected scientific argument. Treat stylistic checks as prompts for judgment, not quotas or automatic reasons to rewrite sound prose.
 
-- [ ] Complete the integration pass in `integration.md`: the sections address the same central message at the same evidential scope. Compare the draft's editorial choices with the examples in `register.md`; facts are organized into findings, and each limitation earns its place by changing interpretation or satisfying a venue requirement.
+- [ ] Coordinator: complete the integration pass in `integration.md`; the sections address the same central message at the same evidential scope. Compare the draft's editorial choices with the examples in `register.md`; facts are organized into findings, and each limitation earns its place by changing interpretation or satisfying a venue requirement.
 - [ ] Someone who reads only the Introduction can state the central contribution and why it matters to the target readers. It matches the evidence and the rest of the paper; its meaning stays consistent without repeated scope labels or defensive recaps.
 - [ ] Introduction: establish a scientific problem and a reason for the intended reader to care, then develop the question and contribution. Use the level of abstraction that supports this progression; the opening need not be unique to this paper or describe its experimental contrast. Keep genuine frequency or conditionality, and introduce technical detail when it helps the reader understand the argument.
 - [ ] Each paragraph connects to where the previous one ended, in the argument rather than by repeated words, and none re-explains the paragraph before it.
@@ -33,7 +41,7 @@ Resolve factual errors and material omissions, then judge the draft as a connect
 - [ ] No report-register phrase, summary label, British spelling (unless the author or venue uses it) or non-English text in the manuscript.
 - [ ] No claim is stronger than its evidence; every number is traced to the inputs with its unit, comparator and basis.
 - [ ] The main scientific message remains clear. Remove qualifications that change no relevant interpretation, repeated "shown/not shown" language and internal review vocabulary; retain the actual conditions, contrary findings and explanations that matter.
-- [ ] The separate `reference-verification` skill has checked the delivered main text and supplied SI in the required mode; remaining findings and the checked saved artifact are stated accurately.
+- [ ] Coordinator: the separate `reference-verification` skill has checked the delivered main text and supplied SI in the required mode; remaining findings and the checked saved artifact are stated accurately.
 
 If a shell is available, `python3 -I <skill folder>/scripts/check_prose.py DRAFT --notes NOTES --section intro|methods|results` reports report-register phrases, weakness signposts, summary labels, British spellings, words to review in context, generic openers, untraced numbers, undefined acronyms, non-English text, layout patterns and sentence lengths; `--section intro` adds checks on the first sentence and paragraph. When the draft uses computed values, make a separate working-notes copy containing the original source facts plus labeled computations with operands, units and basis; pass that copy as `NOTES`. Preserve the source notes unchanged and keep this arithmetic outside the manuscript and routine author notes. The checker tests whether each number occurs in the notes, not its sign, unit, comparator or provenance; check those by reading. It does not assess the paragraph's role in the argument, a case's explanatory value or whether an inference follows from its premises; passing it does not replace semantic review. A match marked for review is a prompt to reread, not an instruction to delete.
 

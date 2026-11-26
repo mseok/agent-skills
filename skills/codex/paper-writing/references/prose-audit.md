@@ -2,6 +2,8 @@
 
 Apply these diagnostics to an already coherent manuscript. Their purpose is to preserve meaning while removing the writer’s reporting habits. A sound passage is not improved merely by changing its vocabulary. American English is the default unless the author or venue specifies otherwise.
 
+Use this guide in coordinator preparation and the separate correction pass. Do not load it into the fresh composition context. Return precise repairs for actual problems and keep optional stylistic preferences separate from factual corrections. Preserve the existing argument and scientific strength; the finished manuscript does not need to display these checks.
+
 ## Banned in manuscript text
 
 | Report register | Instead |

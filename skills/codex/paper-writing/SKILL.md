@@ -9,27 +9,33 @@ Write the scientific argument the intended reader needs: why the question matter
 
 The author's direction and the complete research record govern the work. Every factual claim, number, citation and explanation must be supported; preserve material contrary findings and the conditions that change interpretation. Select a truthful contribution within the supplied scientific purpose before choosing how emphatically to express it. Never invent a result, mechanism, priority claim or failure of prior work to improve the story.
 
-## Work in three stages
+## Separate editorial preparation, composition and correction
+
+The coordinating agent owns the complete research record, all applicable skill instructions and the final deliverable. For a new Introduction, a complete section draft or a substantial rewrite, use the fresh-context protocol in `references/delegation.md`: prepare the editorial brief, commission composition in a context without the preparation history, and check the resulting text in a separate correction context. A new heading or a request to forget instructions does not create a fresh context. Use the documented fallback when separate contexts are unavailable. Keep narrow edits proportionate to their authorized scope.
+
+These are internal roles within one invocation, not additional approval rounds. A supplied direction and request for prose authorize ordinary editorial decisions and completion. Preserve explicit requests to discuss direction first, accepted plans, revision boundaries and inline change marking.
 
 ### 1. Understand and choose
 
-Read the research record, including corrections and unfavorable results. Follow `references/planning.md` to select the contribution in relation to the closest prior accomplishment and the most informative observations. For a new or changed target, follow `references/venue-adaptation.md`, the relevant entry in `references/journal-profiles.md` and matched article analyses. Obtain public guidance and examples yourself; do not ask the author to assemble a style profile.
+Read the research record, including corrections and unfavorable results. Follow `references/planning.md` to select the contribution in relation to the closest prior accomplishment and the most informative observations. Read the applicable section guides, `references/integration.md`, `references/accuracy.md` and `references/prose-audit.md` in the coordinator's context. Read all five contrasts in `references/register.md` before preparing any manuscript draft. For an Introduction, also read `references/argument-example.md`.
 
-Make a compact private drafting brief: the author's scientific purpose, what the closest work already makes possible, the useful capability, method, empirical contribution or understanding supported here, the observations carrying it, and the scientific explanation the reader needs. Keep the full factual record underneath it. Source-note categories, method components and audit categories are not a manuscript outline. Comparative controls serve the scientific purpose; relevant contrary evidence shapes the claim and its scope. Change the purpose only when the evidence requires it or the author directs it.
+For a new or changed target, follow `references/venue-adaptation.md`, the relevant entry in `references/journal-profiles.md` and matched article analyses. Obtain public guidance and examples yourself; do not ask the author to assemble a style profile. Examine complete Introduction or opening prose from matched primary articles before a new draft, and make that prose available to the composer through permitted private inputs or verified source access.
+
+Prepare the compact editorial brief specified in `references/delegation.md`. Explain the positive scientific purpose, the live issue after the closest prior accomplishment, the organizing idea that responds to that issue, and the supported contribution's value to the intended readers. Give literature a role in that reasoning. Keep the complete facts separately available; a short brief never replaces them. Comparative controls establish what can credibly be said about the scientific purpose; they do not automatically become that purpose. Preserve material contrary findings and change the purpose only when the evidence requires it or the author directs it.
 
 When the direction and a request for prose are supplied, make routine editorial choices and proceed. Discuss the plan first only when the author requests that discussion. Reuse accepted plans and supplied writer packages. Ask about a missing fact only when it materially changes the paper and cannot be handled locally; continue the useful work. An internal plan is provisional, not author-approved.
 
 ### 2. Compose and reconstruct
 
-Read the section guide and the contrasting examples in `references/register.md` before writing. Before a new draft, examine complete Introduction or opening prose from matched primary articles through `references/venue-adaptation.md`; use the existing full-main-narrative analyses as context. For an Introduction, also read the paired synthetic whole-argument example in `references/argument-example.md`. Learn editorial decisions, not layouts or phrases. Develop the paper from the selected argument instead of reciting the source packet in order.
+Start the composer without inherited conversation history. Supply `references/composition.md`, the editorial brief, the complete research facts, the named published openings and any authorized revision text. Do not send this coordinating guide, detailed planning or audit instructions, or preparation transcripts to the composer. Translate the five register contrasts into the positive writing intent in the composition card and the task's scientific brief; do not turn them into a checklist to narrate.
 
-Write a complete draft. Explain scientific objects, decisions and consequences in the vocabulary the target readers use. A broad opening, concrete example, technical detail or result belongs when it advances the reasoning; none is mandatory. Let the actual question determine the paragraph order, count and depth. Keep the strongest supported scientific message visible without repeated scope labels, proof-status contrasts or a catalogue of unperformed work. Context established in a connected passage carries forward.
+Have the composer read the complete facts and source openings, then write a complete draft in the field's language. The brief supplies scientific reasoning and author decisions, not paragraph slots. Let the actual question determine paragraph order, count and depth. No opening type, technical detail or numerical result quota is mandatory.
 
-Then read `references/integration.md` and assess the argument actually written. For a newly requested draft, reconstruct the argument once when needed: change the allocation of background, select a different leading comparison, or explain the method's scientific role. Fix the reason to read and the connection between question and answer before polishing transitions. For a scoped revision, preserve its authorized boundaries and follow `references/revision.md`; mark proposed changes inline.
+Read the draft as a manuscript, then apply `references/integration.md` in the coordinator's context. When the reason to read or the connection between question and answer is missing, return a short scientific instruction to the composer and reconstruct the affected argument. Do not repair an unresolved argument by adding audit prose. For a scoped revision, follow `references/revision.md`, preserve the authorized boundaries and mark proposed changes inline.
 
 ### 3. Verify and deliver
 
-After substantive revision, read `references/accuracy.md` and `references/prose-audit.md`. Check all claims against the complete record, including unfavorable comparisons. Resolve factual errors and consequential omissions, and refine wording without turning the paper into an account of its verification. Scientific explanations and interpretations remain when supported; removing report tone must never strengthen a claim.
+After argument revision, use a separate correction context as specified in `references/delegation.md`. Give it the actual draft, complete record, binding author decisions, source material and detailed accuracy and prose guides. Check every claim against the record, including unfavorable comparisons. Require identifiable errors, consequential omissions and precise repairs; distinguish these from editorial preferences. Preserve a coherent argument unless the evidence requires rebuilding it. Recheck any substantive correction against its source and surrounding meaning. Removing report tone must never strengthen a claim.
 
 After the last substantive edit, invoke the separate `reference-verification` skill in **full** mode on the actual deliverable and supplied SI. Resolve or report metadata and citation-support findings before declaring the manuscript reference-cleared. A metadata-only check applies only when explicitly requested and does not clear the whole manuscript. For an isolated writer, the coordinating agent owns retrieval and this final check. It grants no additional editing permission.
 
@@ -42,15 +48,16 @@ Return the requested manuscript in the input's LaTeX or Markdown format. If refe
 | Direction, evidence selection and author discussion | `references/planning.md` |
 | Journal, readers, explanatory depth and terminology | `references/venue-adaptation.md`; relevant part of `references/journal-profiles.md` |
 | Matched published examples | Relevant articles in `references/corpus-nature-biotech.md`, `references/corpus-computational-ai.md` or `references/corpus-chemistry.md` |
-| Brief another writer or produce a writer prompt | `references/delegation.md` |
+| Orchestrate fresh composition and correction, or produce a writer package | `references/delegation.md` |
+| Instructions given to the fresh composer | `references/composition.md` |
 | Revise an existing or live shared manuscript | `references/revision.md` |
 | Introduction | `references/introduction.md`; `references/argument-example.md` |
 | Methods or Experimental setup | `references/methods.md` |
 | Results or Experiments | `references/results.md` |
 | Abstract or Discussion | `references/abstract-discussion.md` |
-| Every manuscript-writing task, before composition | Contrasting examples in `references/register.md` |
+| Coordinator preparation for every manuscript-writing task | All five contrasting examples in `references/register.md` |
 | Substantive revision and alignment across sections | `references/integration.md` |
-| After substantive revision | `references/accuracy.md`; `references/prose-audit.md` |
+| Coordinator preparation and separate correction after substantive revision | `references/accuracy.md`; `references/prose-audit.md` |
 | Final reference check | Separate `reference-verification` skill, full mode ([source](../reference-verification/SKILL.md)) |
 
 For quantitative charts and multi-panel plots, read the `nature-figure` skill before planning or producing the figure. For schematic, architecture, mechanism or pipeline diagrams, read `concept-figure`. Do not invent missing data or make explanatory figures substitute for evidence.

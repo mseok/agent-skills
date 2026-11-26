@@ -2,6 +2,8 @@
 
 Write the argument that makes this study worth reading. The reader should understand the scientific problem, why the available knowledge leaves a consequential question, and what this paper contributes. Use the actual journal, article type and matched examples selected through `venue-adaptation.md`; consult the relevant entry in `journal-profiles.md`.
 
+Use this guide during coordinator preparation and integration. Give the fresh composer the scientific decisions through the brief, alongside `composition.md`, complete facts and the complete named source openings; keep the detailed preparation and audit guides in their own contexts (`delegation.md`).
+
 ## Find the argument before arranging the paragraphs
 
 Use the contribution selection in `planning.md`: connect the author's scientific purpose, the closest established accomplishment, the contribution and its decisive evidence. Build from the short argument-oriented drafting view, with the complete facts available for checking. Read `argument-example.md` for paired synthetic examples of this selection. The private brief supplies the reasoning, not sentences or paragraph slots to reproduce. Examine the complete opening prose of matched primary articles before a new draft, as specified in `venue-adaptation.md`; summarized style rules alone do not supply this reading.

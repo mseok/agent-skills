@@ -2,6 +2,8 @@
 
 Use this for a new paper, a changed target or a substantial reframing. The author supplies the research direction and target; obtain the relevant public material and make ordinary editorial choices yourself. Keep the working context compact, reuse it within the project, and never require the author to build a journal profile or terminology file.
 
+The coordinator owns this preparation. Give the composer a short scientific and editorial brief plus the actual matched opening prose; do not pass this entire discovery guide or the preparation transcript. Follow the role-specific context and source-access protocol in `delegation.md`.
+
 ## Establish the context
 
 Identify the exact journal or conference, article type, field, intended readers and actual contribution. Infer an unspecified article type from the work and verify that the target uses it. Respect the author's stated direction; ask only about an ambiguity that would materially change the paper.
@@ -30,7 +32,7 @@ Extract decisions, not phrases to imitate:
 
 A few examples reveal possible arguments, not a journal-wide template. Keep official requirements, observed choices and the strategy chosen for this paper distinct in working notes.
 
-Turn the reading into a short editorial brief. State what the intended readers care about, which contribution the study can carry, why the matched examples are useful, what their different choices teach, and the disciplinary terms needed for this subject. Record a counterexample to any tempting generalization, such as always opening broadly or always previewing numerical results. The brief may guide the argument without prescribing its sentences or exact paragraph count.
+Turn the reading into the short editorial brief specified in `delegation.md`. Explain what the intended readers care about, the live issue after the closest accomplishment, why the study's organizing idea responds to it and what the supported addition changes. State why the matched examples are useful and the disciplinary relationships and terms needed for this subject. Keep a counterexample to any tempting generalization in the coordinator's working notes, such as always opening broadly or always previewing numerical results. The brief guides the argument without prescribing its sentences or exact paragraph count.
 
 When the coordinator retrieves examples, give the writer actual opening prose privately where permitted, or verified source access that the writer can use, together with the editorial brief. Require the writer to examine that prose; source pointers without usable access and abstract style summaries are insufficient. For an offline writer, include readable source material among the explicitly allowed private inputs. Keep published full text out of the public skill and final deliverables; do not redistribute it or transplant distinctive wording.
 

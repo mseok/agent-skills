@@ -12,7 +12,7 @@ Before adding a qualification, ask what scientific meaning would change without 
 
 ## Same facts, different editorial decisions
 
-Read these contrasts before drafting and compare your draft's choices with them before returning. All are independent synthetic examples, not findings from real studies. The excerpts illustrate editorial decisions; a real paper keeps its supporting figure references and necessary uncertainty. Transfer the decisions, not the vocabulary or a fixed sentence template.
+The coordinator reads all five contrasts before preparing a manuscript draft and compares the returned draft's choices with them before delivery. Keep the examples in the coordinator's preparation and correction contexts. Their positive intent is carried by `composition.md` and the task's scientific brief; the fresh composer does not need this full guide. All are independent synthetic examples, not findings from real studies. The excerpts illustrate editorial decisions; a real paper keeps its supporting figure references and necessary uncertainty. Transfer the decisions, not the vocabulary or a fixed sentence template.
 
 ### 1. A list of results becomes a finding
 
@@ -64,4 +64,4 @@ Read these contrasts before drafting and compare your draft's choices with them 
 
 **Decision:** The sentence names the process, effect and experimental setting. It makes no cellular or therapeutic claim, so a list of unmeasured outcomes adds no scientific information. A paper that argues for such an application must address the relevant evidence in that argument. Nearby sentences about the same assay need not repeat its scope.
 
-Read `prose-audit.md` after substantive revision for detailed phrase, verb and spelling checks. The examples guide editorial selection; they are not sentence patterns to imitate.
+Use `prose-audit.md` in the separate correction pass after substantive revision for detailed phrase, verb and spelling checks. The examples guide editorial selection; they are not sentence patterns to imitate.
