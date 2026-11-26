@@ -12,6 +12,8 @@ The coordinator may reuse the target-resolution, primary-source and comparison-c
 
 ## Read matched examples
 
+Start with the target entry in `journal-profiles.md` and its linked article analyses. These are a dated, purposive corpus, not definitions of journal style. Choose examples by contribution and scientific audience as well as venue: a biological measurement platform, a diagnostic computational finding and a discovery method need different arguments even in the same journal. Refresh the examples when the subject, contribution or publication requirements differ materially. Do not load all six journal profiles and every source into a writer's context.
+
 Select a small useful set of published papers, often three to five initially, matched by article type, scientific area, contribution and evidential breadth. Include different plausible arguments when useful. Prefer recent examples for current terminology and format; an older paper may clarify a lasting editorial choice. Avoid selecting only famous or unusually expansive papers.
 
 Read complete Introductions and abstracts, then the Results, Methods or Discussion passages needed to understand how their central claims are supported. An abstract or search snippet is not a substitute for the Introduction. If access is incomplete, use an accessible author manuscript or another appropriate example and record what was actually read. Continue useful writing without pretending missing material was inspected.
@@ -27,6 +29,8 @@ Extract decisions, not phrases to imitate:
 - disciplinary nouns, verbs, collocations and distinctions that carry scientific meaning.
 
 A few examples reveal possible arguments, not a journal-wide template. Keep official requirements, observed choices and the strategy chosen for this paper distinct in working notes.
+
+Turn the reading into a short editorial brief. State what the intended readers care about, which contribution the study can carry, why two matched examples are useful, what their different choices teach, and the disciplinary terms needed for this subject. Record one counterexample to any tempting generalization, such as always opening broadly or always previewing numerical results. Give the writer the decisions and source pointers, not a large inventory of rules or every source paragraph. The brief may guide the argument without prescribing its sentences or exact paragraph count.
 
 ## Choose the central question and argument
 
@@ -46,6 +50,8 @@ Replace generic software or review language with the scientific operation it den
 
 Match explanation to the target readers. Explain a technical distinction early when it is essential to understand the advance; place implementation details where they support assessment or reproduction. Do not turn a specialist paper into a tutorial or remove its scientific reasoning in pursuit of broad accessibility.
 
+Read terms in their scientific relationships. Note which object a verb acts on and what quantity the sentence actually reports: predicting an activity is different from measuring it; selecting a candidate is different from synthesizing it; a representation is different from the physical system it describes. Prefer a small vocabulary of accurate relationships over a list of fashionable words. Established computational terminology remains appropriate when it names the contribution precisely.
+
 ## Integrate and reuse
 
 Use the selected question and reader assumptions across the title, abstract, Introduction, Results and Discussion. Check both overstatement and understatement of the contribution. Preserve meaning through the surrounding scientific context rather than repeating qualifiers. Apply the target's actual section, abstract, heading and supplementary-material requirements.
@@ -59,3 +65,4 @@ These illustrate choices, not fixed profiles. Abstracts and full Introductions w
 - **ProteinGenerator, Nature Biotechnology** ([published article](https://www.nature.com/articles/s41587-024-02395-w), [author-hosted full text](https://www.ipd.uw.edu/publication-pdfs/312/deaab1fe65adbe2dc10584032b687631/s41587-024-02395-w-1.pdf)): a two-paragraph Introduction connects a sequence–structure design constraint to the proposed capability and introduces technical concepts immediately. Learn when technical explanation establishes significance, not a requirement for short Introductions.
 - **Efficient evolution of human antibodies from general protein language models, Nature Biotechnology** ([full text](https://pmc.ncbi.nlm.nih.gov/articles/PMC10869273/)): the argument asks whether general evolutionary information can guide improvement under specific selection pressures. Learn to identify a scientific question within a computational application, not to append claims of therapeutic impact.
 - **Analyzing Learned Molecular Representations for Property Prediction, JCIM** ([author-hosted full text](https://people.csail.mit.edu/tommi/papers/acs.jcim.9b00237.pdf)): conflicting comparisons motivate a question about evaluation in new chemical space. Learn how a field-specific uncertainty establishes importance while results remain conditional. This 2019 example is not evidence of the journal's current typical style.
+
