@@ -171,8 +171,22 @@ LAYOUT_COMMAND = re.compile(
     r"|\\begin\{(?:tabular\*?|tabularx|minipage|subfigure|wrapfigure)\}(?:\[[^\]]*\])?\{[^}]*\}(?:\{[^}]*\})?"
     r"|\[(?:width|height|scale|trim|clip|angle|page)=[^\]]*\]"
 )
-TRAILING_FIG_POINTER = re.compile(
-    r"\((?:see\s+)?(?:Supplementary\s+|Extended Data\s+)?(?:Fig(?:ure)?s?\.?|Tables?|Tab\.)[^()\n]{0,40}\)\s*[.!?][ \t]*$",
+FIGURE_REFERENCE = (
+    r"(?:Supplementary\s+|Extended Data\s+)?(?:Fig(?:ure)?s?\.?|Tables?|Tab\.)\s*~?\s*"
+    r"(?:S?\d+(?:\.\d+)*[a-z]?|\\(?:ref|autoref|[Cc]ref)\{[^}]+\})"
+)
+POINTER_ONLY_ENDING = re.compile(
+    rf"^\(?\s*(?:(?:see|refer to)\s+)?{FIGURE_REFERENCE}"
+    rf"(?:\s*(?:,|and|[–-]|to)\s*(?:{FIGURE_REFERENCE}|S?\d+(?:\.\d+)*[a-z]?|[a-z]))*"
+    r"\s*\)?(?:\s+for details)?[.!?]?$",
+    re.IGNORECASE,
+)
+LAYOUT_PROCESS_ENDING = re.compile(
+    r"^(?:(?:the|these|this|our)\s+)?(?:results?|data|comparisons?|analys[ie]s|values|details)\s+"
+    r"(?:is|are)\s+(?:shown|displayed|presented|plotted|summari[sz]ed|provided|reported)\s+(?:in|on|below|above)\b"
+    r"|^we\s+(?:show|display|present|plot|summari[sz]e|provide|report)\s+"
+    r"(?:(?:the|these|this|our)\s+)?(?:results?|data|comparisons?|analys[ie]s|values|details)\s+(?:in|on|below|above)\b"
+    r"|^(?:the\s+)?(?:left|right|upper|lower|top|bottom|middle)\s+panels?\s+(?:shows?|displays?|presents?|contains?)\b",
     re.IGNORECASE,
 )
 NUMBER = re.compile(r"(?<![\w.])[-−+]?(?:\d{1,3}(?:,\d{3})+(?!\d|,\d)(?:\.\d+)?|\d+(?:\.\d+)?|\.\d+)(?:[eE][-−+]?\d+)?")
@@ -264,15 +278,36 @@ def opening_issues(body):
     issues = []
     for m in OPENING_HEDGE.finditer(first):
         issues.append({"issue": "frequency hedge in the first sentence", "match": m.group(0)})
-    for m in re.finditer(r"\$[^$]+\$|\\\(.+?\\\)|\b[A-Z][0-9]\b|[₀-₉α-ωΑ-Ω]", para):
+    # Greek letters and subscripts alone can be part of scientific entity names.
+    for m in re.finditer(r"\$[^$]+\$|\\\(.+?\\\)|\b[A-Z][0-9]\b|(?<![\w-])[α-ωΑ-Ω][₀-₉]*\s*[=<>≤≥]", para):
         issues.append({"issue": "notation in the first paragraph", "match": m.group(0)[:40]})
     return issues
 
 
 def results_ending_issues(body):
-    """Flag Results paragraphs whose final prose line ends on a parenthetical figure/table pointer."""
+    """Review pointer-only or presentational endings, not citations attached to findings."""
     issues = []
-    last_prose = None
+    paragraph = []
+
+    def finish_paragraph():
+        if not paragraph:
+            return
+        text = "\n".join(line for _, line in paragraph)
+        protected = ABBREV.sub(lambda m: m.group(0)[:-1] + "\0", text)
+        boundaries = list(re.finditer(r"(?<=[.!?])\s+", protected))
+        start = boundaries[-1].end() if boundaries else 0
+        ending = text[start:].strip()
+        if POINTER_ONLY_ENDING.fullmatch(ending):
+            issue = "figure/table pointer"
+        elif LAYOUT_PROCESS_ENDING.search(ending):
+            issue = "layout/process sentence"
+        else:
+            issue = None
+        if issue:
+            lineno = paragraph[text[:start].count("\n")][0]
+            issues.append({"line": lineno, "match": f"paragraph ends on {issue}: {ending}"})
+        paragraph.clear()
+
     in_math = False
     for lineno, raw_line in enumerate(body.splitlines(), 1):
         s = raw_line.strip().lstrip("> ").strip()
@@ -281,9 +316,7 @@ def results_ending_issues(body):
                 in_math = False
             continue
         if not s:
-            if last_prose and (m := TRAILING_FIG_POINTER.search(last_prose[1])):
-                issues.append({"line": last_prose[0], "match": f"paragraph ends on figure/table pointer: {m.group(0).strip()}"})
-            last_prose = None
+            finish_paragraph()
             continue
         if s.startswith("$$"):
             in_math = not (len(s) > 2 and s.endswith("$$"))
@@ -295,10 +328,10 @@ def results_ending_issues(body):
             in_math = not re.search(r"\\end\{(?:equation|align|gather|multline)\*?\}", s)
             continue
         if s.startswith(("#", "|", "%")) or re.match(r"^\\(?:sub)*section\*?\{", s):
+            finish_paragraph()
             continue
-        last_prose = (lineno, s)
-    if last_prose and (m := TRAILING_FIG_POINTER.search(last_prose[1])):
-        issues.append({"line": last_prose[0], "match": f"paragraph ends on figure/table pointer: {m.group(0).strip()}"})
+        paragraph.append((lineno, s))
+    finish_paragraph()
     return issues
 
 

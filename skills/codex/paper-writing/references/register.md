@@ -1,18 +1,18 @@
 # Register: write as the paper, never as a report
 
-A paper states what was established. A report narrates status to someone. Report register makes solid work sound unfinished and the authors unsure, and reviewers read it that way.
+A paper develops a scientific argument through its questions, findings and interpretation. A report narrates status to someone. Write in the language of the scientific subject, not the language of the writing or verification process.
 
-Removing report register never changes what the evidence supports. Translate each note by its evidential meaning: an established measurement is stated directly with its conditions; a tentative interpretation keeps one calibrated verb; an untested claim leaves the paper.
+State supported findings directly. Keep evidence checking in the working notes, and use its outcome to choose accurate words. A measured effect can simply reduce, increase or change a scientific quantity; it does not need to be introduced as "evidence that establishes only …". An interpretation keeps the degree of confidence its basis warrants, and an untested result never becomes a finding.
 
 ## Select facts for the argument
 
 Write the clearest, strongest claim the evidence supports, with the conditions that make it true. Organize facts by what they let the reader understand; do not give every observation, untested setting or possible objection equal space. Keep the source notes complete while selecting, combining and placing material in the manuscript. Preserve exceptions and contrary results that change a claim's meaning; put other details in their agreed location.
 
-Before adding a limitation, ask whether omitting it would mislead the reader about the actual claim's scope, validity or application. If so, state it concisely where it matters, or in the venue's required Limitations section. If the claim is already accurately scoped, do not append a generic warning that other settings were not evaluated or universal applicability was not proved. An untested domain does not diminish an observed result within its tested domain. Preserve concise scope words wherever a claim recurs without repeating the full methodological caveat each time.
+Before adding a qualification, ask what scientific meaning would change without it. Keep a consequential condition or contrary finding where the reader needs it. Once the experimental or theoretical setting is clear, let that context carry through the argument; repeat a condition only when the context changes or the statement will be read independently. An accurately stated finding needs no routine inventory of untested settings, no "does not establish" afterthought and no repeated "in this study". Keep necessary study-level limitations in the appropriate Discussion or required section, with their scientific consequence.
 
 ## Same facts, different editorial decisions
 
-Read these contrasts before drafting and compare your draft's choices with them before returning. All four are independent synthetic examples, not findings from a real study. The excerpts illustrate editorial decisions; a real paper keeps its supporting figure references and necessary uncertainty. Transfer the decisions, not the vocabulary or a fixed sentence template.
+Read these contrasts before drafting and compare your draft's choices with them before returning. All are independent synthetic examples, not findings from real studies. The excerpts illustrate editorial decisions; a real paper keeps its supporting figure references and necessary uncertainty. Transfer the decisions, not the vocabulary or a fixed sentence template.
 
 ### 1. A list of results becomes a finding
 
@@ -54,11 +54,23 @@ Read these contrasts before drafting and compare your draft's choices with them 
 
 **Decision:** The deadline makes the peak-load result essential to interpreting the application claim. Keep the exception and both measurements beside the finding, without adding a vague judgment about the quality of the work.
 
+### 5. A scientific finding replaces a verification disclaimer
+
+**Facts:** In a cell-free aggregation assay, peptide P reduced tau fibril formation by 40% relative to vehicle. The study contains no cellular or animal experiments.
+
+**Report-like:** These results establish only a reduction in fibril formation in a cell-free assay; they do not establish cellular efficacy or therapeutic benefit.
+
+**Paper-like:** Peptide P reduced tau fibril formation by 40% relative to vehicle in the cell-free assay.
+
+**Decision:** The sentence names the process, effect and experimental setting. It makes no cellular or therapeutic claim, so a list of unmeasured outcomes adds no scientific information. A paper that argues for such an application must address the relevant evidence in that argument. Nearby sentences about the same assay need not repeat its scope.
+
 ## Banned in manuscript text
 
 | Report register | Instead |
 |---|---|
-| "has not yet been confirmed / verified / tested", "has not been run yet", "remains to be verified", "is still under investigation", "analysis is in progress", "requires further verification", "additional experiments are needed" | Leave the unverified claim out (Notes to author). If the boundary matters to the reader, state it once as a boundary of the evidence in the Discussion: "Our experiments cover X; Y lies outside the evaluated scope." A boundary that narrows a specific claim stays beside that claim instead (`results.md`). |
+| "has not yet been confirmed / verified / tested", "has not been run yet", "remains to be verified", "is still under investigation", "analysis is in progress", "requires further verification", "additional experiments are needed" | State the supported finding directly. Leave unfinished work out of the manuscript; flag it to the author only when it requires a decision. Include a material experimental condition or limitation where it changes the scientific interpretation (`results.md`). |
+| Routine proof-status contrasts: "establishes only X, not Y", "does not prove", "cannot establish", "is not sufficient evidence for" after an already accurate finding | Remove the bookkeeping and state the finding in the field's terms. Keep a distinction of this kind only when resolving it is part of the scientific question or correcting an inference the argument otherwise invites. |
+| Internal labels: "verified artifact", "eligible claim", "evidence ledger", "validation gate", run status or checklist verdicts | Name the scientific object, operation and observation. Such terms belong in the manuscript only when they are actual subjects of the research. |
 | "preliminary results suggest", "initial experiments show" | Report the result with its actual support, or leave it out. |
 | "we plan to", "will be explored in future work", "TBD", "TODO", "(?)" | Remove from Results and Methods; at most one forward-looking sentence with scientific content in the Discussion. |
 | Process narration: "we first tried", "after several attempts", "it turned out that", "we then checked", "we noticed that" | Describe the final procedure and the evidence. |
@@ -69,7 +81,7 @@ Read these contrasts before drafting and compare your draft's choices with them 
 | Apology and defense: "unfortunately", "although not perfect", "only slightly worse", "despite its limitations" | The number and its condition, stated neutrally (`results.md`, weak results). |
 | Vague magnitude: "much better", "a lot", "huge" | The number. |
 | Hedge stacks: "may possibly suggest", "could potentially" | One calibrated verb (below). |
-| Report formatting: bold run-in labels in nature-family Results, bullet lists in Results or Discussion, arrows in prose, emoji | Prose paragraphs. Only an ml-conference contributions list may be bulleted, and only ml-conference Experiments may use short bold paragraph labels. |
+| Chat-style formatting, arrows in ordinary prose, emoji, or headings that narrate the author's work | Use the paragraph, heading and list conventions of the target article type established in `venue-adaptation.md`. A list or short label earns its place by helping the scientific argument, not by the agent's reporting habits. |
 | First-person singular, chatty asides, rhetorical questions | "We" for the authors; declarative sentences. A Results subsection opens by motivating its question in a declarative (`results.md`). |
 
 ## Words that depend on context
@@ -80,18 +92,18 @@ Read these contrasts before drafting and compare your draft's choices with them 
 
 Give the effect size with its uncertainty beside any test result: a small p-value is not a large effect.
 
-"Sometimes", "often" and "in many cases" weaken an opening sentence without adding information. State the fact and the condition under which it holds instead; deleting the hedge without the condition would claim universality.
+Review "sometimes", "often" and "in many cases" for vague padding. State a meaningful condition when the evidence identifies one; preserve genuine frequency or conditionality when it is the accurate scientific claim. Never delete a qualifier merely to make a statement sound universal.
 
 ## Calibrated verbs
 
-One verb per claim, matched to the evidence:
+Choose a verb that expresses the scientific result at the strength its evidence supports. Prefer the result itself ("binds", "reduces", "increases", "is associated with") to a running commentary on its evidential status:
 
 - direct measurement or controlled comparison: "shows", "reduces", "outperforms", or a plain "is";
 - a test designed to establish exactly the claim, whose outcome does: "establishes", "confirms", "validates";
 - consistent indirect evidence: "indicates", "is consistent with", "supports";
 - interpretation from an analysis: "suggests", once per point and never stacked with "may".
 
-An exploratory finding (a pattern found after seeing the data or in a search over variants) is stated as observed in that analysis; validation verbs need an independent test, such as held-out data, a separate cohort or a replication. Predictive accuracy is not a causal effect: a model that predicts an outcome does not show that its inputs cause it.
+State an exploratory pattern as an observation from the analysis that found it; reserve validation language for a suitable independent test. Keep prediction, association and causation distinct through accurate nouns and verbs, rather than attaching a disclaimer to each result.
 
 Universal words ("every", "each", "always", "unchanged", "any") need evidence of universality; otherwise say "can" or give the tested range.
 
@@ -106,7 +118,7 @@ American English by default: analyze, organize, optimize, normalize, modeling, l
 | Note | In the paper |
 |---|---|
 | "~인 것 같음", "~로 보임", "seems to" | First decide what the evidence is. A measurement: state it with its number and the tested conditions. An interpretation of indirect evidence: one calibrated verb. Never turn an observed range into independence, causality or generality. |
-| "아직 확인 안 됨", "아직 안 돌려봄", "추가 실험 필요", "not run yet" | Omit; Notes to author. |
+| "아직 확인 안 됨", "아직 안 돌려봄", "추가 실험 필요", "not run yet" | Omit from manuscript prose; flag to the author only when it changes the selected claim or requires action. |
 | "애매함", "미묘함", "mixed" | Exact numbers with their condition (`results.md`, weak results). |
 | "원인은 아마 ~", "probably because" | A mechanism only when an analysis supports it ("is consistent with …"); otherwise omit the cause and keep what the result implies. |
 | "기존 방법은 별로임", "baselines are bad" | The specific shortfall of the closest work, cited. |
@@ -114,9 +126,9 @@ American English by default: analyze, organize, optimize, normalize, modeling, l
 
 ## Limitations without report register
 
-Limitations are boundaries of the evidence, stated where they matter: beside the claim they qualify when they change it, and in the Discussion or the Limitations section a venue requires.
+State a limitation when it changes the interpretation, reliability or application of a finding, in the location where that consequence matters. Preserve contrary scientific results. Keep routine verification records and lists of unattempted work out of the manuscript.
 
 - Report: "Finite systems have not yet been tested."
-- Paper: "All simulations use periodic boundary conditions, which limits the evidence for finite systems."
+- Paper: "The simulations use periodic boundary conditions."
 
-Rephrasing a limitation must not add a failure mechanism, a necessity claim or a remedy that the evidence does not contain.
+The second sentence gives the actual scientific setting. If finite-system behavior is part of the paper's claim, explain the relevant consequence there; otherwise it needs no additional disclaimer. Rephrasing must not invent a failure mechanism or remedy.

@@ -1,15 +1,15 @@
 # Results
 
-The reader finishes each subsection convinced of one claim, with the strongest evidence first and its meaning spelled out. Less favorable results stay visible beside the claims they bound; the narrative follows the headline results.
+The reader finishes each subsection understanding a finding and its role in the paper's question. Use the readership, article type and contribution established in `venue-adaptation.md` to choose the order, depth and scientific vocabulary. Give the strongest relevant evidence clear emphasis, and keep consequential contrary results with the finding they change.
 
 ## Tiers and placement
 
 | Tier | Where | How |
 |---|---|---|
-| headline | the claim of a subsection or paragraph, stated by its second sentence, or by its third when a question and a setup sentence come first; also the abstract, the Introduction preview and a main figure | claim with its scope words, comparator, exact number, figure or table reference close by |
+| headline | the finding that carries a subsection or core paragraph, and the corresponding abstract, Introduction preview or main figure where appropriate | direct scientific statement, with the comparison, quantities and figure or table needed to understand it |
 | supporting | body of the paragraph, ablations, analyses | number, and what it shows |
 | weak | after the strong result it qualifies, in the same paragraph; on secondary settings outside the scope of every headline claim, the Supplementary with a pointer | compact, exact, with its condition and direction |
-| unverified | nowhere in the manuscript | Notes to author |
+| unverified | no result claim in the manuscript | retain in source notes; raise with the author only when a decision is needed |
 
 A trade-off, null or adverse result that answers the paper's question is a finding and is placed as one, even when it is negative.
 
@@ -17,17 +17,17 @@ A trade-off, null or adverse result that answers the paper's question is a findi
 
 Before drafting, map each core paragraph to the reader's question, the observation that answers it, the implication supported by that observation and its role in the paper's central claim. Keep this map in the writing plan, or make it privately when planning is skipped; for a local revision, map the target passage in its surrounding argument. A supporting-only paragraph can name the claim it supports. These are reasoning prompts, not four compulsory sentences: use the order the reader needs, and do not invent an implication to fill a slot. A benchmark name or metric alone is not a scientific question.
 
-Open the section, and each major subsection whose question changes, the way a good Introduction paragraph opens: a declarative sentence or two on why this question needs answering at this point in the argument (the gap the previous finding leaves, or the distinction only this experiment can draw), not a literal question; one sentence on how it was set up if the reader needs it; then the headline answer with its number. The reader should know what to look for before the details arrive. Do not open on a description of a table, and do not repeat the Introduction's general motivation. The headline in the opening already carries its scope words ("at signal-to-noise ratios below 10 dB"), so that no later sentence has to narrow it; the numbers of weak results come later, beside the claims they qualify. When an ml-conference Experiments section begins with a setup subsection, this opening belongs to the first results subsection.
+When the question changes, motivate it with the scientific distinction or unresolved point that makes the next result matter. Use a declarative rather than a literal question. Supply the setup only to the extent this reader needs it, then give the finding; the argument determines the number and order of sentences. Do not reintroduce the study's general motivation or open with a description of a table. Once the experimental setting is clear, let it carry into subsequent findings without repeated scope labels. A separate experimental-setup subsection may establish shared conditions for several results.
 
 ## Making strong results land
 
 - **Claim first, figure second.** "The decoder lowers the logical error rate by a factor of 3.1 (Fig. 2a)", not "Fig. 2a shows the logical error rates of both decoders." When the reader needs the motivation or the experiment first, give it in one sentence, then the claim.
 - **Size in its most telling honest form.** Absolute and relative when both mean something ("from 12.1% to 7.5%, a 38% reduction"); against the strongest baseline, not the weakest; as a fraction of the gap to an oracle or upper bound, or in units of prior progress, when the inputs allow.
 - **Breadth amplifies.** "on all 12 benchmarks", "at every lead time from 1 to 10 days", "across three orders of magnitude in compute", always within the tested range. An aggregate does not show that every case improves.
-- **Then say what it means.** End a claim with what its result implies for the paper's question, after any qualification, so that the implication already accounts for it: "The improvement therefore concentrates in the noisy conditions that the consistency objective targets"; "The two decoders therefore differ only where errors arrive in bursts." An implication says where, when or on which measure the result holds and what that means for the question; it needs only the data just shown, so state it plainly. A cause is not an implication and follows the next bullet. A paragraph that only adds supporting numbers to the previous claim needs no meaning sentence of its own, and none is appended for symmetry. A results section that only reports numbers leaves its most interesting material unsaid.
+- **Then say what it means.** Explain what the finding contributes to the paper's question when the implication adds understanding. State it directly in the domain's terms: "The improvement concentrates in the noisy conditions that the consistency objective targets." Let the preceding evidence establish the context, and include a qualification when it changes this implication. A cause is not an implication and follows the next bullet. A paragraph that adds supporting measurements needs no extra meaning sentence for symmetry. A results section that only reports numbers leaves its most interesting material unsaid.
 - **Mechanisms at the strength the evidence allows.** An ablation shows what removing a component does under its controls; say what was held fixed and whether variants were retrained when the inputs say so. Attribute a gain to the core idea only when an ablation removes that idea alone under otherwise matched settings; without one, attribute it to the full method. Call something a mechanism only when an analysis isolates it; otherwise use "suggests" once, or leave the cause out while keeping the implication.
 - **Numbers carry the intensity.** At most one evaluative adverb per paragraph ("substantially"), and only next to a number. No "remarkable", "unprecedented" or "dramatic".
-- **Proportion.** Each paragraph carries one claim, its evidence and its meaning. Per-item numbers that a table already lists appear in the text only when the sentence uses them. A subsection that reports one main comparison usually reads best at about 400–600 words; above that, cut per-item numbers, secondary comparisons that bound no headline claim, and repeated setup before cutting any sentence that says what a result means.
+- **Proportion.** Give each paragraph a clear role in the argument. Let the finding's complexity, the target reader and the article's space determine its length. Per-item numbers already in a table appear in prose only when the sentence uses them. Cut repetitive setup, redundant comparisons and routine disclaimers before cutting explanation that makes a result scientifically meaningful.
 
 ## What a case adds
 
@@ -53,7 +53,7 @@ Legitimate devices, in order of preference:
 4. **Supplementary with a pointer**, for weak results on secondary settings outside the scope of every headline claim (not a component of a headline aggregate): "Results on the two coastal stations are in Supplementary Table S4."
 5. **Exact, neutral wording.** "is 0.4 points lower", "narrows to 1.2 points", "trails the baseline by 0.1 points (s.d. 0.2 over three runs)"; always say which system is higher. Equivalence words ("comparable", "on par", "matches") need an equivalence analysis or interval in the inputs; overlapping error bars are not one.
 
-When a weak result bounds a headline claim, state it beside that claim and narrow the claim, in the abstract and Introduction too: "lowers the error on noisy recordings" rather than "lowers the error".
+When a less favorable result changes a headline's meaning, keep it beside the finding and make the headline accurate wherever it appears independently, including the abstract. Within a continuous argument, established context carries forward; do not repeat the same restriction or append a separate statement of what was not established to every sentence.
 
 Never:
 
@@ -69,10 +69,10 @@ Never:
 
 ## Layout
 
-- **nature-family.** Subsection headings are full-sentence findings within the evidence, with their scope: "Correlation-aware decoding suppresses burst-induced failures", not "Decoder performance". Inside a subsection, paragraphs are continuous prose without bold run-in labels. Figures are cited inline in parentheses, "(Fig. 2a)", never in a heading or label.
-- **ml-conference.** Experiments are organized around the paper's questions. A short bold label naming a question or experiment may open a paragraph ("**Transfer to unseen chips.**").
-- **Both.** No closing summary paragraph or label ("Summary.", "In summary,", "Key findings:", "Takeaways"): the opening already gave the answer, and the Discussion draws the conclusions.
-- **Paragraph and caption endings.** A Results paragraph ends on its finding (or on what the finding means), never on a figure pointer or a layout remark. A figure or table caption says what is shown and how it was measured, with panel letters; it carries no layout remarks (where an element sits, its size or color) beyond what a reader needs to decode the data.
+- **Headings and organization.** Follow the target article type and the matched examples in `venue-adaptation.md`. Choose finding-led headings, descriptive headings or short paragraph labels where they help this reader follow the argument. Organize around scientific questions and dependencies; a method comparison, a sequence of mechanistic experiments and a resource characterization need not share a structure.
+- **Prose and references.** Use continuous prose unless the target format calls for another form. Cite figures at the finding they support, not as substitutes for saying what was found.
+- **No redundant recap.** Do not append a summary label or paragraph that merely repeats the findings. Follow the target's Results/Discussion arrangement when deciding where interpretation and synthesis belong.
+- **Paragraph and caption endings.** A Results paragraph's final sentence states its finding or meaning; an inline figure reference may accompany that sentence. Do not end with a separate pointer or layout remark. A figure or table caption says what is shown and how it was measured, with panel letters; it carries no layout remarks beyond what a reader needs to decode the data.
 
 ## Tables
 
@@ -92,4 +92,4 @@ Results:
 
 > The consistency objective penalizes only predictions that change when noise is added, so its effect should appear in noisy speech. Across all noise conditions, the consistency-trained model lowers the average word error rate from 12.9% to 8.4% relative to the strongest baseline (Table 2). The relative reduction ranges from 33% to 36% across the tested training-pool sizes of 50 to 500 speakers (Fig. 3b). The margin is largest in the noisiest condition: at −5 dB, the error rate falls from 21.3% to 12.6%, a 41% reduction, whereas on clean speech the consistency-trained model is 0.1 points lower (3.1% versus 3.2%). The improvement therefore concentrates in the noisy conditions that the consistency objective targets.
 
-What changed: the motivation of the question opens, derived from the definition of the consistency term rather than posed as a question, and the claim with the strongest comparison follows at once; the breadth across training-pool sizes comes next; the clean-speech result is exact, attributed and placed in a trailing clause that reads as the low-noise end of the contrast; the closing sentence says what the pattern means and already accounts for it; "유지되는 듯" became the measured range with its tested conditions, not a claim of independence; the 41% and 0.1 are computed from the notes and listed in Notes to author; the untested dialectal speech is absent from the text and listed in Notes to author.
+What changed: the motivation of the question opens, derived from the definition of the consistency term rather than posed as a question, and the claim with the strongest comparison follows at once; the breadth across training-pool sizes comes next; the clean-speech result is exact, attributed and placed in a trailing clause that reads as the low-noise end of the contrast; the closing sentence says what the pattern means and already accounts for it; "유지되는 듯" became the measured range with its tested conditions, not a claim of independence; the calculations for 41% and 0.1 stay with the source notes, as does the untested dialectal work. Neither needs a routine disclaimer in the manuscript.

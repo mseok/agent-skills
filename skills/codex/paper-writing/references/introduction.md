@@ -1,73 +1,73 @@
 # Introduction
 
-The reader leaves the Introduction knowing four things: the problem, why current approaches fall short, what this paper changes, and the evidence that the change works. The difference must be unmistakable, and the path to it easy to follow.
+The reader leaves the Introduction understanding the scientific question, why it matters, and what this work adds. Use the target readership, article type, contribution and central message established in `venue-adaptation.md`. A limitation of existing methods is one possible reason for the study; an unexplained observation, competing explanations, an unmeasured regime or a need for a reliable resource can be equally good reasons.
 
 ## The first sentence and the first paragraph
 
 Readers and editors decide in the first paragraph whether to keep reading, so it gets the most care.
 
-- **The first sentence** states a concrete fact or tension that could only begin a paper on this topic, as a plain declarative. No frequency hedge ("sometimes", "often", "in many cases") and no softening modal ("can differ"): if the fact holds only under a condition, state the condition. No notation, no citation-list opener.
-- **The first paragraph** is written for a scientist outside the subfield: the phenomenon, why it matters, and the open problem, in words. Symbols, variable names, component labels, dataset names and equation-level detail enter later, where the formulation does; a term of art is explained in words when it first appears.
-- **It ends on the open problem** the paper addresses, stated in the paper's own terms rather than announced as "the open problem", so the next paragraph can start from it.
-- **Make the problem concrete.** One illustration often does more than three abstract sentences: a worked number, a limiting case or a familiar consequence. Introduce it as an example in the prose ("For a clock that drifts by 0.1 s per day, …"), keep its premises explicit and its arithmetic exact, never present a hypothetical quantity as a measurement, and list any computed number in Notes to author. Prefer a number from the inputs; a hypothetical premise needs an explicit hypothetical frame ("Suppose …", "For a …") and no attribution to a real system. Keep it light: one comparison a reader can picture, such as a ratio, a fraction or a count of halvings. An illustration that needs its own explanation or a chain of calculations is too heavy for the opening paragraphs.
+- **The first sentence** gives the target reader a concrete phenomenon, question or tension at the scale this study addresses. Prefer a direct declarative to a generic announcement of importance. Replace vague frequency or modal wording with the relevant condition when that improves precision; retain it when it expresses a real scientific distinction. Do not remove uncertainty by strengthening the claim.
+- **The first paragraph** starts from what this readership can reasonably be expected to know. Explain unfamiliar concepts that the argument needs; use established field terms for familiar objects. Do not turn a specialist opening into a general tutorial or enlarge a focused problem into a claim about the whole field. Mathematical formalism enters when it helps the argument; a standard scientific name such as Aβ is not distracting notation.
+- **Its ending** gives the next paragraph a reason to follow. This may be the unresolved question, a distinction or the next piece of background; there is no compulsory closing sentence or paragraph count.
+- **Make the problem concrete.** One illustration often does more than three abstract sentences: a worked number, a limiting case or a familiar consequence. Introduce it as an example in the prose ("For a clock that drifts by 0.1 s per day, …"), keep its premises explicit and its arithmetic exact, never present a hypothetical quantity as a measurement, and retain any calculation in the working notes. Prefer a number from the inputs; a hypothetical premise needs an explicit hypothetical frame ("Suppose …", "For a …") and no attribution to a real system. Keep it light: one comparison a reader can picture, such as a ratio, a fraction or a count of halvings. An illustration that needs its own explanation or a chain of calculations is too heavy for the opening paragraphs.
 
 Synthetic contrast:
 
 - Weak: "Quantum processors sometimes exhibit correlated errors $e_{ij}$ between syndrome bits."
 - Strong: "A surface-code quantum processor must decode each round of syndrome measurements before the next round arrives, roughly every microsecond."
 
-## The obvious flow and what replaces it
+## Make the argument specific
 
-The obvious flow runs "X is important → many methods exist → they have limitations → we propose Y → experiments show it works". Readers have seen it thousands of times, and because its sentences fit any paper, the actual difference drowns in them. The progression itself can stay when it suits the argument; what changes is that every step becomes specific to this paper.
+The familiar flow "X is important → many methods exist → they have limitations → we propose Y → experiments show it works" can suit a methods paper. Its generic sentences obscure the contribution, and its structure does not suit every study. Select the reasoning this paper needs, using matched published examples to judge what the target reader needs to hear.
 
 | Obvious step | Specific replacement |
 |---|---|
-| "X is important in many applications." | The concrete problem and what failing to solve it costs, with a number or a concrete case. |
-| "Many methods have been proposed [1–20]." | The closest prior work, what it already achieves, and the specific thing it does not provide. Broader work is grouped only where the grouping is accurate and useful. |
-| "However, they have limitations." | The specific reason the closest work falls short here, and when. |
-| "We propose a novel framework Y." | What Y does differently, in the same terms used to describe the shortfall. |
-| "Extensive experiments demonstrate …" | The headline result, with comparator and number. |
+| "X is important in many applications." | The scientific understanding, measurement or practical decision that this question affects. Use a concrete consequence or example when it clarifies the importance. |
+| "Many studies have examined X [1–20]." | What the closest work established and what remains unresolved for this question. Group broader work only where the grouping is accurate and useful. |
+| "However, they have limitations." | The actual uncertainty, disagreement or limitation that motivates this study. Do not invent a failure of prior work. |
+| "We propose a novel framework Y." | What this work adds, stated in the same scientific terms as its question. |
+| "Extensive experiments demonstrate …" | The decisive finding, with the comparison and quantities needed to understand it. |
 
 ## Moves
 
 Use the moves the argument needs, in the order it needs them.
 
-- **Anchor.** Open on the specific phenomenon, task or tension, not on the field (first paragraph, above).
-- **Closest work.** Say what the nearest approaches do and what they already achieve, as the inputs and citations describe them. Credit them precisely; the difference is only as sharp as the description of what it differs from.
-- **Shortfall.** Explain why that work falls short in this setting, as concretely as the inputs allow. When the approaches share an assumption that causes the shortfall, name it: the difference then becomes one contrast instead of a list of small improvements. When they do not, do not invent one.
-- **Turn.** State the difference in a sentence that names both sides, often with parallel structure ("Rather than …, we …"; "Existing decoders treat X as fixed; we estimate X from …"). Reuse the nouns of the shortfall so the reader sees the match.
+- **Anchor.** Open on the phenomenon, scientific uncertainty or practical problem at the level relevant to the target reader.
+- **Closest work.** Explain what is already known or possible. Credit the nearest studies precisely so the reader can see what this work adds.
+- **Unresolved question.** Identify the missing understanding, conflicting observations, unexplored conditions or methodological limitation that matters here. Explain a shared assumption or failure mechanism only when the sources establish it.
+- **Contribution.** State the new understanding, measurement, resource or capability in the question's own terms. Use a contrast when it clarifies an actual distinction; do not force every contribution into "Rather than …, we …".
 - **Insight** (when the inputs have one). Why the change is possible or why it works: a property, an observation, an identity.
-- **Objection** (when the inputs or their formulas answer it). The first objection a specialist would raise against the shortfall, and why it does not remove it, in one sentence.
+- **Alternative explanation** (when it matters to the argument). Explain the competing account or interpretation that makes the question consequential and how the study distinguishes it. Do not interrupt the Introduction with a routine defense against hypothetical objections.
 - **Approach** (when the contribution is a multistage procedure). Its functional steps in a short prose sequence: what enters each step, what leaves it, and who makes any judgment ("The approach has three steps. First, …"). This is how the idea works, not a list of implementation components.
-- **Evidence preview.** The headline results with numbers and comparators: the "Here we …" paragraph for nature-family, the closing paragraph or contributions list for ml-conference.
+- **Evidence preview.** Give the decisive results when the target article type and argument call for them. Use a study objective or approach at the close when that is the more appropriate progression; a results preview and a contributions list are options, not requirements.
 - **Consequence.** What the result makes possible within the tested domain, in one grounded sentence.
 
-## Making the difference unmistakable
+## Make the contribution clear
 
-- State it crisply and as early as the argument allows: right after the shortfall when the change needs no new background, or where the obstacle is resolved when the change rests on a tool, representation or result the reader must first meet (background, then obstacle, then resolution and Turn). Never state the Turn before the background it depends on. State it once in the Turn and once more in the closing paragraph in the terms of the result, with the same scope words. A Turn that picks up the nouns of the paragraph before it ("Rather than …, we …") is a handoff and stays; a sentence that re-explains that paragraph's content is a restatement and goes.
-- **Scope it correctly the first time.** Describe what the method delivers, not the end state it serves. If a result still depends on a reference measurement, extra data, a human decision or a condition, the Turn says so, and no later sentence has to walk the claim back.
+- State the contribution as early as the reader has the background to understand it. Let the argument determine its position and whether a later statement adds anything. Keep the scientific objects consistent while varying the wording naturally; do not repeat a contrast just to satisfy a template.
+- **State the result accurately.** Describe what the work delivers. Include a condition or dependence when omitting it would change the meaning. Within a continuous argument, established context carries forward without repeating qualifiers such as "in this study" or "under the tested conditions". A title, abstract or heading that can be read independently must remain accurate on its own.
   - Overclaim, then retraction: "The probe measures soil moisture without calibration. … Each soil type still needs one reference sample."
   - Scoped once: "The probe measures soil moisture from one reference sample per soil type, instead of the laboratory calibration curve that current probes require."
-- One central difference. Distinct supported contributions stay, in the closing paragraph, without competing with it as a second turn.
-- Name the contrast at the level of an idea (an assumption, a representation, an objective, a regime, a measurement), not a component swap. "We replace the MLP with a transformer" is a component; "we stop assuming errors are independent across rounds" is an idea.
+- Keep one central message. Place supporting contributions where they advance it, without making them compete as unrelated stories.
+- Explain the scientific contribution rather than merely naming a component swap. For a methods paper, the important difference may be an assumption, representation or objective. For another contribution, it may be the phenomenon explained, the quantity measured or the distinction resolved.
 - Do not undersell with hedges ("we attempt to", "a first step toward") or oversell with adjectives ("novel", "groundbreaking", "unprecedented"). The contrast and the number carry the emphasis.
 - "First" claims appear only when the inputs establish them; otherwise describe the specific capability.
-- A contributions list (ml-conference) holds concise, parallel statements, each naming a distinct intellectual contribution and its evidence; not routine implementation steps, not scale alone, and not a second copy of the results paragraph.
+- Use a contributions list only when it suits the article type and target practice. Each item names a distinct contribution; routine implementation steps and a second copy of the results paragraph do not earn items.
 
 ## The evidence preview
 
-The closing paragraph makes the reader want the Results; it is not a summary of them.
+When the Introduction previews results, select the findings that establish the central contribution. Do not compress every result into the closing paragraph.
 
-- Usually the one or two headline results, each with its comparator and number; this is a default, not a quota. Keep a second number when it supplies an essential denominator, cost or trade-off.
-- State each result as a concrete observation a reader outside the subtopic can picture, not as an abstract verdict about the evidence ("the picture is nuanced", "the two criteria diverge").
-- Conditional or best-case variants ("reaching 63% at the largest model size"), secondary metrics and per-task scores stay in Results.
+- Give the decisive observation or result, with a comparator and number when they carry the scientific meaning. Include an essential denominator, cost or trade-off; do not choose numbers to meet a quota.
+- State the finding in terms familiar to the target reader, rather than as an abstract verdict about the evidence ("the picture is nuanced", "the two criteria diverge").
+- Keep secondary metrics and per-task scores in Results. A special condition belongs in the preview when it defines the scientific finding; do not present a favorable special case as typical performance.
 - Introduce an unfamiliar dataset, benchmark or prior experiment by its role ("one of the calibration runs", "the strongest physics-based forecast"); give its name only when the reader needs it to identify the comparison. Names of people and individual datasets that readers of the venue do not know stay in Results.
-- A boundary on the headline enters as scope words inside the claim ("on noisy recordings", "for graphs with more than 10,000 nodes"), not as a list of weaker numbers. When several results bound the headline, the scope words must cover all of them; if scope words alone cannot make the claim accurate, add the shortest clause that does.
+- Express a necessary boundary in the finding itself, such as "on noisy recordings", rather than following it with an inventory of what was not shown. Retain a contrary result when it changes the central message.
 
 ## Readable
 
 - Each paragraph has one job, and the reader can tell what it is early in the paragraph.
-- Paragraphs follow the dependencies of the argument: what the reader needs to understand the obstacle comes before the obstacle, and the obstacle before its resolution. Each paragraph connects to what the reader already holds, usually where the previous one ended; the connection lies in the argument (from a limitation to its cause, from a proposal to its obstacle, from a method to its test), not in repeated words. Remove repeated contrasts, including those hidden in a contributions list.
+- Paragraphs follow the dependencies of this argument: supply the knowledge the next step needs, then add a new understanding. Connections can run from an observation to competing explanations, a measurement to its interpretation, or a method to its test. Remove repeated contrasts, including those hidden in a contributions list.
 - Known before new: start each sentence from something the reader already holds (the end of the previous sentence, a term already defined) and end on the new information. Introduce a concept in words before its notation.
 - One main idea per sentence, but connect ideas that belong together: a run of short declaratives that each restate a fact reads like a list, so join a cause and its consequence with "because", "so" or "which".
 - Every "so", "therefore" and "thus" must follow from what precedes it alone. If the conclusion needs a premise the paragraph has not stated, state the premise or drop the connective.
@@ -76,9 +76,9 @@ The closing paragraph makes the reader want the Results; it is not a summary of 
 - Verbs over nominalizations: "we estimate the noise" rather than "estimation of the noise is performed".
 - Concrete over abstract: a number, an example, a named regime.
 - Citations support statements about what prior work does; they never replace that description.
-- Vary sentence length. An average near 20–25 words reads easily; a sentence over 40 words usually carries two ideas. These are diagnostics, not a reason to break a coherent explanation into fragments.
+- Vary sentence length. Reread a dense sentence for competing ideas, distant subjects and verbs, or unnecessary qualifications; do not split a coherent explanation merely to meet a word-count target.
 
-## Example (synthetic; the system and numbers are invented)
+## Example of a methods contribution (synthetic; the system and numbers are invented)
 
 Obvious version:
 
@@ -90,7 +90,7 @@ Specific version (compressed into one paragraph for illustration):
 
 What changed: the opening could only begin this paper and needs no notation; the closest work is described by what it does and the assumption its members share; the shortfall has a mechanism and a consequence; the turn reuses "independent" and "correlated"; the evidence is one number against a named comparator, with its condition inside the claim. In a real paper each of these statements about hardware and prior decoders needs its source in the inputs.
 
-A component-level turn versus an idea-level turn (ml-conference):
+A component description versus the scientific contribution in a computational methods paper:
 
 - Component: "We replace the reward model with a larger network trained on more preference data."
 - Idea: "Existing test-time adaptation methods assume the label distribution is the same at training and deployment; we estimate the deployment label distribution online and adapt the classifier to it."
