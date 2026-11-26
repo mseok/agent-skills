@@ -18,6 +18,16 @@ Keep a working map from the proposed central message to supporting and contrary 
 
 Identify a missing experiment only when it is necessary for a claim the paper proposes to make. Narrow or select another supported claim and record the consequential gap for the author. Do not list every untested downstream application, add a limitation for every possible extension or run new experiments as part of writing.
 
+## Select the contribution before the outline
+
+Connect the author's question, the closest established accomplishment, the most informative new observation and what that observation changes for the reader. A central sentence that merely describes the evaluation program is not enough. If the record supports competing contributions, compare two plausible hierarchies privately before choosing; preserve an already agreed scientific direction.
+
+Ask whether the proposed contribution would still sound true with the closest prior method's name substituted. If it would, identify the actual increment: a new explanation, decision, capability, domain of evidence, resource or trade-off. An empirical extension can matter, but its scientific value must be explained rather than concealed by a stronger novelty adjective. Ask which observation changes an expectation and why that distinction matters to the intended readers.
+
+Give each important comparison its logical role. A study can establish a useful outcome, test an added component, investigate an information source or distinguish explanations; these are different arguments. Keep the comparator and the conditions that determine each inference attached in the working record. An adverse or null result may select the central claim, constitute a complementary finding or set a local condition. Decide which before allocating prose.
+
+Create a short argument-oriented drafting view: selected contribution; decisive observations; nearest relevant accomplishment; necessary explanatory idea; and conditions that change meaning. Preserve the complete ledger separately and consult it during verification. Organize prior work by the premise it establishes and method details by the scientific decision they explain. A detail earns space when removing it leaves a specific gap in the argument.
+
 ## Make the editorial choices
 
 Apply the editorial decisions below and the target context in `venue-adaptation.md`. Identify what the reader should newly understand, with the closest relevant prior work and the results that make that message credible. Keep novelty distinct from better performance. Consider a more consequential framing when the current description reduces a finding to implementation details, but never change facts to fit the journal.

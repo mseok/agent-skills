@@ -4,7 +4,7 @@ Write the argument that makes this study worth reading. The reader should unders
 
 ## Find the argument before arranging the paragraphs
 
-Privately finish two ordinary sentences: what the reader needs to understand before encountering the study, and what the reader should understand differently after it. Connect them using the research record and the relevant literature. These are aids to thinking, not sentences that must appear in the manuscript.
+Use the contribution selection in `planning.md`: connect the author’s question, the closest established accomplishment, the decisive observations and the understanding they add. Build from the short argument-oriented drafting view, with the complete facts available for checking. Read `argument-example.md` for a synthetic example of this selection. The private brief supplies the reasoning, not sentences or paragraph slots to reproduce.
 
 Choose a contribution that the results can carry. A new method can matter because it enables a scientific decision; a diagnostic study can matter because it changes how a familiar result is interpreted. A resource can make a previously difficult comparison possible. Do not force these contributions into the same failed-methods story. Let the author's direction govern when already settled.
 
@@ -24,7 +24,7 @@ Make the remaining question follow from what is already possible. Existing demon
 
 ## Contribution and evidence
 
-Explain the contribution in the same scientific terms used to motivate it. For a method, give its organizing idea and the operations necessary to understand that idea. A list of all components, input fields, fallback behaviors or software interfaces is usually a Methods description. Keep a detail here when it explains the scientific advance.
+Explain the contribution in the same scientific terms used to motivate it. For a method, give its organizing idea and the operations necessary to understand that idea. Explain the method through the decision it enables or the scientific difficulty it addresses. An operational rationale describes what the procedure does; a claim that a component caused an empirical benefit requires suitable evidence. A list of all components, input fields, fallback behaviors or software interfaces is usually a Methods description. Keep a detail here when it explains the scientific advance.
 
 Select a preview that helps the reader grasp the answer. This may be a qualitative finding, a capability, a contrast or a decisive quantitative result. Give a comparator, budget, unit or condition when needed to interpret a claim; leave the rest of the result table for Results. Use no quota for numerical results. End on the contribution's scientific meaning when the argument supports it, rather than repeating the study design or appending a generic future promise.
 

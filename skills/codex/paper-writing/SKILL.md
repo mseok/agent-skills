@@ -5,103 +5,56 @@ description: Write or revise English research-paper prose (Introduction, Methods
 
 # Paper writing
 
-The manuscript text you produce is the paper. Make its scientific question, contribution and meaning clear to the intended readers, with the information needed to assess and reproduce the work in the appropriate places. Write the strongest supported message in natural disciplinary language. Keep the writing process and evidence audit out of the manuscript.
+Write the scientific argument the intended reader needs: why the question matters, what the study changes and how its evidence supports that change. Use natural disciplinary language. The manuscript is the paper; planning, evidence audits and instructions to the author stay outside it.
 
-Use editorial guidance selectively to serve the whole argument. Natural progression, reader motivation and the author's direction take priority over stylistic heuristics. A broad scientific statement can establish essential context; a concrete example can distract. Do not make prose unusual, more technical or more detailed merely to satisfy a writing rule. Accuracy and faithful reporting remain required.
+The author's direction and the complete research record govern the work. Every factual claim, number, citation and explanation must be supported; preserve material contrary findings and the conditions that change interpretation. Select a truthful contribution before choosing how emphatically to express it. Never invent a result, mechanism, priority claim or failure of prior work to improve the story.
 
-## Workflow
+## Work in three stages
 
-1. **Choose the writing direction** from the research record and the author's goal (`references/planning.md`). For a new paper or a changed target, read `references/venue-adaptation.md`: establish the exact journal, article type and readers, inspect suitable published examples, and choose the most consequential question the available results answer. Audit the full research history, including corrections and unfavorable results; privately outline the argument and the role of each figure and paragraph.
-   When the author supplies a direction and asks for prose, proceed through drafting without a planning-approval round. Infer routine editorial choices, obtain public journal guidance yourself, and reuse an accepted plan or a supplied writer package. Ask only when a missing fact or unresolved choice would materially change the requested paper and cannot be handled locally. When the author explicitly asks to discuss the direction first, return the concise plan before drafting. In unattended or delegated runs, make reasonable choices and continue; report only unresolved decisions requiring the author's attention.
-   A plan never overrides the inputs or the non-negotiables. Follow the evidence and explain any material departure outside the manuscript.
-2. **Brief a writer** when another agent or model will draft the text, or when the author asks for the prompt (`references/delegation.md`): package the facts, the accepted plan and the writing instructions so that a writer with no other context can draft from them.
-3. **Write** each section from the plan with its guide below and the contrasting examples in `references/register.md`. First develop the scientific argument for the intended reader; then verify and refine it. Do not continually interrupt composition to satisfy local style checks.
-4. **Integrate the paper** before final wording: read `references/integration.md` and check the assembled draft against the agreed one-sentence central message. Reconcile the question, evidence and conclusion across sections, then polish the prose and run the self-check. For a scoped revision, use the available surrounding text and preserve the authorized edit boundaries.
-5. **Verify references last, before finalization.** After the last substantive edit, invoke the `reference-verification` skill in **full** mode on the actual deliverable and supplied SI. Resolve or report its metadata and citation-support findings before declaring the manuscript reference-cleared. A metadata-only check is permitted when explicitly requested, but does not clear the whole manuscript. For an isolated writer, the coordinating agent owns source retrieval and this final check after integration (`references/delegation.md`). Keep audit findings outside manuscript prose. This mandatory check grants no additional editing permission.
+### 1. Understand and choose
 
-## Keep preparation separate from the prose
+Read the research record, including corrections and unfavorable results. Follow `references/planning.md` to select the contribution in relation to the closest prior accomplishment and the most informative observations. For a new or changed target, follow `references/venue-adaptation.md`, the relevant entry in `references/journal-profiles.md` and matched article analyses. Obtain public guidance and examples yourself; do not ask the author to assemble a style profile.
 
-Before drafting, understand the research history, the author's direction, the target readers and the strongest supported contribution. Keep a complete factual record, including corrections and material contrary results. Select the headline findings and decide where supporting evidence and reproducibility details belong. These editorial decisions remain working material.
+Make a compact private drafting brief: the author's question, what the closest work already makes possible, the new understanding supported here, the observations carrying that understanding, and the scientific explanation the reader needs. Keep the full factual record underneath it. Source-note categories, method components and audit categories are not a manuscript outline. Relevant contrary evidence determines the message rather than becoming an obligatory negative sentence appended later.
 
-Draft from that understanding as a connected scientific argument. Do not translate the fact ledger, novelty assessment or methods inventory into successive manuscript paragraphs. Explain what the science means to the reader. After the argument works, check every claim against the record and repair its wording locally when possible; do not add an audit narrative to a sound paragraph.
+When the direction and a request for prose are supplied, make routine editorial choices and proceed. Discuss the plan first only when the author requests that discussion. Reuse accepted plans and supplied writer packages. Ask about a missing fact only when it materially changes the paper and cannot be handled locally; continue the useful work. An internal plan is provisional, not author-approved.
 
-For the journal context, read the relevant entry in `references/journal-profiles.md` and matched public-paper analyses. Use their decisions about readership, contribution and explanation. A paper's publication does not make every rhetorical claim sound, and a journal's prestige does not determine a paper's ambition.
+### 2. Compose and reconstruct
 
-## Guides
+Read the section guide and the contrasting examples in `references/register.md` before writing. For an Introduction, also read the short synthetic whole-argument example in `references/argument-example.md`. Learn editorial decisions, not layouts or phrases. Develop the paper from the selected argument instead of reciting the source packet in order.
 
-Read the guide for the task or section at hand, plus `references/register.md`, including its contrasting examples, whenever you write manuscript text. Apply the examples' editorial decisions, not their sentence patterns.
+Write a complete draft. Explain scientific objects, decisions and consequences in the vocabulary the target readers use. A broad opening, concrete example, technical detail or result belongs when it advances the reasoning; none is mandatory. Let the actual question determine the paragraph order, count and depth. Keep the strongest supported scientific message visible without repeated scope labels, proof-status contrasts or a catalogue of unperformed work. Context established in a connected passage carries forward.
 
-| Task | Guide |
+Then read `references/integration.md` and assess the argument actually written. For a newly requested draft, reconstruct the argument once when needed: change the allocation of background, select a different leading comparison, or explain the method's scientific role. Fix the reason to read and the connection between question and answer before polishing transitions. For a scoped revision, preserve its authorized boundaries and follow `references/revision.md`; mark proposed changes inline.
+
+### 3. Verify and deliver
+
+After substantive revision, read `references/accuracy.md` and `references/prose-audit.md`. Check all claims against the complete record, including unfavorable comparisons. Resolve factual errors and consequential omissions, and refine wording without turning the paper into an account of its verification. Scientific explanations and interpretations remain when supported; removing report tone must never strengthen a claim.
+
+After the last substantive edit, invoke the separate `reference-verification` skill in **full** mode on the actual deliverable and supplied SI. Resolve or report metadata and citation-support findings before declaring the manuscript reference-cleared. A metadata-only check applies only when explicitly requested and does not clear the whole manuscript. For an isolated writer, the coordinating agent owns retrieval and this final check. It grants no additional editing permission.
+
+Return the requested manuscript in the input's LaTeX or Markdown format. If references remain unresolved, label it a draft and state the specific unresolved items. Add `---` and `Notes to author` only for matters requiring attention: factual conflicts, placeholders, consequential departures or decisions, nontrivial derivations or computations, and missing figures, definitions or supplementary items. Use the author's language for these notes. Keep the complete audit in working notes; do not print routine editorial checks or unrelated untested possibilities.
+
+## Select the relevant guides
+
+| Task | Read |
 |---|---|
-| Writing plan and discussion with the author | `references/planning.md` |
-| Target journal, readers, framing and disciplinary language | `references/venue-adaptation.md` |
-| Dated journal examples and contribution-specific writing choices | `references/journal-profiles.md`; read only the relevant journal |
-| Article-level examples for the chosen journal | `references/corpus-nature-biotech.md`, `references/corpus-computational-ai.md`, or `references/corpus-chemistry.md`; select relevant articles |
-| Writer package and delegation prompt | `references/delegation.md` |
-| Revising an existing or live shared manuscript | `references/revision.md` |
-| Introduction | `references/introduction.md` |
-| Methods, Experimental setup | `references/methods.md` |
-| Results, Experiments | `references/results.md` |
-| Figures and panels | the `nature-figure` skill for quantitative data charts and multi-panel plots, and the `concept-figure` skill for schematic, architecture, mechanism or pipeline diagrams; read the matching skill before planning or producing any figure |
-| Final integration across sections | `references/integration.md` |
-| Final reference verification, after all substantive edits | the `reference-verification` skill, full mode ([source](../reference-verification/SKILL.md)) |
-| Abstract, Discussion | end of this file |
+| Direction, evidence selection and author discussion | `references/planning.md` |
+| Journal, readers, explanatory depth and terminology | `references/venue-adaptation.md`; relevant part of `references/journal-profiles.md` |
+| Matched published examples | Relevant articles in `references/corpus-nature-biotech.md`, `references/corpus-computational-ai.md` or `references/corpus-chemistry.md` |
+| Brief another writer or produce a writer prompt | `references/delegation.md` |
+| Revise an existing or live shared manuscript | `references/revision.md` |
+| Introduction | `references/introduction.md`; `references/argument-example.md` |
+| Methods or Experimental setup | `references/methods.md` |
+| Results or Experiments | `references/results.md` |
+| Abstract or Discussion | `references/abstract-discussion.md` |
+| Every manuscript-writing task, before composition | Contrasting examples in `references/register.md` |
+| Substantive revision and alignment across sections | `references/integration.md` |
+| After substantive revision | `references/accuracy.md`; `references/prose-audit.md` |
+| Final reference check | Separate `reference-verification` skill, full mode ([source](../reference-verification/SKILL.md)) |
 
-Before editing this skill itself, read `references/user-decisions.md`.
+For quantitative charts and multi-panel plots, read the `nature-figure` skill before planning or producing the figure. For schematic, architecture, mechanism or pipeline diagrams, read `concept-figure`. Do not invent missing data or make explanatory figures substitute for evidence.
 
-## Non-negotiables
+For a writer-package request, return the self-contained package and prompt specified in `references/delegation.md`. For an explicitly requested planning discussion, return the concise plan in the author's language before drafting. A supplied direction otherwise permits completion in one invocation.
 
-- **Accuracy over emphasis.** Every device here for emphasis or de-emphasis works inside the evidence. If a device would overstate a result, hide a qualification that changes a headline claim, or drop an explanation the reader needs, do not use it. When a placement or length preference conflicts with accuracy, accuracy wins.
-- **Keep the scientific message in front.** State findings and their scientific meaning directly. Never turn the manuscript into an evidence-status report, a catalogue of unperformed experiments or repeated explanations of what a result does not prove. Before adding a qualification, ask what interpretation it changes for the intended reader. If none, omit it. When one is needed, make the scientific statement precise rather than appending a defensive disclaimer. Do not manufacture an overclaim simply to rebut it.
-- **Preserve meaning through context.** Use the right scientific object, verb and conditions for the result. Conditions established in a connected passage carry forward; do not mechanically repeat scope words or add "in this study", "under the tested conditions" or "does not establish" to each restatement. Repeat a condition when its omission would change the meaning, when the context changes, or in a passage read independently such as the abstract. Choose "confirms", "validates", "proves" and "ensures" only for the scientific operation and result actually supplied; do not narrate that choice in the paper. Express an important implication at its justified strength, without surrounding it with generic uncertainty.
-- **Numbers.** Every number in the text appears in the inputs with the same value, unit, comparator and basis (per sample, per step, per device, in total), or is computed from them with ordinary rounding. A computed number keeps the basis of its inputs, and a change of basis (per item to total, percentage points to percent) is itself a computation; record each computed number and its computation in the working notes, and flag it to the author when it requires attention. The only other numbers allowed are the premises of an illustration framed explicitly as hypothetical (`references/introduction.md`), never attributed to a real system or to this work. Never change a value to make it look better.
-- **No fabrication.** No citations, baselines, datasets, mechanisms, motivations, sampling schemes, statistical tests, symbol meanings, supplementary items or "first" claims the inputs do not support. Where a citation is needed and missing, write `[CITE: what is needed]`.
-- **Clean register, same strength.** Removing report tone never strengthens a claim. A tentative note becomes the measured result with its tested conditions and range, not a general statement; an observed range is not independence, and a tested domain is not generality.
-- **Less favorable results** get space in proportion to their bearing on the claims, are never deleted when they bear on a claim and are never misstated. A result that bounds a headline claim narrows the claim's wording wherever the claim appears ("lowers the error on noisy recordings" rather than "lowers the error"), and its numbers sit in Results beside that claim, in a compact clause. Only weak results on secondary settings, outside the scope of every headline claim, move to the Supplementary, with a pointer. Replace a weakness label with the factual comparison; never announce weakness as a topic ("Two further results are weak", "The evidence is mixed").
-- **Register.** No status reports, process narration, summary labels or messages to the author in manuscript text (`references/register.md`).
-- **Explanation and interpretation stay.** Keep the explanations the intended readers need: why the question matters, what an unfamiliar term means, what a design choice changes and how a non-obvious step works. Reasoning that follows from the inputs by a step a specialist could check without outside data (a consequence of an equation, what a parameter controls, which alternative explanation a matched setting removes) is explanation, so give it. Check its premises, object and conditions privately and express the consequence naturally where it helps the argument. Give explanations where they close a gap, not after every routine operation. Author motivation, causes of empirical effects and untested alternatives still need evidence; plausible reasoning alone is not an experimental finding. In Results, explain what the finding means for the paper's question. Place reproducibility details where the target format allows them to be found, preserving information that changes interpretation; keep the source notes complete.
-- **American English** (analyze, modeling, normalization, behavior, favorable, judgment) unless the author's draft or the venue uses British spelling. Proper names keep their own spelling.
-- **No fixed template.** Paragraph order and count follow the argument of this paper. The numbers in this skill (paragraph counts, sentence lengths, word ranges) are diagnostics that prompt a second look, not shapes to fill.
-- **Revision mode.** When revising a draft, change what the author asked for and, inside the passages that request covers, what violates this skill; keep the author's structure, terminology, citations and claims. Follow `references/revision.md` for before/after drafts, numbers-only updates and anything applied to a live shared manuscript.
-
-## Apply the journal choices
-
-Use the target's actual requirements for abstract form, word limits, section labels, Methods placement, supplementary material and required statements. Use matching articles to inform explanatory depth, paragraph functions, headings and disciplinary usage. A short technical Introduction or a detailed specialist argument may be appropriate in either a broad or a specialist journal. Never infer a fixed paragraph count, a compulsory contributions list or a lower scientific ambition from a journal family. Reuse verified choices for the same paper instead of rediscovering them on every passage revision.
-
-## Output
-
-- When a planning discussion is requested, return the concise plan in the author's language; otherwise complete the requested prose. For a writer-package request, return the package and prompt (`references/delegation.md`).
-- After steps 3–5, return the manuscript text, in LaTeX or Markdown to match the inputs or the author's draft; if reference verification is not clear, label the delivery as a draft and state the unresolved items.
-- If anything needs the author's attention, add a line `---` and the heading `Notes to author` after the manuscript. Keep it concise, in the author's language unless the brief says otherwise: unresolved factual conflicts, placeholders, material departures or choices, nontrivial derivations, computations requiring confirmation, and figures, supplementary items or definitions the author must supply. Report moved results when their placement needs attention. Keep the complete evidence audit in working notes; do not print a routine inventory of unsupported extensions, missing experiments unrelated to the selected message, or every editorial choice. Omit an empty block.
-
-## Self-check before returning
-
-Resolve factual errors and material omissions, then judge the draft as a connected scientific argument. Treat stylistic checks as prompts for judgment, not quotas or automatic reasons to rewrite sound prose.
-
-- [ ] Complete the integration pass in `references/integration.md`: the sections address the same central message at the same evidential scope. Compare the draft's editorial choices with the examples in `references/register.md`; facts are organized into findings, and each limitation earns its place by changing interpretation or satisfying a venue requirement.
-- [ ] Someone who reads only the Introduction can state the central contribution and why it matters to the target readers. It matches the evidence and the rest of the paper; its meaning stays consistent without repeated scope labels or defensive recaps.
-- [ ] Introduction: establish a scientific problem and a reason for the intended reader to care, then develop the question and contribution. Use the level of abstraction that supports this progression; the opening need not be unique to this paper or describe its experimental contrast. Keep genuine frequency or conditionality, and introduce technical detail when it helps the reader understand the argument.
-- [ ] Each paragraph connects to where the previous one ended, in the argument rather than by repeated words, and none re-explains the paragraph before it.
-- [ ] Unfamiliar acronyms and symbols are defined where the intended readers need them, including independently read sections. Review long or dense sentences for readability; preserve necessary scientific terms and logical connections rather than targeting a fixed average length.
-- [ ] Methods: organize the actual study so the intended readers can follow its design and non-obvious steps. Define quantities before use; make controls and comparisons intelligible. Preserve required values across the appropriate main and supplementary materials, avoid repeating setup tables, and invent no motivation, symbol meaning or pointer.
-- [ ] Results: make the scientific question and findings clear, with the measurements, comparisons and figures needed to understand them nearby. Explain supported implications and complete the semantic review in `references/results.md`. Organize findings, interpretation and synthesis for the target article type; remove redundant recaps and caveat inventories. Keep material contrary findings, and do not give secondary unfavorable results disproportionate emphasis.
-- [ ] No report-register phrase, summary label, British spelling (unless the author uses it) or non-English text in the manuscript.
-- [ ] No claim is stronger than its evidence; every number is traced to the inputs with its unit, comparator and basis.
-- [ ] The main scientific message remains clear. Remove qualifications that change no relevant interpretation, repeated "shown/not shown" language and internal review vocabulary; retain the actual conditions, contrary findings and explanations that matter.
-- [ ] The separate `reference-verification` skill has checked the delivered main text and supplied SI in the required mode; remaining findings and the checked saved artifact are stated accurately.
-
-If a shell is available, `python3 -I <skill folder>/scripts/check_prose.py DRAFT --notes NOTES --section intro|methods|results` reports report-register phrases, weakness signposts, summary labels, British spellings, words to review in context, generic openers, untraced numbers, undefined acronyms, non-English text, layout patterns and sentence lengths; `--section intro` adds checks on the first sentence and paragraph. When the draft uses computed values, make a separate working-notes copy containing the original source facts plus labeled computations with operands, units and basis; pass that copy as `NOTES`. Preserve the source notes unchanged and keep this arithmetic outside the manuscript and routine author notes. The checker tests whether each number occurs in the notes, not its sign, unit, comparator or provenance; check those by reading. It does not assess the paragraph's role in the argument, a case's explanatory value or whether an inference follows from its premises; passing it does not replace semantic review. A match marked for review is a prompt to reread, not an instruction to delete.
-
-## Abstract or summary paragraph
-
-- Follow the exact journal and article type for structure, length and citations. State the scientific question, the contribution, its decisive evidence and its meaning at the target readers' level. Let a finding, mechanism, method or resource determine the argument; do not force every abstract into a failed-methods story. Select quantities that explain the advance rather than compressing the Results into a list.
-- No weak results, no hedge stacks, no conditional best cases ("reaching 63% at the largest model size"). A boundary that changes the headline claim is folded into the claim itself ("on noisy recordings, …").
-
-## Discussion
-
-- Open with what the paper established, in one or two sentences, in the terms of the difference; do not recap every result.
-- Explain how the findings change the picture relative to the closest prior work. Keep established explanations apart from interpretations, and address an alternative explanation when a reader would raise it.
-- Discuss a limitation when it changes interpretation, explains a result, identifies a consequential open question or satisfies the target's requirements. Explain the scientific consequence once, in the relevant discussion; do not append a generic "this does not establish X" after each finding or enumerate unrelated things not tested. Preserve important contrary evidence without turning the Discussion into an audit.
-- End on the strongest grounded conclusion. Add a future direction only when it follows specifically from the findings.
-
-
+Before editing this skill itself, read `references/user-decisions.md`. Writers do not need that maintenance record.
