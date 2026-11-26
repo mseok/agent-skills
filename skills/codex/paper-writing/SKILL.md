@@ -7,7 +7,7 @@ description: Write or revise English research-paper prose (Introduction, Methods
 
 Write the scientific argument the intended reader needs: why the question matters, what the study changes and how its evidence supports that change. Use natural disciplinary language. The manuscript is the paper; planning, evidence audits and instructions to the author stay outside it.
 
-The author's direction and the complete research record govern the work. Every factual claim, number, citation and explanation must be supported; preserve material contrary findings and the conditions that change interpretation. Select a truthful contribution before choosing how emphatically to express it. Never invent a result, mechanism, priority claim or failure of prior work to improve the story.
+The author's direction and the complete research record govern the work. Every factual claim, number, citation and explanation must be supported; preserve material contrary findings and the conditions that change interpretation. Select a truthful contribution within the supplied scientific purpose before choosing how emphatically to express it. Never invent a result, mechanism, priority claim or failure of prior work to improve the story.
 
 ## Work in three stages
 
@@ -15,13 +15,13 @@ The author's direction and the complete research record govern the work. Every f
 
 Read the research record, including corrections and unfavorable results. Follow `references/planning.md` to select the contribution in relation to the closest prior accomplishment and the most informative observations. For a new or changed target, follow `references/venue-adaptation.md`, the relevant entry in `references/journal-profiles.md` and matched article analyses. Obtain public guidance and examples yourself; do not ask the author to assemble a style profile.
 
-Make a compact private drafting brief: the author's question, what the closest work already makes possible, the new understanding supported here, the observations carrying that understanding, and the scientific explanation the reader needs. Keep the full factual record underneath it. Source-note categories, method components and audit categories are not a manuscript outline. Relevant contrary evidence determines the message rather than becoming an obligatory negative sentence appended later.
+Make a compact private drafting brief: the author's scientific purpose, what the closest work already makes possible, the useful capability, method, empirical contribution or understanding supported here, the observations carrying it, and the scientific explanation the reader needs. Keep the full factual record underneath it. Source-note categories, method components and audit categories are not a manuscript outline. Comparative controls serve the scientific purpose; relevant contrary evidence shapes the claim and its scope. Change the purpose only when the evidence requires it or the author directs it.
 
 When the direction and a request for prose are supplied, make routine editorial choices and proceed. Discuss the plan first only when the author requests that discussion. Reuse accepted plans and supplied writer packages. Ask about a missing fact only when it materially changes the paper and cannot be handled locally; continue the useful work. An internal plan is provisional, not author-approved.
 
 ### 2. Compose and reconstruct
 
-Read the section guide and the contrasting examples in `references/register.md` before writing. For an Introduction, also read the short synthetic whole-argument example in `references/argument-example.md`. Learn editorial decisions, not layouts or phrases. Develop the paper from the selected argument instead of reciting the source packet in order.
+Read the section guide and the contrasting examples in `references/register.md` before writing. Before a new draft, examine complete Introduction or opening prose from matched primary articles through `references/venue-adaptation.md`; use the existing full-main-narrative analyses as context. For an Introduction, also read the paired synthetic whole-argument example in `references/argument-example.md`. Learn editorial decisions, not layouts or phrases. Develop the paper from the selected argument instead of reciting the source packet in order.
 
 Write a complete draft. Explain scientific objects, decisions and consequences in the vocabulary the target readers use. A broad opening, concrete example, technical detail or result belongs when it advances the reasoning; none is mandatory. Let the actual question determine the paragraph order, count and depth. Keep the strongest supported scientific message visible without repeated scope labels, proof-status contrasts or a catalogue of unperformed work. Context established in a connected passage carries forward.
 
