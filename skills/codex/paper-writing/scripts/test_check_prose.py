@@ -51,20 +51,59 @@ class CheckProseTests(unittest.TestCase):
         rep = check("Complex VIII and Complex XII bind DNA, RNA and ATP in 2D and 3D views of QWERTY.\n")
         self.assertEqual(rep["undefined_acronyms"], ["QWERTY"])
 
-    def test_results_trailing_figure_pointer_and_equivalence_and_slop_flags(self):
+    def test_results_finding_citations_and_equivalence_and_slop_flags(self):
         draft = (
             "Informed search halved the evaluations required to hit the target (Fig. 2a).\n\n"
             "Informed search (Fig. 2b) is comparable to the baseline and not merely faster, but cleaner.\n"
         )
         rep = check(draft, section="results")
-        self.assertEqual(len(rep["review_layout"]), 1)
-        self.assertEqual(rep["review_layout"][0]["line"], 1)
-        self.assertIn("(Fig. 2a).", rep["review_layout"][0]["match"])
+        self.assertEqual(rep["review_layout"], [])
         self.assertTrue(any("comparable to" in h["match"].lower() for h in rep["review_in_context"]))
         self.assertTrue(any("not merely" in h["match"].lower() for h in rep["generic"]))
 
         rep_methods = check(draft, section="methods")
         self.assertEqual(rep_methods["review_layout"], [])
+
+    def test_results_wrapped_finding_citations_are_not_layout_issues(self):
+        draft = (
+            "The treatment reduced aggregate formation\n"
+            "(Fig. S2a).\n\n"
+            "The affinity increased across the tested concentrations\n"
+            "(see Fig. 3a and 3b).\n"
+        )
+        self.assertEqual(check(draft, section="results")["review_layout"], [])
+
+    def test_results_pointer_only_and_presentational_endings(self):
+        draft = (
+            "The treatment reduced aggregate formation. See Fig. 2.\n\n"
+            "(Table S1).\n\n"
+            "The results are shown in Fig. 3.\n\n"
+            "The left panel shows the comparison.\n"
+        )
+        hits = check(draft, section="results")["review_layout"]
+        self.assertEqual([hit["line"] for hit in hits], [1, 3, 5, 7])
+        self.assertIn("See Fig. 2.", hits[0]["match"])
+        self.assertIn("layout/process sentence", hits[-1]["match"])
+        self.assertEqual(check(draft, section="methods")["review_layout"], [])
+
+    def test_intro_greek_entity_names_are_not_automatically_notation(self):
+        for draft in (
+            "Aβ and α-synuclein form distinct aggregates.",
+            "β-lactam exposure altered the measured response.",
+            "CO₂ concentration controls the reaction conditions.",
+        ):
+            with self.subTest(draft=draft):
+                self.assertEqual(check(draft, section="intro")["opening"], [])
+
+    def test_intro_explicit_math_remains_a_review_item(self):
+        for draft in (
+            "The coefficient $\\alpha$ controls the response.",
+            r"The response is defined by \(y = x^2\).",
+            "The response follows α = 0.5 under the stated conditions.",
+        ):
+            with self.subTest(draft=draft):
+                hits = check(draft, section="intro")["opening"]
+                self.assertTrue(any(hit["issue"] == "notation in the first paragraph" for hit in hits))
 
     def test_cli_runs_under_ascii_locale(self):
         script = Path(__file__).resolve().with_name("check_prose.py")

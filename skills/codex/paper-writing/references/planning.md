@@ -1,73 +1,74 @@
-# Planning the paper with the author
+# Plan the paper
 
-The materials show what was done; the author knows what the paper is for. Agree on the direction before drafting, so the prose argues the paper the author wants to publish and no draft has to be rewritten because its premise was wrong.
+Develop the author's supplied message using the full research record and the needs of the target readers. Choose a provisional message only when none is supplied. Plan privately during ordinary drafting. Discuss the direction first when the author requests it; do not turn every writing request into an approval sequence.
 
-## When
+Use this guide in the coordinator's editorial preparation. Pass its scientific decisions through the compact brief in `delegation.md`; keep detailed planning categories out of the fresh composer's instructions. Preserve the original accepted plan for checking and carry every binding decision into the brief.
 
-- Before the first draft of a paper or of a new set of sections, and whenever the author asks to settle the direction first ("방향부터 같이 정하자").
-- Skip it for a revision of one passage, when the author has already accepted a plan for these sections (continue from it without asking again), or when the inputs include a writer package (`plan.md` with `brief.md`).
-- Skip it in any run where no one can answer before the text is due (SKILL.md, Workflow step 1): make the decisions and the paragraph outline privately, write the sections, and list each open decision with the choice made in Notes to author. Such a draft is provisional; never record its decisions as accepted.
-- Handing the work to another agent does not waive the discussion: if the author asked to settle the direction first, the plan goes back to the author before any prose.
+## Decide how to proceed
 
-## Audit the research history first
+- When the author gives a research direction and asks for a draft, make routine editorial choices and write. Apply `venue-adaptation.md` without asking the author to supply a profile, exemplar collection or terminology list.
+- Continue an accepted plan or a supplied writer package without renewed approval. For a scoped revision, use the available context and preserve the authorized boundaries.
+- When the author explicitly asks to settle the direction first, return a concise plan and wait before drafting the requested sections. Delegation does not remove that instruction.
+- Ask only about a missing fact or choice that would materially change the paper and cannot be handled by a local placeholder or a reasonable editorial decision. Continue the parts that can be written.
+- In unattended or delegated runs, make the choices privately and proceed. Mark an unreviewed saved plan as provisional; do not invent author acceptance.
 
-Build the evidence from the full record of the work, not from the latest result or from earlier favorable ones. Read the project's question report and experiment ledger (`research-workflow`, `experiment-ledger`) where they exist, as well as the supplied results, logs and drafts. For each experiment, record whether it was planned, actually run or independently re-verified (recomputed from raw outputs, repeated on held-out data or reproduced by someone else), its data source, its result, later corrections and failures. A result that a later experiment corrected or superseded enters only in its corrected form; a failed or inconclusive run that bears on a claim stays in the evidence map. Only a run result supports a claim, and only an independently re-verified result is described as reproduced or validated. Where the record and the supplied materials disagree, show the disagreement to the author instead of choosing silently.
+## Read the research record
 
-## Read the materials first
+Read the supplied notes, tables, logs, drafts and relevant project records, including a question report or experiment ledger when present. Include corrections, inconclusive runs and unfavorable results that bear on the selected message. Distinguish measurements, interpretations, derived consequences and planned work internally. A later correction replaces the earlier result; a plan never becomes a finding.
 
-Read everything supplied: notes, result tables, logs, drafts, earlier versions. Sort what you read into facts (a measured value with its unit, comparator, condition and source), the author's interpretations, hypotheses and plans, and items marked as not run or unconfirmed. The plan is built from the facts; an interpretation enters as the author's framing, labeled as such. Map every result that supports, tests, bounds or contradicts a proposed claim, including the components of an aggregate, and classify it by its role in the paper's question, not by an informal label in the notes: a result the notes call weak may answer the central question. List each experiment or analysis a planned claim lacks (a matched comparison, a simple baseline, an ablation of the core idea, a panel the data cannot fill), with the claim it would support and how the claim narrows without it; never run it or write as if it had been run.
+Keep a working map from the proposed central message to supporting and contrary results, with their sources, values, units, comparators, conditions, aggregation and uncertainty. Resolve factual conflicts from the record when possible; otherwise flag the specific conflict to the author. Use this map to choose accurate scientific statements, not as an outline of evidence-status declarations for the manuscript.
 
-## The plan
+Identify a missing experiment only when it is necessary for a claim the paper proposes to make. Narrow or select another supported claim and record the consequential gap for the author. Do not list every untested downstream application, add a limitation for every possible extension or run new experiments as part of writing.
 
-Write the plan in the author's language, but quote the difference, the headline claims, their scope words, the proposed sentences and the Results headings in English, as they will appear in the manuscript. Show it in two passes, so the author settles the direction before reading any table.
+## Develop the supplied message
 
-**First pass, one screen.**
+Read the author's problem-formulation notes, accepted framing and relevant research discussion. Carry the original central sentence or framing into the writing inputs; it states the intended scientific message, not a required first sentence or paragraph order. Use the record to understand its motivation, support and scope. A short message need not already contain the Introduction's exposition. Distinguish the motivating problem from the systems, datasets and comparisons used to investigate it.
 
-1. **Story.** Three to five lines: what the paper shows, in the order the Introduction will argue it.
-2. **Direction.** The closest prior work and what it achieves; the difference as one sentence naming both sides; its scope words; the insight, if the materials contain one; the alternative explanations a specialist would raise, each with the result that addresses it or a note that none does. Make this sentence the paper's central message: what the reader should newly understand from the work, not just what was built. Use the same sentence as the reference for the final integration pass (`integration.md`). Beside it, the proposed English first sentence of the Introduction and the Turn sentence. When the materials support more than one framing, show the two best supported side by side, each with its first sentence and the headline it would lead to, and recommend one.
-3. **Headlines.** The one or two headline results with comparator and number, and the weak results that narrow them, with the scope words they add.
-4. **Questions.** Only gaps that change the text: which result leads when two compete, a missing acronym expansion or value, two numbers that disagree, a figure number. At most three, each a single decision with your recommended answer.
+Reconstruct the history of a framing document only when the task requests provenance or a substantive conflict requires it. Then record identifiable source passages, versions and transformations, and mark unavailable history as unknown. Ordinary drafting still requires support for scientific premises, but not a reconstruction of how an earlier writer arrived at them.
 
-Ask about the direction only.
+Add connected framing to the brief only where the supplied sources leave an actual premise missing. Ground it in the record and relevant primary literature; do not require the author to supply a polished argument. Otherwise pass the existing message and framing through and let the composer develop the progression. Keep the central question stable when demonstration systems change unless the evidence or author changes its premise.
 
-**Second pass, after the direction is accepted.**
+## Position the contribution
 
-5. **Evidence.** Full rows (claim supported, comparator and number, figure or table, tier, placement) for headline, weak and unverified results and for any placement the author may want to change; supporting results in one line per section.
-6. **Figures.** Before the outline, sketch the main figures as the paper's visual argument: their order (for example problem and idea, comparison with prior methods, the source of the gain, use on real data, generality and limits, as this paper needs) and, for each figure, the one question it answers and the panels that answer it, with comparator, sample size, effect size, uncertainty and any failure case that answers the question. A panel the data cannot fill exposes a missing experiment; list it as above. Produce the figures themselves with the `nature-figure` skill.
-7. **Outline.** The Introduction in full: one row per paragraph with its job, the content and numbers it carries, and its closing point (what its last sentence lands on, as a phrase). For Results, map each core paragraph's reader question, observation, supported implication and role in the paper's central claim, as described in `results.md`, then show subsection order, headings (a full-sentence finding for nature-family, a short question or experiment for ml-conference) and where each weak result sits. Supporting-only paragraphs can name the claim they support. For Methods, show only the rows where a choice is made: main text or Supplementary and the tier (novel, critical, routine, environment).
-8. **Format**, only where it differs from the defaults or is unknown: venue profile, target length, spelling, output format, citation placeholders.
+Position the intended contribution relative to the closest established accomplishment and what the work adds for the reader. When no message is supplied, compare plausible contributions within the author's direction and select a provisional one. When a message is supplied, use prior work and the evidence to make it accurate and intelligible; change its purpose only when the evidence requires it or the author directs it.
 
-Before asking for acceptance, check the load of the outline: a paragraph that must carry two claims, an Introduction preview with more than two headline numbers, or a Methods subsection that mixes a novel component with routine settings gets a proposed split, and the author decides.
+Credit what the closest prior work already achieves and identify the supported increment: an explanation, decision, capability, domain of evidence, resource or trade-off. A useful empirical or methodological contribution does not need to establish a new general principle. Explain its value and acknowledge its novelty limits without replacing the author's scientific question.
 
-## Discussion
+Give each important comparison its logical role in the supplied purpose. A study can establish a useful outcome, test an added component, investigate an information source or distinguish explanations; these are different arguments. Controls can explain a method's usefulness and conditions without becoming the paper's central question. Keep the comparator and the conditions that determine each inference attached in the working record. An adverse or null result may narrow a claim, constitute a complementary finding or overturn its premise. Preserve that consequence, and make a diagnostic finding central when it answers the author's question or the evidence requires a different one.
 
-- After a revision, show only what changed.
-- When the author fixes how a method, dataset or result must be described, add the wording to the project facts file in the same turn, as well as to the plan.
-- Keep the author's wording for the difference and the headline when it is accurate. When it overstates the evidence, show the accurate version beside it and name the result that bounds it. The author chooses the framing and the emphasis; the scope words the evidence requires are not a choice, and the plan records the scoped version. An author's confirmation makes an interpretation the paper's framing, not evidence: it is still stated at the strength its support allows, and an item marked as not run stays unverified.
-- "Left out" and "Supplementary" are placements only for unverified items and for weak results outside the scope of every headline claim. A result that bounds or contradicts a headline claim is placed beside that claim in Results, and the claim narrows, whatever placement is preferred.
-- End each pass with one explicit question: whether to draft the named sections with this plan. Apart from the proposed first sentence and Turn sentence, draft prose only after the author accepts. A request to explore, silence, a timeout or the existence of a plan file is not acceptance while the author can answer.
-- After acceptance, every section follows the plan without asking again. A substantive departure (a new headline, a dropped result, a changed scope) goes back to the author; wording and fit do not. A plan never overrides the materials: where it conflicts with them or with the non-negotiables, follow those and tell the author.
-- Save the accepted plan as `plan.md` beside the draft, with its status ("accepted"), the sections it covers, the date and the author's words of acceptance, so that a later session or another writer works from the same plan. A plan the author has not reviewed is saved with the status "provisional".
+## Make the editorial choices
 
-## Example of a first pass (synthetic; the system and numbers are invented)
+Apply the editorial decisions below and the target context in `venue-adaptation.md` to explain the message to these readers. Identify the prior work and results needed to make it credible. Keep novelty distinct from better performance, and never change facts to fit the journal.
 
-> **줄거리**
-> 1. 잡음 속 음성 인식은 같은 발화라도 잡음 조건에 따라 오류가 크게 달라짐.
-> 2. 잡음 증강 학습은 잡음 조건의 오류를 낮추지만, 깨끗한 버전과 잡음 버전의 예측을 서로 맞추는 학습 신호는 없음.
-> 3. 우리는 두 버전의 frame posterior를 맞추는 일관성 항을 CTC 손실에 더함.
-> 4. 잡음 조건 평균 오류가 기존 최고 모델 대비 12.9%에서 8.4%로 내려가고, 차이는 가장 시끄러운 조건에서 가장 큼.
->
-> **방향**
-> - 가장 가까운 선행 연구: 잡음 증강 학습. 잡음 조건의 오류를 낮추지만 두 버전의 예측을 맞추도록 학습하지는 않음.
-> - 차이: "Rather than only adding noisy copies to the training data, we train the recognizer to give the same frame-level predictions for an utterance and its noisy copy."
-> - 범위 단어: "in noisy conditions". 깨끗한 음성에서는 차이가 0.1포인트라 헤드라인 범위에 넣지 않음.
-> - 첫 문장 후보: "Even the strongest recognizer we compare makes about four times as many word errors on noisy speech as on clean speech."
->
-> **헤드라인**
-> - 평균 WER, 잡음 조건 전체: 기존 최고 모델 12.9% → 8.4% (Table 2).
-> - 범위를 정하는 약한 결과: 깨끗한 음성 3.2% 대 3.1%. 헤드라인에 "in noisy conditions"를 붙임.
->
-> **질문**
-> 1. 헤드라인을 평균 WER로 둘까요, −5 dB 결과(21.3% → 12.6%)로 둘까요? 추천: 평균 WER. 모든 잡음 조건을 대표하고, −5 dB는 그 안에서 차이가 가장 큰 조건으로 바로 뒤에 둡니다.
+Outline sections when useful to resolve missing reasoning or coordinate a larger manuscript; leave paragraph order and depth to the argument. Arrange figures as evidence for the scientific questions; map each proposed panel to actual data. Choose Methods placement by explanatory importance, reproducibility and the target format. Use the appropriate figure skill named in SKILL.md when figures themselves are requested.
 
-The first-sentence candidate rests on the strongest baseline's 3.2% on clean speech and 12.9% averaged over the noise conditions, both in the notes; the ratio of about four is a computed number and goes to Notes to author.
+Keep this work compact. The author need not see every alternative framing, result tier, scope check or formatting choice. The final manuscript should express the selected scientific argument directly.
+
+## When the author requests a planning discussion
+
+Present the plan in the author's language, with the proposed central sentence and any manuscript wording in English:
+
+1. **Message and importance:** what the work shows, what is new and why it matters to the target readers. Include the strongest supporting results and any contrary finding that changes this choice.
+2. **Argument:** the proposed opening and the role of each main section or figure. Explain a consequential choice briefly. Show an alternative only when there is a real competing direction.
+3. **Decisions needed:** at most three material questions, each with a recommendation when possible. Do not ask the author to approve routine phrasing or every paragraph.
+
+Provide a detailed outline or evidence table when requested or when needed to resolve a disagreement; do not require a second planning round by default. In an explicit planning discussion, ask whether to draft with the selected direction. A request to explore or the mere existence of a plan file is not acceptance of a proposed plan.
+
+## Preserve the agreed direction
+
+- Keep accurate author wording and disciplinary terminology. When proposing an edit to supplied prose, mark changes inline and follow `revision.md` for the requested review format.
+- When the author fixes a scientific description, record it in the project facts and plan so later sections use the same meaning.
+- Preserve material unfavorable results in the scientific argument. Their relevance determines placement; a result contradicting the central claim cannot be removed for a cleaner story.
+- An accepted plan governs the direction, not every sentence. Ordinary structural and wording improvements proceed without another approval. Explain a material departure when the evidence requires it; do not silently substitute a different paper.
+- Save a plan only when useful for continued work or delegation, beside the draft as `plan.md`. Record the sections covered, date and status. An accepted plan includes the author's acceptance; an internally selected plan is provisional. Reuse it rather than restarting planning for each section.
+
+
+## Detailed planning decisions
+
+Make these from the inputs and verified journal sources. They guide the writing privately; show a concise rationale when the author requests a planning discussion. Never print these labels or the audit in the manuscript.
+
+1. **Prior work and novelty.** Locate the contribution accurately without requiring a new central sentence. Keep conceptual, algorithmic, statistical or empirical novelty distinct from better performance, and preserve dependencies that change the claim. Use an assumption → failure → change argument only when supported; never invent a shared assumption or failure. If the supplied message claims an unsupported difference, correct its scope and flag the consequential issue in Notes to author.
+2. **Result roles.** Identify which findings carry the paper's contribution, which support it, which are less favorable to its claims and which remain unverified. Use these roles to choose an accurate argument, not to impose a quota or supply headings to the composer. A result that a later experiment corrected or superseded enters only in its corrected form. Less favorable results can include losses on secondary settings, ties, small or noisy gains. A result that overturns a central claim requires narrowing or changing that claim, not a weak-result label. A trade-off, null or adverse result that answers the paper's question is a finding. Anything the notes mark as not run, not confirmed or assumed never becomes a finding.
+3. **Methods tiers.** Sort every method detail into *novel*, *critical* (needed to understand the contribution, reproduce a reported number or judge whether a comparison is fair), *routine* (standard and citable) and *environment* (software, hardware and incidental engineering).
+4. **Journal and readers.** Identify the exact target, article type, intended readers and contribution, using `references/venue-adaptation.md`. Decide what those readers already know, why the supported contribution matters to them, how the argument should develop and which disciplinary terms describe it. Treat a missing journal as an editorial choice to infer from the request, not a reason to stop or assign a prestige category. Neither journal reputation nor exemplar wording changes the facts.
+

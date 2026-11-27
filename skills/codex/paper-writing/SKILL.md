@@ -1,110 +1,67 @@
 ---
 name: paper-writing
-description: Plan with the author, brief a writer, and write or revise English research-paper prose (Introduction, Methods, Results, Discussion, abstract) for any journal or conference, at the level of Nature-family journals and NeurIPS, ICML or ICLR oral papers, from notes (including Korean notes), result tables, logs or an existing draft. Use whenever the output is manuscript prose, including 논문 써줘, 초안 작성, 논문화, 논문 문단, manuscript로 정리, 논문 방향 같이 정하자, Introduction/Methods/Results 써줘, 다듬어줘, 원고, 고쳐줘, 업데이트해줘 (on a research manuscript, including live Overleaf documents), 작성 지시문/프롬프트 만들어줘, "turn these notes into a Results paragraph", "draft the Methods", "tighten the Methods", "write a brief for a writer agent". Not for reports or summaries addressed to the requester, slides, grant forms or code documentation.
+description: Write or revise English research-paper prose (Introduction, Methods, Results, Discussion, abstract) from research notes, tables, logs or a draft, adapting the scientific framing, argument, explanation and disciplinary language to the target journal or conference and article type. Plan with the author when requested, or proceed from a supplied direction; brief a separate writer when needed. Use for 논문 써줘, 초안 작성, 논문화, 논문 문단, manuscript로 정리, 논문 방향 같이 정하자, Introduction/Methods/Results 써줘, 다듬어줘, 원고, 고쳐줘, 업데이트해줘 (on a research manuscript, including live Overleaf documents), 작성 지시문/프롬프트 만들어줘, "turn these notes into a Results paragraph", "draft the Methods", "tighten the Methods", or "write a brief for a writer agent". Not for reports to the requester, slides, grant forms or code documentation.
 ---
 
 # Paper writing
 
-The manuscript text you produce is the paper. A reader at a top venue should finish it knowing exactly what is new, able to trust and reproduce every number, and carrying the strongest results in mind. Nothing in it is addressed to the person who gave you the notes.
+Write the scientific argument the intended reader needs: why the question matters, what the study changes and how its evidence supports that change. Use natural disciplinary language. The manuscript is the paper; planning, evidence audits and instructions to the author stay outside it.
 
-## Workflow
+The author's message and the complete research record govern the work. Carry the author's original central sentence or framing directly into composition and develop its scientific meaning. This message states what the paper should communicate, not where the Introduction must begin. Choose a provisional message only when none is supplied; correct or qualify a supplied message when the evidence requires it. Every factual claim, number, citation and explanation must be supported; preserve material contrary findings and the conditions that change interpretation. Never invent a result, mechanism, priority claim or failure of prior work to improve the story.
 
-1. **Agree on the direction with the author** before drafting a new paper or a new set of sections (`references/planning.md`). Build the plan from an audit of the full research history, not from the latest or the most favorable results. Turn the materials into a writing plan (the story, the difference, every result with its placement, the figures and a paragraph-level outline), discuss it, and draft prose only after the author accepts it. Skip this step for a revision of one passage, when the author has already accepted a plan for these sections, or when the inputs include a writer package from step 2 (`plan.md` with `brief.md`).
-   Also skip it in any run where no one can answer before the text is due: a run started by another agent or a script, a batch run, or a prompt that says to skip planning. There, make the four decisions below privately, outline each section privately (every paragraph's job and the point its last sentence lands on, so that each paragraph can open from where the previous one ended), write the sections without stopping to ask, and list each open decision with the choice you made in Notes to author. Any discussion the author asked for belongs to whoever started the run, before it starts.
-   A plan never overrides the inputs or the non-negotiables: where it conflicts with them, follow them and list the departure in Notes to author.
-2. **Brief a writer** when another agent or model will draft the text, or when the author asks for the prompt (`references/delegation.md`): package the facts, the accepted plan and the writing instructions so that a writer with no other context can draft from them.
-3. **Write** each section from the plan with its guide below and the contrasting examples in `references/register.md`.
-4. **Integrate the paper** before final wording: read `references/integration.md` and check the assembled draft against the agreed one-sentence central message. Reconcile the question, evidence and conclusion across sections, then polish the prose and run the self-check. For a scoped revision, use the available surrounding text and preserve the authorized edit boundaries.
-5. **Verify references last, before finalization.** After the last substantive edit, invoke the `reference-verification` skill in **full** mode on the actual deliverable and supplied SI. Resolve or report its metadata and citation-support findings before declaring the manuscript reference-cleared. A metadata-only check is permitted when explicitly requested, but does not clear the whole manuscript. This mandatory check grants no additional editing permission.
+## Separate editorial preparation, composition and correction
 
-## The four decisions behind the plan
+The coordinating agent owns the complete research record, all applicable skill instructions and the final deliverable. For a new Introduction, a complete section draft or a substantial rewrite, use the fresh-context protocol in `references/delegation.md`: prepare the editorial brief, commission composition in a context without the preparation history, and check the resulting text in a separate correction context. A new heading or a request to forget instructions does not create a fresh context. Use the documented fallback when separate contexts are unavailable. Keep narrow edits proportionate to their authorized scope.
 
-Make these from the inputs. In step 1 they are the core of the plan the author sees; without a discussion, make them privately. They are never printed in the manuscript.
+These are internal roles within one invocation, not additional approval rounds. A supplied direction and request for prose authorize ordinary editorial decisions and completion. Preserve explicit requests to discuss direction first, accepted plans, revision boundaries and inline change marking.
 
-1. **The difference.** Name the closest prior work and what it already achieves, then what this paper does or shows that it does not: a changed assumption, a new capability, a measurement, a theory, a dataset or a better trade-off. Write it as one sentence naming both sides, concrete enough that a specialist could disagree. Say where the novelty lies (conceptual, algorithmic, statistical or empirical) and keep it apart from any claim of outperforming prior methods: being new and being better are separate claims, each with its own evidence. Scope it to what the work actually delivers: if a result still depends on a human decision, a reference measurement or a stated condition, that dependence belongs inside the difference, not in a later sentence that takes part of it back. Tell it as assumption → failure → change only when the inputs support that story; never invent a shared assumption or a failure to make the contrast neater. Other supported contributions stay, subordinate to this central one. If the inputs support no clear difference, write the strongest contrast they do support and flag it in Notes to author.
-2. **Result tiers.** Sort every result into *headline* (the one or two that carry the paper), *supporting*, *weak* and *unverified*. A result that a later experiment corrected or superseded enters only in its corrected form. Weak means less favorable to the paper's claims without overturning them: losses on secondary settings, ties, small or noisy gains. A result that would overturn a headline claim is not weak: narrow the claim until the result no longer contradicts it, and the result then bounds the narrowed claim. A trade-off, null or adverse result that answers the paper's question is a finding, not a weak result. Unverified means anything the notes mark as not run, not confirmed or assumed; it never becomes a finding.
-3. **Methods tiers.** Sort every method detail into *novel*, *critical* (needed to understand the contribution, reproduce a reported number or judge whether a comparison is fair), *routine* (standard and citable) and *environment* (software, hardware and incidental engineering).
-4. **Venue profile.** `nature-family` or `ml-conference` (table below), inferred from the inputs when not stated.
+### 1. Understand the message and evidence
 
-## Guides
+Read the research record, including the author's problem-formulation notes, corrections and unfavorable results. Follow `references/planning.md` to establish the evidence for the message, position the contribution accurately and identify any missing premises. Read the applicable section guides, `references/integration.md`, `references/accuracy.md` and `references/prose-audit.md` in the coordinator's context. Read all five contrasts in `references/register.md` before preparing any manuscript draft. For an Introduction, also read `references/argument-example.md`.
 
-Read the guide for the task or section at hand, plus `references/register.md`, including its contrasting examples, whenever you write manuscript text. Apply the examples' editorial decisions, not their sentence patterns.
+For a new or changed target, follow `references/venue-adaptation.md`, the relevant entry in `references/journal-profiles.md` and matched article analyses. Obtain public guidance and examples yourself; do not ask the author to assemble a style profile. Examine complete Introduction or opening prose from matched primary articles before a new draft, and make that prose available to the composer through permitted private inputs or verified source access.
 
-| Task | Guide |
+Use the compact handoff specified in `references/delegation.md`. Pass through the author's original message and authorized framing; add connected framing only where an actual premise is missing. Supply the venue and output requirements and keep complete facts separately available. Select results for their role in the author's question, retaining material contrary findings. Change the purpose only when the evidence requires it or the author directs it.
+
+When the direction and a request for prose are supplied, make routine editorial choices and proceed. Discuss the plan first only when the author requests that discussion. Reuse accepted plans and supplied writer packages. Ask about a missing fact only when it materially changes the paper and cannot be handled locally; continue the useful work. An internal plan is provisional, not author-approved.
+
+### 2. Compose and reconstruct
+
+Start the composer without inherited conversation history. Supply `references/composition.md`, the author's original message and authorized writing references, the editorial brief, the complete research facts, the named published openings and any authorized revision text. Do not send this coordinating guide, detailed planning or audit instructions, or preparation transcripts to the composer. Translate the five register contrasts into the positive writing intent in the composition card and the task's scientific brief; do not turn them into a checklist to narrate.
+
+Have the composer read the author's message, complete facts and source openings, then develop the scientific argument in the field's language. The brief supplies task decisions and any missing premises. For an Introduction, normally establish the consequential problem and narrow naturally to the specific question and contribution; introduce demonstrations after their significance is clear. Let the argument determine paragraph order, count and depth, without a quota for technical details or numerical results.
+
+Read the draft as a manuscript, then apply `references/integration.md` in the coordinator's context. When the reason to read or the connection between question and answer is missing, return a short scientific instruction to the composer and reconstruct the affected argument. Do not repair an unresolved argument by adding audit prose. For a scoped revision, follow `references/revision.md`, preserve the authorized boundaries and mark proposed changes inline.
+
+### 3. Verify and deliver
+
+After argument revision, use a separate correction context as specified in `references/delegation.md`. Give it the actual draft, complete record, binding author decisions, source material and detailed accuracy and prose guides. Check every claim against the record, including unfavorable comparisons. Require identifiable errors, consequential omissions and precise repairs; distinguish these from editorial preferences. Preserve a coherent argument unless the evidence requires rebuilding it. Recheck any substantive correction against its source and surrounding meaning. Removing report tone must never strengthen a claim.
+
+After the last substantive edit, invoke the separate `reference-verification` skill in **full** mode on the actual deliverable and supplied SI. Resolve or report metadata and citation-support findings before declaring the manuscript reference-cleared. A metadata-only check applies only when explicitly requested and does not clear the whole manuscript. For an isolated writer, the coordinating agent owns retrieval and this final check. It grants no additional editing permission.
+
+Return the requested manuscript in the input's LaTeX or Markdown format. If references remain unresolved, label it a draft and state the specific unresolved items. Add `---` and `Notes to author` only for matters requiring attention: factual conflicts, placeholders, consequential departures or decisions, nontrivial derivations or computations, and missing figures, definitions or supplementary items. Use the author's language for these notes. Keep the complete audit in working notes; do not print routine editorial checks or unrelated untested possibilities.
+
+## Select the relevant guides
+
+| Task | Read |
 |---|---|
-| Writing plan and discussion with the author | `references/planning.md` |
-| Writer package and delegation prompt | `references/delegation.md` |
-| Revising an existing or live shared manuscript | `references/revision.md` |
-| Introduction | `references/introduction.md` |
-| Methods, Experimental setup | `references/methods.md` |
-| Results, Experiments | `references/results.md` |
-| Figures and panels | the `nature-figure` skill for quantitative data charts and multi-panel plots, and the `concept-figure` skill for schematic, architecture, mechanism or pipeline diagrams; read the matching skill before planning or producing any figure |
-| Final integration across sections | `references/integration.md` |
-| Final reference verification, after all substantive edits | the `reference-verification` skill, full mode ([source](../reference-verification/SKILL.md)) |
-| Abstract, Discussion | end of this file |
+| Direction, evidence selection and author discussion | `references/planning.md` |
+| Journal, readers, explanatory depth and terminology | `references/venue-adaptation.md`; relevant part of `references/journal-profiles.md` |
+| Matched published examples | Relevant articles in `references/corpus-nature-biotech.md`, `references/corpus-computational-ai.md` or `references/corpus-chemistry.md` |
+| Orchestrate fresh composition and correction, or produce a writer package | `references/delegation.md` |
+| Instructions given to the fresh composer | `references/composition.md` |
+| Revise an existing or live shared manuscript | `references/revision.md` |
+| Introduction | `references/introduction.md`; `references/argument-example.md` |
+| Methods or Experimental setup | `references/methods.md` |
+| Results or Experiments | `references/results.md` |
+| Abstract or Discussion | `references/abstract-discussion.md` |
+| Coordinator preparation for every manuscript-writing task | All five contrasting examples in `references/register.md` |
+| Substantive revision and alignment across sections | `references/integration.md` |
+| Coordinator preparation and separate correction after substantive revision | `references/accuracy.md`; `references/prose-audit.md` |
+| Final reference check | Separate `reference-verification` skill, full mode ([source](../reference-verification/SKILL.md)) |
 
-Before editing this skill itself, read `references/user-decisions.md`.
+For quantitative charts and multi-panel plots, read the `nature-figure` skill before planning or producing the figure. For schematic, architecture, mechanism or pipeline diagrams, read `concept-figure`. Do not invent missing data or make explanatory figures substitute for evidence.
 
-## Non-negotiables
+For a writer-package request, return the self-contained package and prompt specified in `references/delegation.md`. For an explicitly requested planning discussion, return the concise plan in the author's language before drafting. A supplied direction otherwise permits completion in one invocation.
 
-- **Accuracy over emphasis.** Every device here for emphasis or de-emphasis works inside the evidence. If a device would overstate a result, hide a qualification that changes a headline claim, or drop an explanation the reader needs, do not use it. When a placement or length preference conflicts with accuracy, accuracy wins.
-- **Claims carry their correct scope every time they appear.** State each capability at the strength the evidence supports the first time it appears, and repeat its scope words wherever it reappears, so that no later sentence has to take it back. "Confirms", "validates", "proves" and "ensures" need an analysis designed to show exactly that, with an outcome that does; agreement with an earlier estimate is "consistent with" it. Downstream effects and generality are possibilities ("can bias the inferred trajectories"), not universals ("biases every inferred trajectory"), unless shown.
-- **Numbers.** Every number in the text appears in the inputs with the same value, unit, comparator and basis (per sample, per step, per device, in total), or is computed from them with ordinary rounding. A computed number keeps the basis of its inputs, and a change of basis (per item to total, percentage points to percent) is itself a computation; list each computed number with its computation in Notes to author. The only other numbers allowed are the premises of an illustration framed explicitly as hypothetical (`references/introduction.md`), never attributed to a real system or to this work. Never change a value to make it look better.
-- **No fabrication.** No citations, baselines, datasets, mechanisms, motivations, sampling schemes, statistical tests, symbol meanings, supplementary items or "first" claims the inputs do not support. Where a citation is needed and missing, write `[CITE: what is needed]`.
-- **Clean register, same strength.** Removing report tone never strengthens a claim. A tentative note becomes the measured result with its tested conditions and range, not a general statement; an observed range is not independence, and a tested domain is not generality.
-- **Less favorable results** get space in proportion to their bearing on the claims, are never deleted when they bear on a claim and are never misstated. A result that bounds a headline claim narrows the claim's wording wherever the claim appears ("lowers the error on noisy recordings" rather than "lowers the error"), and its numbers sit in Results beside that claim, in a compact clause. Only weak results on secondary settings, outside the scope of every headline claim, move to the Supplementary, with a pointer. Replace a weakness label with the factual comparison; never announce weakness as a topic ("Two further results are weak", "The evidence is mixed").
-- **Register.** No status reports, process narration, summary labels or messages to the author in manuscript text (`references/register.md`).
-- **Explanation and interpretation stay.** Keep every explanation a reader outside the subfield needs: why the obstacle exists, what a term means, what a design choice changes, and what each novel or critical step of a method does. Reasoning that follows from what the inputs state, by a step a specialist could check without outside data (a consequence of an equation, what a parameter controls, which alternative explanation a matched setting removes), is explanation, not fabrication, so give it. Identify its premises, keep the quantity it is about (the term, not the whole objective) and every condition it needs: a consequence shown for fixed parameters, a finite range or one matched quantity says nothing outside that domain, and plausibility alone is not derivation. Give an explanation where it closes a gap in the reader's understanding, not after every routine operation. Why the authors chose a step, why it improves results, how alternatives would behave and the range over which an approximation holds are motivations, causes or empirical claims: they need the inputs, or the inputs' own formulas for a range. A property derived this way stays a property and never becomes an untested capability ("needs no transcript" is a property; "exploits untranscribed audio" is a capability). In Results, say what a finding means for the paper's question whenever the data support an implication. Cut generic filler. Select and place other details by their role in the paper's argument and reproducibility, preserving information that changes a claim's meaning or validity; the source notes remain complete.
-- **American English** (analyze, modeling, normalization, behavior, favorable, judgment) unless the author's draft or the venue uses British spelling. Proper names keep their own spelling.
-- **No fixed template.** Paragraph order and count follow the argument of this paper. The numbers in this skill (paragraph counts, sentence lengths, word ranges) are diagnostics that prompt a second look, not shapes to fill.
-- **Revision mode.** When revising a draft, change what the author asked for and, inside the passages that request covers, what violates this skill; keep the author's structure, terminology, citations and claims. Follow `references/revision.md` for before/after drafts, numbers-only updates and anything applied to a live shared manuscript.
-
-## Venue profiles
-
-Stylistic defaults, not submission specifications. When the author supplies the journal's or conference's instructions (word limits, section labels, required statements), those win.
-
-| | nature-family | ml-conference |
-|---|---|---|
-| Reader | scientist outside the subfield | ML researcher outside the subtopic |
-| Opening | Nature uses an unlabeled summary paragraph; most other titles use a labeled abstract. Write the one the target uses, not both | abstract |
-| Introduction | typically 4–6 paragraphs; usually closes with a "Here we …" paragraph that states the advance and its decisive evidence | typically 4–6 paragraphs; closes with the key results and, if it helps navigation, a 3–4 item contributions list; broader prior work goes to a Related Work section |
-| Methods | at the end, short descriptive subheadings; extra figures and tables that support the argument go to Extended Data where the journal has it, long protocols and derivations to Supplementary Information | problem formulation and method in the main text; setup at the start of Experiments, with a table when several models or settings are compared; full details in the appendix |
-| Results | subsections whose headings are full-sentence findings with their scope; continuous prose inside a subsection, without bold run-in labels; figures cited inline in parentheses, never in headings | Experiments organized around the paper's empirical questions: setup, main comparison, ablations, analysis; short bold paragraph labels naming a question or experiment are acceptable |
-| Required extras | data and code availability as the journal requires | a Limitations section or checklist answers when the venue requires them |
-
-## Output
-
-- In step 1, return the plan in the author's language, not manuscript text; in step 2, the package files and the prompt (`references/delegation.md`).
-- After steps 3–5, return the manuscript text, in LaTeX or Markdown to match the inputs or the author's draft; if reference verification is not clear, label the delivery as a draft and state the unresolved items.
-- If anything needs the author's attention, add after the text a line `---`, the literal English heading `Notes to author` (kept in English so tools can find it) and at most one bullet per category, in the language of the notes unless the brief names one, each listing every item of its category: open planning decisions, each with the choice made; departures from a supplied plan, with the reason; nontrivial derivations added beyond the inputs, with their premises; unverified claims left out; weak results moved to the Supplementary; boundaries left for a Discussion or Limitations section not written here; `[CITE]` and `[AUTHOR]` placeholders; computed numbers with their computation; Supplementary or appendix items the text now points to; symbol definitions to confirm; numbers that could not be traced. Omit the block when it would be empty.
-
-## Self-check before returning
-
-Fix every failure, then return.
-
-- [ ] Complete the integration pass in `references/integration.md`: the sections address the same central message at the same evidential scope. Compare the draft's editorial choices with the examples in `references/register.md`; facts are organized into findings, and each limitation earns its place by changing interpretation or satisfying a venue requirement.
-- [ ] Someone who reads only the Introduction could restate the difference in one sentence, and it matches decision 1. No later sentence takes back part of it, and every restatement keeps its scope words.
-- [ ] Introduction: the first sentence is a plain, confident statement specific to this topic: no frequency hedge ("sometimes", "often") or softening modal ("can differ"); if the fact holds only under a condition, the condition is stated instead. No notation in the first paragraph, which reads easily for a scientist outside the subfield, joins related facts instead of listing them as short declaratives, and makes the problem concrete.
-- [ ] No opener or sentence that could begin any paper in the field.
-- [ ] Each paragraph connects to where the previous one ended, in the argument rather than by repeated words, and none re-explains the paragraph before it.
-- [ ] Every acronym is spelled out at first use, in the Introduction and again in Methods; every symbol is defined before or where it is first used. The Introduction averages at most 25 words per sentence; any sentence over 40 words has been reread and split if it carries two ideas.
-- [ ] Methods: quantities are defined before the equations that use them; after each novel or critical step the reader learns what it does or implies, in this paper's quantities, wherever that follows from the inputs; any control, floor or reference that results are read against is defined in the problem setup; every novel and critical item is present with exact values; routine items take a clause and a citation; environment details sit in a Supplementary table; every setup-table column carries per-row values, and the prose does not repeat the table; no [AUTHOR] marker sits in a sentence that can stand without it; no motivation, symbol meaning or pointer goes beyond the inputs.
-- [ ] Results: the section opens with the motivation of its question and the scoped headline answer; each headline result is the claim of its paragraph, with comparator, number and figure or table reference close by; claims are followed by what they mean whenever the data support an implication; complete the semantic review in `references/results.md` for the paragraph argument, each case's added explanation and the premises of each inference; no weak result is a heading, topic sentence or paragraph of its own; no closing summary, and no closing paragraph that only lists caveats.
-- [ ] No report-register phrase, summary label, British spelling (unless the author uses it) or non-English text in the manuscript.
-- [ ] No claim is stronger than its evidence; every number is traced to the inputs with its unit, comparator and basis.
-- [ ] The separate `reference-verification` skill has checked the delivered main text and supplied SI in the required mode; remaining findings and the checked saved artifact are stated accurately.
-
-If a shell is available, `python3 -I <skill folder>/scripts/check_prose.py DRAFT --notes NOTES --section intro|methods|results` reports report-register phrases, weakness signposts, summary labels, British spellings, words to review in context, generic openers, untraced numbers, undefined acronyms, non-English text, layout patterns and sentence lengths; `--section intro` adds checks on the first sentence and paragraph. It tests whether each number occurs in the notes, not its sign, unit, comparator or provenance; check those by reading. It does not assess the paragraph's role in the argument, a case's explanatory value or whether an inference follows from its premises; passing it does not replace semantic review. A match marked for review is a prompt to reread, not an instruction to delete.
-
-## Abstract or summary paragraph
-
-- nature-family: make the problem matter to a broad scientific reader in a sentence or two, name the specific obstacle, state the advance ("Here we show …"), give the decisive evidence with one or two numbers, and say what it makes possible. It is an argument, not a compressed results table. Nature's summary paragraph is about 200 words and may cite; follow the target's format otherwise.
-- ml-conference (about 150–250 words): the problem, why current methods fall short (the mechanism, not "they have limitations"), the key idea, headline results against the strongest baseline, and code or data release if any.
-- No weak results, no hedge stacks, no conditional best cases ("reaching 63% at the largest model size"). A boundary that changes the headline claim is folded into the claim itself ("on noisy recordings, …").
-
-## Discussion
-
-- Open with what the paper established, in one or two sentences, in the terms of the difference; do not recap every result.
-- Explain how the findings change the picture relative to the closest prior work. Keep established explanations apart from interpretations, and address an alternative explanation when a reader would raise it.
-- State limitations as boundaries of the evidence ("All simulations use periodic boundary conditions, which limits the evidence for finite systems"), never as status ("finite systems have not yet been tested"). Do not infer failure outside the tested domain, or prescribe a remedy, unless the inputs establish it.
-- End on the strongest grounded conclusion. Add a future direction only when it follows specifically from the findings.
+Before editing this skill itself, read `references/user-decisions.md`. Writers do not need that maintenance record.
