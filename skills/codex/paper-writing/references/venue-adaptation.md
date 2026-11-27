@@ -2,7 +2,7 @@
 
 Use this for a new paper, a changed target or a substantial reframing. The author supplies the research direction and target; obtain the relevant public material and make ordinary editorial choices yourself. Keep the working context compact, reuse it within the project, and never require the author to build a journal profile or terminology file.
 
-The coordinator owns this preparation. Give the composer a short scientific and editorial brief plus the actual matched opening prose; do not pass this entire discovery guide or the preparation transcript. Follow the role-specific context and source-access protocol in `delegation.md`.
+The coordinator owns this preparation. Give the composer the author's original message, a short scientific and editorial brief and the actual matched opening prose; do not pass this entire discovery guide or the preparation transcript. Follow the role-specific context and source-access protocol in `delegation.md`.
 
 ## Establish the context
 
@@ -32,13 +32,13 @@ Extract decisions, not phrases to imitate:
 
 A few examples reveal possible arguments, not a journal-wide template. Keep official requirements, observed choices and the strategy chosen for this paper distinct in working notes.
 
-Turn the reading into the short editorial brief specified in `delegation.md`. Explain what the intended readers care about, the live issue after the closest accomplishment, why the study's organizing idea responds to it and what the supported addition changes. State why the matched examples are useful and the disciplinary relationships and terms needed for this subject. Use the examples to choose the appropriate starting scale and explanatory depth for the normal progression from scientific problem to specific question. Record a departure when a particular phenomenon or system already supplies the motivating significance; do not use an exception to leave the opening strategy undecided. The brief guides the argument without prescribing its sentences or exact paragraph count.
+Use the reading to inform the short brief specified in `delegation.md`: the readers' assumed knowledge, necessary scientific relationships and terminology, and the useful editorial choices in the matched examples. Apply these choices to the author's supplied message. Add connected framing only where an actual premise is missing; leave the prose sequence to the composer. The examples can inform starting scale and explanatory depth without prescribing sentences or paragraph count.
 
 When the coordinator retrieves examples, give the writer actual opening prose privately where permitted, or verified source access that the writer can use, together with the editorial brief. Require the writer to examine that prose; source pointers without usable access and abstract style summaries are insufficient. For an offline writer, include readable source material among the explicitly allowed private inputs. Keep published full text out of the public skill and final deliverables; do not redistribute it or transplant distinctive wording.
 
-## Choose the central question and argument
+## Explain the message to these readers
 
-Find the most consequential question for these readers that the supplied work actually answers. Consider whether the contribution changes understanding, enables a useful capability, resolves a disagreement, improves a measurement or method, establishes a boundary, or supplies a resource. These are possibilities, not a mandatory taxonomy. Choose a consequential starting problem at the scale of the actual contribution and readership. A specialist question can carry substantial significance; breadth does not require a claim about an entire field.
+Explain why the supplied message matters to these readers. If no message is supplied, select the most consequential supported question within the author's direction. The contribution may change understanding, enable a capability, resolve a disagreement, improve a measurement or method, establish a boundary, or supply a resource; these are possibilities, not a taxonomy to impose. Choose a starting problem at the scale of the actual contribution and readership. A specialist question can carry substantial significance; breadth does not require a claim about an entire field.
 
 When the direction is not already settled, compare plausible framings privately and select the best supported one. Do not automatically describe a substantive finding as an implementation change, or enlarge a limited comparison into a demonstrated practical benefit. Tie the selected message to actual results in working notes. Keep evidence-status labels and inventories of untested extensions out of the prose.
 
@@ -58,7 +58,7 @@ Read terms in their scientific relationships. Note which object a verb acts on a
 
 ## Integrate and reuse
 
-Use the selected question and reader assumptions across the title, abstract, Introduction, Results and Discussion. Check both overstatement and understatement of the contribution. Preserve meaning through the surrounding scientific context rather than repeating qualifiers. Apply the target's actual section, abstract, heading and supplementary-material requirements.
+Use the author's message and reader assumptions across the title, abstract, Introduction, Results and Discussion, or the provisional message when none was supplied. Check both overstatement and understatement of the contribution. Preserve meaning through the surrounding scientific context rather than repeating qualifiers. Apply the target's actual section, abstract, heading and supplementary-material requirements.
 
 Keep useful source pointers and editorial choices in the existing plan or brief. Reuse them for passage revisions; refresh them when the target, contribution, article type or relevant source changes. A source used as a writing example is not automatically a scientific citation in the manuscript.
 
