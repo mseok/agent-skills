@@ -14,7 +14,7 @@ Construct the introduction as connected reasoning. Each paragraph should leave t
 
 ## Opening and importance
 
-Normally begin with the consequential broader scientific problem that motivates the study and narrow naturally toward its specific question. Choose a starting scale at which the intended readers can understand what is at stake, then explain the difficulty that makes a more specific question necessary. Breadth should supply a useful premise; a general declaration that a field is important does not do this work.
+Normally begin with the consequential broader scientific problem that motivates the study and develop the relationship that makes this particular question follow. Choose a starting scale at which the intended readers understand what is at stake. General importance can establish the stakes, but the opening movement must also explain the difficulty or opportunity at the scientific scope of the contribution. Develop that connection from the supplied premises; their presence in the record does not mean their relationship has been explained in the prose.
 
 Establish why the research matters before introducing its particular test systems, datasets or experimental comparisons. These can make the approach and evidence concrete once the motivating problem is clear. Begin with a specific system only when that problem itself carries the paper's significance and fits the author's direction; an available or vivid example is not sufficient.
 
@@ -28,7 +28,7 @@ Make the remaining question follow from what is already possible. Existing demon
 
 ## Contribution and evidence
 
-Explain the contribution in the same scientific terms used to motivate it. For a method, give its organizing idea and the operations necessary to understand that idea. Explain the method through the decision it enables or the scientific difficulty it addresses. An operational rationale describes what the procedure does; a claim that a component caused an empirical benefit requires suitable evidence. A list of all components, input fields, fallback behaviors or software interfaces is usually a Methods description. Keep a detail here when it explains the scientific advance.
+Explain the contribution in the same scientific terms used to motivate it. For a method, explain its organizing idea through the scientific objects involved and what the procedure represents, changes or measures. When a contribution depends on spanning different settings, make the relevant variation and shared operation intelligible; application names alone may leave that relationship unexplained. These particulars belong here when they explain the advance. Routine input fields, fallback behaviors and interfaces belong in Methods. An operational rationale follows from what the procedure does; a claim that a component caused an empirical benefit requires suitable evidence.
 
 Select a preview that helps the reader grasp the answer. This may be a qualitative finding, a capability, a contrast or a decisive quantitative result. Give a comparator, budget, unit or condition when needed to interpret a claim; leave the rest of the result table for Results. Use no quota for numerical results. End on the contribution's scientific meaning when the argument supports it, rather than repeating the study design or appending a generic future promise.
 
